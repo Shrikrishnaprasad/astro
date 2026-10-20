@@ -1,0 +1,249 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, "Segoe UI", sans-serif;
+}
+
+.tamil {
+  font-family: "Noto Sans Tamil", "Nirmala UI", "Latha", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #0f1117;
+  color: #f0f0f0;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.nav {
+  width: 220px;
+  flex-shrink: 0;
+  background: #161925;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.nav h1 {
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+
+.nav a {
+  display: block;
+  color: #cfd3e6;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.nav a.active,
+.nav a:hover {
+  background: #2a2f45;
+  color: #fff;
+}
+
+.content {
+  flex: 1;
+  padding: 24px 32px;
+  max-width: 900px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid #2a2f45;
+  font-size: 14px;
+}
+
+th {
+  color: #9aa0c0;
+  font-weight: 600;
+}
+
+input, select, button {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #333a55;
+  background: #1b1f30;
+  color: #f0f0f0;
+}
+
+button {
+  cursor: pointer;
+  background: #3a4270;
+}
+
+button:hover {
+  background: #4a5390;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.field-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #9aa0c0;
+}
+
+.pass {
+  color: #6ee7a0;
+}
+
+.fail {
+  color: #ff8a8a;
+}
+
+.card {
+  background: #161925;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.south-indian-chart-wrap {
+  position: relative;
+  width: fit-content;
+  margin: 32px 32px 40px;
+}
+
+.south-indian-chart {
+  display: grid;
+  grid-template-columns: repeat(4, 130px);
+  grid-template-rows: repeat(4, 110px);
+  gap: 2px;
+  background: #333a55;
+  width: fit-content;
+}
+
+.chart-outer-marker {
+  position: absolute;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.chart-cell {
+  background: #161925;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chart-cell-blank {
+  background: #0f1117;
+}
+
+.chart-cell-rasi {
+  font-size: 12px;
+  color: #9aa0c0;
+  margin-bottom: 3px;
+}
+
+.chart-cell-markers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-content: flex-start;
+}
+
+.chart-marker {
+  font-size: 12px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-marker-degree {
+  font-size: 9px;
+  opacity: 0.85;
+}
+
+.chart-marker-retrograde {
+  color: #ff6b6b;
+  font-weight: 700;
+}
+
+.retrograde-tag {
+  color: #ff6b6b;
+  font-weight: 700;
+}
+
+.chart-marker-planet {
+  background: #2a2f45;
+  color: #cfd3e6;
+}
+
+.chart-marker-lagna {
+  background: #6ee7a0;
+  color: #0f1117;
+  font-weight: 700;
+}
+
+.chart-marker-arudha {
+  background: #e7b96e;
+  color: #0f1117;
+}
+
+.chart-marker-mandhi {
+  background: #e76e8a;
+  color: #0f1117;
+}
+
+.chart-marker-kavippu {
+  background: #b59cf0;
+  color: #0f1117;
+}
+
+.chart-marker-jamagraham {
+  background: #6eb8e7;
+  color: #0f1117;
+  font-weight: 700;
+  border: 1px solid #0f1117;
+}
+
+.chart-marker-jamagraham-inactive {
+  background: transparent;
+  color: #6eb8e7;
+  border: 1px solid #6eb8e7;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.chart-marker-transit {
+  background: #c77eea;
+  color: #0f1117;
+  font-weight: 700;
+  border: 1px solid #0f1117;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: #9aa0c0;
+  margin-bottom: 16px;
+}
