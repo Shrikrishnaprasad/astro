@@ -1,5 +1,10 @@
-import { getLahiriAyanamsa } from "./ayanamsa";
+import { getAyanamsa } from "./ayanamsa";
 import { normalizeDegrees } from "./constants";
+import {
+  DEFAULT_EPHEMERIS_SETTINGS,
+  resolveEphemerisSettings,
+  type EphemerisSettings,
+} from "./ephemerisSettings";
 import { getLocalSiderealTimeDegrees, getMeanObliquityDegrees } from "./siderealTime";
 
 const DEG2RAD = Math.PI / 180;
@@ -28,11 +33,22 @@ export function getTropicalAscendant(date: Date, latitude: number, longitude: nu
   return normalizeDegrees(lambda);
 }
 
-export function getSiderealAscendant(date: Date, latitude: number, longitude: number): number {
+export function getSiderealAscendant(
+  date: Date,
+  latitude: number,
+  longitude: number,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): number {
+  const resolved = resolveEphemerisSettings(settings);
   const tropical = getTropicalAscendant(date, latitude, longitude);
-  return normalizeDegrees(tropical - getLahiriAyanamsa(date));
+  return normalizeDegrees(tropical - getAyanamsa(date, resolved.ayanamsa));
 }
 
-export function getLagnaRasiIndex(date: Date, latitude: number, longitude: number): number {
-  return Math.floor(getSiderealAscendant(date, latitude, longitude) / 30);
+export function getLagnaRasiIndex(
+  date: Date,
+  latitude: number,
+  longitude: number,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): number {
+  return Math.floor(getSiderealAscendant(date, latitude, longitude, settings) / 30);
 }

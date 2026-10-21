@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
+import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
 import PlanetTable from "../components/PlanetTable";
 import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
@@ -64,6 +65,7 @@ export default function LiveTransitPage() {
   return (
     <div>
       <h2>Current Live Transit (Gochara)</h2>
+      <EphemerisAccuracyNotice />
       <div className="card">
         <p>As of: {now.toLocaleString()}</p>
         <div className="field-row">

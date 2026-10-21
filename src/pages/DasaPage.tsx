@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
+import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import {
   computeVimshottariDasa,
   findActiveMahadasaAndBhukti,
@@ -97,6 +98,7 @@ export default function DasaPage() {
   return (
     <div>
       <h2>Vimshottari Dasa - Bhukti - Antara - Sukshma</h2>
+      <EphemerisAccuracyNotice />
       <DateTimePlaceForm
         submitToCalculate
         submitLabel="Calculate Dasa"

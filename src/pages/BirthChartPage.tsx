@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
+import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import JyotishScopePanel from "../components/JyotishScopePanel";
 import PlanetTable from "../components/PlanetTable";
+import PushkaraAtBirthTable from "../components/PushkaraAtBirthTable";
 import { NAKSHATRAS } from "../data/nakshatras";
 import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
@@ -11,14 +14,13 @@ import { getSiderealAscendant } from "../engine/ascendant";
 import { houseRasiIndex } from "../engine/houses";
 import { longitudeToNavamsa } from "../engine/navamsa";
 import {
-  AVAYOGI_NOT_IMPLEMENTED_REASON,
-  TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON,
+  computeAvayogi,
   computeInduLagna,
   computeYogi,
   getTithiType,
 } from "../engine/jaiminiPoints";
+import { computeTithiShunya } from "../engine/tithiShunya";
 import { computePanchangam } from "../engine/panchanga";
-import { computePushkara } from "../engine/pushkara";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
 import { computeSamvatsara } from "../engine/samvatsara";
 import { computeMandhi } from "../engine/specialPoints";
@@ -70,11 +72,6 @@ export default function BirthChartPage() {
     [input],
   );
   const birthSamvatsara = useMemo(() => (input ? computeSamvatsara(input.date) : null), [input]);
-  const moonPushkara = useMemo(
-    () =>
-      chart ? computePushkara(chart.planetRasi.Moon.rasiIndex, chart.planetRasi.Moon.degreeInRasi) : null,
-    [chart],
-  );
   const induLagna = useMemo(
     () => (chart ? computeInduLagna(chart.lagnaRasiIndex, chart.planetRasi.Moon.rasiIndex) : null),
     [chart],
@@ -83,6 +80,14 @@ export default function BirthChartPage() {
     () => (chart ? computeYogi(chart.planetLongitudes.Sun, chart.planetLongitudes.Moon) : null),
     [chart],
   );
+  const avayogi = useMemo(
+    () => (chart ? computeAvayogi(chart.planetLongitudes.Sun, chart.planetLongitudes.Moon) : null),
+    [chart],
+  );
+  const tithiShunya = useMemo(() => {
+    if (!chart || !birthPanchangam) return null;
+    return computeTithiShunya(birthPanchangam.tithiIndex, chart.planetRasi.Moon.nakshatraIndex);
+  }, [chart, birthPanchangam]);
 
   // Inside each box: this person's own birth-chart placements (planets + lagna + mandhi).
   const cellContents = useMemo(() => {
@@ -193,6 +198,7 @@ export default function BirthChartPage() {
   return (
     <div>
       <h2>Birth / Rasi Chart</h2>
+      <EphemerisAccuracyNotice />
       <DateTimePlaceForm submitToCalculate submitLabel="Calculate birth chart" onChange={setInput} />
       {!chart && (
         <p className="card" style={{ color: "#9aa0c0", fontSize: 14 }}>
@@ -324,6 +330,15 @@ export default function BirthChartPage() {
                       <td>
                         {RASIS[induLagna.rasiIndex].nameEnglish}{" "}
                         <span className="tamil">({RASIS[induLagna.rasiIndex].nameTamil})</span>
+                        <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
+                          <summary>Formula trace &amp; source note</summary>
+                          <p>{induLagna.sourceNote}</p>
+                          <ul style={{ margin: "4px 0 0 0", paddingLeft: 18 }}>
+                            {induLagna.calculationTrace.map((line) => (
+                              <li key={line}>{line}</li>
+                            ))}
+                          </ul>
+                        </details>
                       </td>
                     </tr>
                   )}
@@ -337,43 +352,53 @@ export default function BirthChartPage() {
                         </span>{" "}
                         — Yogi Graha: {yogi.yogiGraha}{" "}
                         <span className="tamil">({planetTamil(yogi.yogiGraha)})</span>
+                        · Duplicate Yogi: {yogi.duplicateYogiGraha}
+                        <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
+                          <summary>Formula trace &amp; source note</summary>
+                          <p>{yogi.sourceNote}</p>
+                          <ul style={{ margin: "4px 0 0 0", paddingLeft: 18 }}>
+                            {yogi.calculationTrace.map((line) => (
+                              <li key={line}>{line}</li>
+                            ))}
+                          </ul>
+                        </details>
                       </td>
                     </tr>
                   )}
-                  {moonPushkara && (
+                  {avayogi && (
                     <tr>
-                      <th>Moon's Pushkara Navamsa</th>
-                      <td className={moonPushkara.isPushkaraNavamsa ? "pass" : "fail"}>
-                        {moonPushkara.isPushkaraNavamsa ? "Yes" : "No"} (pada{" "}
-                        {moonPushkara.navamsaPada}/9)
+                      <th>Avayogi</th>
+                      <td>
+                        {NAKSHATRAS[avayogi.avayogiNakshatraIndex].nameEnglish}{" "}
+                        <span className="tamil">
+                          ({NAKSHATRAS[avayogi.avayogiNakshatraIndex].nameTamil})
+                        </span>{" "}
+                        — {avayogi.avayogiGraha}{" "}
+                        <span className="tamil">({planetTamil(avayogi.avayogiGraha)})</span>
                       </td>
                     </tr>
                   )}
-                  <tr>
-                    <th>Avayogi</th>
-                    <td className="fail" title={AVAYOGI_NOT_IMPLEMENTED_REASON}>
-                      Not implemented
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Tithi Shunya Nakshatra</th>
-                    <td className="fail" title={TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON}>
-                      Not implemented
-                      {birthPanchangam && (
-                        <span style={{ fontSize: 12, color: "#9aa0c0" }}>
-                          {" "}
-                          (birth tithi type: {getTithiType(birthPanchangam.tithiIndex)})
-                        </span>
-                      )}
-                    </td>
-                  </tr>
+                  {tithiShunya && (
+                    <tr>
+                      <th>Tithi Shunya Nakshatra</th>
+                      <td className={tithiShunya.moonIsShunya ? "fail" : "pass"}>
+                        Tithi #{tithiShunya.tithiNumberInPaksha} ({getTithiType(birthPanchangam!.tithiIndex)}
+                        ) — shunya:{" "}
+                        {tithiShunya.hasShunyaList
+                          ? tithiShunya.shunyaNakshatraNames.join(", ")
+                          : "none"}
+                        . Moon:{" "}
+                        {tithiShunya.moonIsShunya ? "in shunya list" : "not shunya"}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
-              <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 8 }}>
-                <summary>Why Avayogi &amp; Tithi Shunya are omitted</summary>
-                <p>{AVAYOGI_NOT_IMPLEMENTED_REASON}</p>
-                <p>{TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON}</p>
-              </details>
+              <PushkaraAtBirthTable chart={chart} />
+              <p style={{ fontSize: 13 }}>
+                <Link to="/advanced-jyotish">Advanced Jyotish</Link> — Shadbala (partial), Ashtakavarga,
+                Mangal dosha, KP sublords.
+              </p>
             </>
           )}
           <JyotishScopePanel pageId="birth-chart" />

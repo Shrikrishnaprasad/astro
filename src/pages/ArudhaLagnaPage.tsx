@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
+import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
 import { JAMAGRAHAM_SEQUENCE } from "../data/jamagraham";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
@@ -165,6 +166,7 @@ export default function ArudhaLagnaPage() {
   return (
     <div>
       <h2>ஜாமக்கோள் ஆரூடம் (Jamakkol Arudam)</h2>
+      <EphemerisAccuracyNotice />
       <p className="tamil">உதயம், ஆரூடம், மாந்தி ஆகியவை தென்னிந்திய முறை ராசி சக்கரத்தில்.</p>
 
       <div className="card field-row">

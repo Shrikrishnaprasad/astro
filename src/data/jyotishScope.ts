@@ -6,6 +6,8 @@ export type JyotishPageId =
   | "dasa"
   | "panchangam"
   | "porutham"
+  | "advanced-jyotish"
+  | "prasna"
   | "global";
 
 export type JyotishFeatureStatus = "implemented" | "partial" | "not-planned";
@@ -26,6 +28,14 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     status: "implemented",
     summary: "Lahiri sidereal lagna, graha longitudes, whole-sign houses, Navamsa chart.",
     pages: ["birth-chart"],
+  },
+  {
+    id: "ephemeris-precision",
+    name: "Ephemeris precision & options",
+    status: "partial",
+    summary: "Optional Lahiri+nutation, Raman, KP ayanamsa; mean or true node; not Swiss Ephemeris.",
+    detail: "Use Ephemeris accuracy → Calculation options. Ascendant formula unchanged.",
+    pages: ["global", "birth-chart", "live-transit", "panchangam", "dasa", "porutham", "jamakkol-arudam"],
   },
   {
     id: "planet-houses",
@@ -50,31 +60,30 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
   },
   {
     id: "indu-yogi",
-    name: "Indu Lagna & Yogi point",
+    name: "Indu Lagna, Yogi & Duplicate Yogi",
     status: "partial",
-    summary: "Commonly cited Jaimini-style formulas; treat as indicative.",
-    detail: "Formulas vary between texts. Shown on the birth chart when calculated.",
-    pages: ["birth-chart"],
+    summary: "Yoga Sphuta + 93°20′; duplicate Yogi = sign lord of Yogi point.",
+    pages: ["birth-chart", "advanced-jyotish"],
   },
   {
     id: "avayogi",
     name: "Avayogi",
-    status: "not-planned",
-    summary: "Not computed — no verified formula in this codebase.",
-    pages: ["birth-chart", "global"],
+    status: "partial",
+    summary: "Yogi point + 186°40′ sphuta rule (not the degenerate 10th-nakshatra count).",
+    pages: ["birth-chart", "advanced-jyotish"],
   },
   {
     id: "tithi-shunya",
     name: "Tithi Shunya Nakshatra",
-    status: "not-planned",
-    summary: "Not computed — no verified regional lookup table.",
-    pages: ["birth-chart", "global"],
+    status: "partial",
+    summary: "Published tithi 1–15 ↔ shunya nakshatra table; regional variants may differ.",
+    pages: ["birth-chart", "advanced-jyotish"],
   },
   {
     id: "pushkara",
     name: "Pushkara Navamsa / Bhaga",
-    status: "partial",
-    summary: "Moon on birth chart; full-day windows on Panchangam for all bodies.",
+    status: "implemented",
+    summary: "All grahas + lagna at birth; full-day windows on Panchangam.",
     pages: ["birth-chart", "panchangam"],
   },
   {
@@ -101,33 +110,32 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
   },
   {
     id: "porutham-dasakoota",
-    name: "Porutham (10 kootas)",
+    name: "Porutham match report",
     status: "partial",
-    summary: "Dasakoota from both charts' Moon nakshatra, pada display, and Moon rasi.",
-    detail:
-      "Simplified rule tables — not a full traditional match workflow (no papasamya, kuja dosha, lagna matching, community minimums, or astrologer review checklist).",
+    summary: "Dasakoota + Papa samyam, Kuja dosha, lagna porutham, minimum score, narrative summary.",
+    detail: "Papa/Kuja rules are simplified; astrologer review still advised for final marriage decision.",
     pages: ["porutham"],
   },
   {
     id: "shadbala",
     name: "Shadbala / Ashtakavarga",
-    status: "not-planned",
-    summary: "Strength points and bindu charts are not implemented.",
-    pages: ["global"],
+    status: "partial",
+    summary: "Parashari Ashtakavarga (SAV/BAV) + Sthana/dignity proxy only — not full six-fold Shadbala.",
+    pages: ["advanced-jyotish", "birth-chart"],
   },
   {
     id: "yoga-dosha-packs",
     name: "Yoga & dosha packs (e.g. Mangal dosha)",
-    status: "not-planned",
-    summary: "No automated dosha/yoga rule packs or cancellation logic.",
-    pages: ["global", "birth-chart", "porutham"],
+    status: "partial",
+    summary: "Mangal dosha from Lagna/Moon/Venus with common cancellations; other yogas not packed yet.",
+    pages: ["advanced-jyotish", "birth-chart", "porutham"],
   },
   {
     id: "kp-prasna",
     name: "KP sublords & Prasna",
-    status: "not-planned",
-    summary: "No Krishnamurti Paddhati or horary Prasna module.",
-    pages: ["global"],
+    status: "partial",
+    summary: "Vimshottari-proportional star/sub/sub-sub lords; basic Prasna page with lagna/Moon hints.",
+    pages: ["advanced-jyotish", "prasna"],
   },
   {
     id: "muhurta-panchangam",

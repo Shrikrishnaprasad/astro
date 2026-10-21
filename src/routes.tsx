@@ -11,4 +11,7 @@ export const MENU_ROUTES: MenuRoute[] = [
   { path: "/panchangam", label: "Panchangam" },
   { path: "/porutham", label: "Porutham" },
   { path: "/jyotish-scope", label: "Jyotish scope" },
+  { path: "/accuracy", label: "Ephemeris accuracy" },
+  { path: "/advanced-jyotish", label: "Advanced Jyotish" },
+  { path: "/prasna", label: "Prasna" },
 ];

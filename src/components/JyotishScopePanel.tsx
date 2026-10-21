@@ -1,9 +1,5 @@
 import { Link } from "react-router-dom";
 import {
-  AVAYOGI_NOT_IMPLEMENTED_REASON,
-  TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON,
-} from "../engine/jaiminiPoints";
-import {
   featuresForPage,
   type JyotishFeature,
   type JyotishFeatureStatus,
@@ -22,13 +18,7 @@ const STATUS_CLASS: Record<JyotishFeatureStatus, string> = {
   "not-planned": "fail",
 };
 
-const NOT_IMPLEMENTED_REASON: Record<string, string> = {
-  avayogi: AVAYOGI_NOT_IMPLEMENTED_REASON,
-  "tithi-shunya": TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON,
-};
-
 function FeatureRow({ feature }: { feature: JyotishFeature }) {
-  const reason = NOT_IMPLEMENTED_REASON[feature.id];
   return (
     <li className="jyotish-scope__item">
       <span className={`jyotish-scope__status ${STATUS_CLASS[feature.status]}`}>
@@ -39,7 +29,6 @@ function FeatureRow({ feature }: { feature: JyotishFeature }) {
       {feature.detail && (
         <p className="jyotish-scope__detail">{feature.detail}</p>
       )}
-      {reason && <p className="jyotish-scope__detail">{reason}</p>}
     </li>
   );
 }

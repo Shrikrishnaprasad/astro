@@ -366,6 +366,40 @@ button:hover {
   font-size: 13px;
 }
 
+.ephemeris-notice {
+  font-size: 13px;
+  color: #9aa0c0;
+  line-height: 1.45;
+  border: 1px solid #2a3350;
+}
+
+.ephemeris-notice a {
+  color: #8eb4ff;
+}
+
+.ephemeris-accuracy__title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.ephemeris-accuracy__subtitle {
+  margin: 16px 0 8px;
+  font-size: 0.95rem;
+}
+
+.ephemeris-notice__lead {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #b8bdd6;
+}
+
+.ephemeris-accuracy__bullets {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #9aa0c0;
+}
+
 .card {
   background: #161925;
   border-radius: 10px;

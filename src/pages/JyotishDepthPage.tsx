@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import EphemerisAccuracyPanel from "../components/EphemerisAccuracyPanel";
 import {
   JYOTISH_FEATURES,
   featuresByStatus,
@@ -44,9 +46,11 @@ export default function JyotishDepthPage() {
         );
       })}
 
+      <EphemerisAccuracyPanel showFullDetails={false} />
+
       <p style={{ fontSize: 12, color: "#9aa0c0" }}>
-        Total catalog entries: {JYOTISH_FEATURES.length}. For ephemeris accuracy notes see{" "}
-        <code>VERIFICATION.md</code> in the repository.
+        Total catalog entries: {JYOTISH_FEATURES.length}. Full test notes:{" "}
+        <Link to="/accuracy">Ephemeris accuracy</Link> · <code>VERIFICATION.md</code>
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
 import { PLANET_TAMIL_NAME } from "../data/planetsTamil";
@@ -126,6 +127,7 @@ export default function PanchangamPage() {
   return (
     <div>
       <h2>Panchangam</h2>
+      <EphemerisAccuracyNotice />
       <div className="card field-row">
         <label>
           Date

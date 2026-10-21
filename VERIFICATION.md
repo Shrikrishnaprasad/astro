@@ -1,5 +1,11 @@
 # Verification Notes
 
+The same content is available in the app under **Ephemeris accuracy** (`/accuracy`), driven by
+`src/data/ephemerisAccuracy.ts` so UI and this file stay aligned.
+
+**Design target:** mean Lahiri ayanamsa, mean Rahu/Ketu, and the closed-form ascendant are
+appropriate for **sign- and nakshatra-level** work, not arcsecond-grade ephemeris.
+
 ## Automated tests
 
 `npm test` runs Vitest unit tests covering:

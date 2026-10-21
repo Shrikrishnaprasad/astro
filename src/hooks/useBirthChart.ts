@@ -1,13 +1,24 @@
 import { useMemo } from "react";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { getSiderealAscendant } from "../engine/ascendant";
+import type { EphemerisSettings } from "../engine/ephemerisSettings";
+import { DEFAULT_EPHEMERIS_SETTINGS } from "../engine/ephemerisSettings";
 import { getSiderealLongitudes } from "../engine/planetaryPositions";
 import { longitudeToRasiNakshatra } from "../engine/rasiNakshatra";
 import type { BirthInput, ChartResult, Planet } from "../engine/types";
 import { PLANETS } from "../engine/types";
 
-export function computeChart(input: BirthInput): ChartResult {
-  const planetLongitudes = getSiderealLongitudes(input.date);
-  const lagnaLongitude = getSiderealAscendant(input.date, input.latitude, input.longitude);
+export function computeChart(
+  input: BirthInput,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): ChartResult {
+  const planetLongitudes = getSiderealLongitudes(input.date, settings);
+  const lagnaLongitude = getSiderealAscendant(
+    input.date,
+    input.latitude,
+    input.longitude,
+    settings,
+  );
   const lagnaRasiIndex = Math.floor(lagnaLongitude / 30);
   const lagnaDegreeInRasi = lagnaLongitude - lagnaRasiIndex * 30;
 
@@ -20,7 +31,11 @@ export function computeChart(input: BirthInput): ChartResult {
 }
 
 export function useBirthChart(input: BirthInput | null): ChartResult | null {
-  return useMemo(() => (input ? computeChart(input) : null), [input]);
+  const { resolved } = useEphemerisSettings();
+  return useMemo(
+    () => (input ? computeChart(input, resolved) : null),
+    [input, resolved],
+  );
 }
 
 export function planetRasiIndexMap(chart: ChartResult): Record<Planet, number> {

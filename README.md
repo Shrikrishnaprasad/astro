@@ -8,8 +8,9 @@ A client-side (no backend) Vedic/Tamil astrology app with six menus:
 - **Dasa - Bhukti** — Vimshottari Mahadasa/Bhukti timeline.
 - **Panchangam** — tithi, nakshatra, yoga, karana, vara for any date.
 - **Porutham** — simplified 10-point (Dasakoota) from both charts’ Moon nakshatra & rasi.
-- **Jyotish scope** — catalog of what is implemented, partial, or deliberately omitted
-  (Avayogi, Shadbala, dosha packs, KP, etc.).
+- **Jyotish scope** — catalog of what is implemented, partial, or deliberately omitted.
+- **Advanced Jyotish** — Avayogi, Tithi Shunya, Ashtakavarga, partial Shadbala, Mangal dosha, KP sublords.
+- **Prasna** — horary chart at question time with basic hints.
 
 ## Defaults / design choices
 
@@ -20,7 +21,8 @@ A client-side (no backend) Vedic/Tamil astrology app with six menus:
 - Location input: a small bundled city list (`src/data/cities.ts`) or manual lat/long/UTC-offset.
 
 These are approximations suitable for sign/nakshatra-level astrology, not
-arcsecond-precision ephemeris work. See `VERIFICATION.md` for accuracy notes.
+arcsecond-precision ephemeris work. See **Ephemeris accuracy** in the app (`/accuracy`) or
+`VERIFICATION.md` in the repo.
 
 ## Getting started
 

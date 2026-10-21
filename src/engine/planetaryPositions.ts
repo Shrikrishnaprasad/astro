@@ -1,8 +1,13 @@
 import * as Astronomy from "astronomy-engine";
 import type { Planet, LongitudeMap } from "./types";
-import { getLahiriAyanamsa } from "./ayanamsa";
+import { getAyanamsa } from "./ayanamsa";
 import { normalizeDegrees } from "./constants";
-import { getMeanRahuKetuTropical } from "./lunarNodes";
+import {
+  DEFAULT_EPHEMERIS_SETTINGS,
+  resolveEphemerisSettings,
+  type EphemerisSettings,
+} from "./ephemerisSettings";
+import { getRahuKetuTropical } from "./lunarNodes";
 
 // astronomy-engine's `Ecliptic()` converts an EQJ (J2000 equatorial) vector into
 // TRUE ECLIPTIC OF DATE coordinates (see its own doc comment: "Converts a J2000
@@ -25,7 +30,8 @@ function tropicalLongitudeOf(body: Astronomy.Body, date: Date): number {
   return normalizeDegrees(Astronomy.Ecliptic(vector).elon);
 }
 
-export function getTropicalLongitudes(date: Date): LongitudeMap {
+export function getTropicalLongitudes(date: Date, settings?: EphemerisSettings): LongitudeMap {
+  const resolved = resolveEphemerisSettings(settings);
   const result = {} as LongitudeMap;
   for (const [planet, body] of Object.entries(BODIES) as [
     Exclude<Planet, "Rahu" | "Ketu">,
@@ -33,15 +39,19 @@ export function getTropicalLongitudes(date: Date): LongitudeMap {
   ][]) {
     result[planet] = tropicalLongitudeOf(body, date);
   }
-  const { rahu, ketu } = getMeanRahuKetuTropical(date);
+  const { rahu, ketu } = getRahuKetuTropical(date, resolved.nodeMode);
   result.Rahu = rahu;
   result.Ketu = ketu;
   return result;
 }
 
-export function getSiderealLongitudes(date: Date): LongitudeMap {
-  const ayanamsa = getLahiriAyanamsa(date);
-  const tropical = getTropicalLongitudes(date);
+export function getSiderealLongitudes(
+  date: Date,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): LongitudeMap {
+  const resolved = resolveEphemerisSettings(settings);
+  const ayanamsa = getAyanamsa(date, resolved.ayanamsa);
+  const tropical = getTropicalLongitudes(date, resolved);
   const result = {} as LongitudeMap;
   for (const planet of Object.keys(tropical) as Planet[]) {
     result[planet] = normalizeDegrees(tropical[planet] - ayanamsa);
