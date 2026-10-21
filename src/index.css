@@ -286,12 +286,46 @@ button:hover {
   margin-bottom: 16px;
 }
 
+.chart-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 32px;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 16px 0 32px;
+}
+
+.chart-pair__item {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.chart-pair__title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  color: #d8dcf0;
+}
+
+.chart-pair__hint {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: #7a8199;
+  text-align: center;
+  max-width: 28rem;
+}
+
 .chart-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
   margin: 24px 0 32px;
   padding: 4px 0 8px;
+}
+
+.chart-pair .chart-scroll {
+  margin: 0 0 8px;
 }
 
 .south-indian-chart-wrap {

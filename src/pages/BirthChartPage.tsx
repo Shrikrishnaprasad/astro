@@ -8,6 +8,7 @@ import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { getSiderealAscendant } from "../engine/ascendant";
 import { houseRasiIndex } from "../engine/houses";
+import { longitudeToNavamsa } from "../engine/navamsa";
 import { computeInduLagna, computeYogi, getTithiType } from "../engine/jaiminiPoints";
 import { computePanchangam } from "../engine/panchanga";
 import { computePushkara } from "../engine/pushkara";
@@ -113,6 +114,35 @@ export default function BirthChartPage() {
     return cells;
   }, [chart, mandhi, birthRetrograde]);
 
+  const navamsaCellContents = useMemo(() => {
+    const cells: Record<number, ChartMarker[]> = {};
+    const push = (rasiIndex: number, marker: ChartMarker) => {
+      (cells[rasiIndex] ??= []).push(marker);
+    };
+
+    if (!chart) return cells;
+
+    for (const planet of PLANETS) {
+      const nav = longitudeToNavamsa(chart.planetLongitudes[planet]);
+      const isRetrograde = shouldShowRetrograde(planet, birthRetrograde);
+      push(nav.rasiIndex, {
+        label: PLANET_TAMIL_ABBR[planet],
+        kind: "planet",
+        title: `${planet} (${PLANET_TAMIL_NAME[planet]}) — Navamsa${isRetrograde ? " - Vakram (retrograde)" : ""}`,
+        degree: nav.degreeInRasi,
+        retrograde: isRetrograde,
+      });
+    }
+    const lagnaNav = longitudeToNavamsa(chart.lagnaLongitude);
+    push(lagnaNav.rasiIndex, {
+      label: "லக்",
+      kind: "lagna",
+      title: "நவாம்ச லக்னம் (Navamsa Lagna)",
+      degree: lagnaNav.degreeInRasi,
+    });
+    return cells;
+  }, [chart, birthRetrograde]);
+
   // Outer ring: where each planet (+ lagna, + mandhi) is transiting right
   // now, with its current degree.
   const outerMarkers = useMemo(() => {
@@ -179,7 +209,17 @@ export default function BirthChartPage() {
             </label>
           </div>
 
-          <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />
+          <div className="chart-pair">
+            <div className="chart-pair__item">
+              <h3 className="chart-pair__title">Rasi (D1)</h3>
+              <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />
+              <p className="chart-pair__hint">Outer ring: live Gochara at birth location</p>
+            </div>
+            <div className="chart-pair__item">
+              <h3 className="chart-pair__title">Navamsa (D9)</h3>
+              <SouthIndianChart cellContents={navamsaCellContents} />
+            </div>
+          </div>
 
           <PlanetTable longitudes={chart.planetLongitudes} date={input?.date} />
           <h3>Whole-sign Houses</h3>
