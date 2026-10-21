@@ -246,6 +246,23 @@ input, select, button {
   align-items: flex-end;
 }
 
+.birth-form__actions {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.birth-form__submit {
+  font-weight: 600;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #2d3a6e;
+  border-color: #4a5a9a;
+}
+
+.birth-form__submit:hover {
+  background: #364480;
+}
+
 button {
   cursor: pointer;
   background: #3a4270;

@@ -186,7 +186,12 @@ export default function BirthChartPage() {
   return (
     <div>
       <h2>Birth / Rasi Chart</h2>
-      <DateTimePlaceForm onChange={setInput} />
+      <DateTimePlaceForm submitToCalculate submitLabel="Calculate birth chart" onChange={setInput} />
+      {!chart && (
+        <p className="card" style={{ color: "#9aa0c0", fontSize: 14 }}>
+          Enter date, time, and place, then click <strong>Calculate birth chart</strong>.
+        </p>
+      )}
       {chart && (
         <>
           <div className="card">

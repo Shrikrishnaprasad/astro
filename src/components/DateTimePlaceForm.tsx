@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import PlaceSelector from "./PlaceSelector";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
 import type { BirthInput } from "../engine/types";
@@ -48,10 +48,16 @@ export function birthFormToInput(value: BirthFormValue): BirthInput | null {
 
 export default function DateTimePlaceForm({
   onChange,
+  submitToCalculate = false,
+  submitLabel = "Calculate chart",
 }: {
   onChange: (input: BirthInput | null, raw: BirthFormValue) => void;
+  /** When true, call onChange only after the user clicks Submit (not on every edit). */
+  submitToCalculate?: boolean;
+  submitLabel?: string;
 }) {
   const [value, setValue] = useState<BirthFormValue>(DEFAULT_VALUE);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const update = (patch: Partial<BirthFormValue>) => {
     setValue((prev) => ({ ...prev, ...patch }));
@@ -59,16 +65,25 @@ export default function DateTimePlaceForm({
 
   const computedInput = useMemo(() => birthFormToInput(value), [value]);
 
-  // Fires on every change, including the initial mount and any later
-  // async update (e.g. PlaceSelector's geolocation auto-fill) — using
-  // functional setState above avoids stale-closure clobbering here.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitAttempted(true);
+    if (computedInput) {
+      onChange(computedInput, value);
+    }
+  };
+
+  // Live mode: recompute on every change (initial mount + geolocation fill, etc.).
   useEffect(() => {
+    if (submitToCalculate) return;
     onChange(computedInput, value);
-  }, [computedInput, value]);
+  }, [computedInput, value, submitToCalculate, onChange]);
+
+  const showValidationError =
+    !computedInput && (!submitToCalculate || submitAttempted);
 
   return (
-    <div className="card">
+    <form className="card birth-form" onSubmit={handleSubmit}>
       <div className="field-row">
         <label>
           Date
@@ -118,7 +133,17 @@ export default function DateTimePlaceForm({
         <PlaceSelector onChange={(place) => update({ place })} />
       )}
 
-      {!computedInput && <p className="fail">Enter a valid date, time, and location.</p>}
-    </div>
+      {submitToCalculate && (
+        <div className="field-row birth-form__actions">
+          <button type="submit" className="birth-form__submit">
+            {submitLabel}
+          </button>
+        </div>
+      )}
+
+      {showValidationError && (
+        <p className="fail">Enter a valid date, time, and location.</p>
+      )}
+    </form>
   );
 }
