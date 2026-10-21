@@ -41,6 +41,12 @@ export function computeInduLagna(lagnaRasiIndex: number, moonRasiIndex: number):
 // lands back on the same lord as the Yogi graha itself, which contradicts
 // how Avayogi is actually used (as a planet distinct from Yogi). Without a
 // verified alternative derivation, showing a value would just be wrong.
+export const AVAYOGI_NOT_IMPLEMENTED_REASON =
+  'The commonly repeated "10th nakshatra from Yogi" rule is degenerate (nakshatra lords repeat every 9 stars), so it always yields the same graha as Yogi — not a distinct Avayogi. No verified alternative formula is wired in this app.';
+
+export const TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON =
+  "Tithi Shunya pairs tithi types with forbidden nakshatras using regional tables that vary by tradition. This app has no source table we could verify, so it does not show Shunya nakshatras.";
+
 const YOGI_OFFSET_DEGREES = 93 + 20 / 60;
 
 export interface YogiResult {

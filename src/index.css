@@ -296,6 +296,76 @@ button:hover {
   color: #ff8a8a;
 }
 
+.dasa-table .dasa-row--current {
+  background: #252d52;
+}
+
+.dasa-table .dasa-row--current td {
+  color: #e8ecff;
+}
+
+.dasa-row__here {
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8eb4ff;
+  white-space: nowrap;
+}
+
+.dasa-current-summary {
+  border: 1px solid #3d4f8a;
+}
+
+.jyotish-scope__title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.jyotish-scope__list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.jyotish-scope__item {
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.jyotish-scope__item:last-child {
+  margin-bottom: 0;
+}
+
+.jyotish-scope__status {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.jyotish-scope__status--partial {
+  color: #e8c96e;
+}
+
+.jyotish-scope__summary {
+  color: #b8bdd6;
+}
+
+.jyotish-scope__detail {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #9aa0c0;
+}
+
+.jyotish-scope__footer {
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+
 .card {
   background: #161925;
   border-radius: 10px;

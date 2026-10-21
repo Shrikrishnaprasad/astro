@@ -11,6 +11,22 @@ export interface DasaPeriod {
   bhuktis: DasaPeriod[];
 }
 
+/** True if `instant` falls in [start, end) for this period. */
+export function isWithinDasaPeriod(period: DasaPeriod, instant: Date): boolean {
+  const t = instant.getTime();
+  return t >= period.start.getTime() && t < period.end.getTime();
+}
+
+/** Active Mahadasa and Bhukti (Antardasa) at `instant`, if within the generated timeline. */
+export function findActiveMahadasaAndBhukti(
+  mahadasas: DasaPeriod[],
+  instant: Date,
+): { mahadasa: DasaPeriod | null; bhukti: DasaPeriod | null } {
+  const mahadasa = mahadasas.find((p) => isWithinDasaPeriod(p, instant)) ?? null;
+  const bhukti = mahadasa?.bhuktis.find((p) => isWithinDasaPeriod(p, instant)) ?? null;
+  return { mahadasa, bhukti };
+}
+
 function addYears(date: Date, years: number): Date {
   return new Date(date.getTime() + years * MS_PER_YEAR);
 }

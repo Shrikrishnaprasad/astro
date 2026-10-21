@@ -10,4 +10,5 @@ export const MENU_ROUTES: MenuRoute[] = [
   { path: "/dasa", label: "Dasa - Bhukti" },
   { path: "/panchangam", label: "Panchangam" },
   { path: "/porutham", label: "Porutham" },
+  { path: "/jyotish-scope", label: "Jyotish scope" },
 ];

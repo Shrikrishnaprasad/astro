@@ -183,71 +183,86 @@ export default function ArudhaLagnaPage() {
           </div>
         </div>
       )}
-      {!live && <DateTimePlaceForm onChange={setFormInput} />}
+      {!live && (
+        <DateTimePlaceForm
+          submitToCalculate
+          submitLabel="Calculate Jamakkol Arudam"
+          onChange={setFormInput}
+        />
+      )}
+      {!live && !chart && (
+        <p className="card" style={{ color: "#9aa0c0", fontSize: 14 }}>
+          Enter date, time, and place, then click <strong>Calculate Jamakkol Arudam</strong>.
+        </p>
+      )}
 
-      {chart && <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />}
+      {chart && (
+        <>
+          <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />
 
-      <div className="card">
-        <strong className="tamil">ஜாமகிரஹம் (Jamagraham) window:</strong>{" "}
-        {jamagraham ? (
-          <>
-            {jamagraham.periodStart.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            {" – "}
-            {jamagraham.periodEnd.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          </>
-        ) : (
-          "unavailable"
-        )}
-        <div style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
-          Shown on the outer edge of the box holding that graha's current position. Changes every
-          1.5 hours from sunrise, cycling Guru-Budhan-Sukran-Sani-Chandran-Ragu-Suriyan-Chevai in
-          reverse order, starting each day from that weekday's lord.
-        </div>
-      </div>
+          <div className="card">
+            <strong className="tamil">ஜாமகிரஹம் (Jamagraham) window:</strong>{" "}
+            {jamagraham ? (
+              <>
+                {jamagraham.periodStart.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {" – "}
+                {jamagraham.periodEnd.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </>
+            ) : (
+              "unavailable"
+            )}
+            <div style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
+              Shown on the outer edge of the box holding that graha's current position. Changes every
+              1.5 hours from sunrise, cycling Guru-Budhan-Sukran-Sani-Chandran-Ragu-Suriyan-Chevai in
+              reverse order, starting each day from that weekday's lord.
+            </div>
+          </div>
 
-      <div className="card">
-        <strong className="tamil">கவிப்பு (Kavippu):</strong>{" "}
-        {kavippu ? (
-          <>
-            {RASIS[kavippu.rasiIndex].nameEnglish}{" "}
-            <span className="tamil">({RASIS[kavippu.rasiIndex].nameTamil})</span>{" "}
-            {kavippu.degreeInRasi !== undefined && formatDegreeInRasi(kavippu.degreeInRasi)}
-            <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
-              <summary>Calculation trace (verified against 3 reference charts)</summary>
-              <ul style={{ margin: "4px 0 0 0", paddingLeft: 18 }}>
-                {kavippu.calculationTrace.map((line, i) => (
-                  <li key={i}>{line}</li>
-                ))}
-              </ul>
-            </details>
-          </>
-        ) : (
-          "unavailable"
-        )}
-      </div>
+          <div className="card">
+            <strong className="tamil">கவிப்பு (Kavippu):</strong>{" "}
+            {kavippu ? (
+              <>
+                {RASIS[kavippu.rasiIndex].nameEnglish}{" "}
+                <span className="tamil">({RASIS[kavippu.rasiIndex].nameTamil})</span>{" "}
+                {kavippu.degreeInRasi !== undefined && formatDegreeInRasi(kavippu.degreeInRasi)}
+                <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
+                  <summary>Calculation trace (verified against 3 reference charts)</summary>
+                  <ul style={{ margin: "4px 0 0 0", paddingLeft: 18 }}>
+                    {kavippu.calculationTrace.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                </details>
+              </>
+            ) : (
+              "unavailable"
+            )}
+          </div>
 
-      {arudhaPadas && (
-        <table>
-          <thead>
-            <tr>
-              <th>House</th>
-              <th>Arudha Pada</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((house) => {
-              const rasi = RASIS[arudhaPadas[house]];
-              return (
-                <tr key={house}>
-                  <td className="tamil">{ARUDHA_LABEL[house]}</td>
-                  <td>
-                    {rasi.nameEnglish} <span className="tamil">({rasi.nameTamil})</span>
-                  </td>
+          {arudhaPadas && (
+            <table>
+              <thead>
+                <tr>
+                  <th>House</th>
+                  <th>Arudha Pada</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((house) => {
+                  const rasi = RASIS[arudhaPadas[house]];
+                  return (
+                    <tr key={house}>
+                      <td className="tamil">{ARUDHA_LABEL[house]}</td>
+                      <td>
+                        {rasi.nameEnglish} <span className="tamil">({rasi.nameTamil})</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
     </div>
   );

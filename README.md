@@ -7,7 +7,9 @@ A client-side (no backend) Vedic/Tamil astrology app with six menus:
 - **Jamakkol Arudam** — Jaimini Arudha Pada for all 12 houses.
 - **Dasa - Bhukti** — Vimshottari Mahadasa/Bhukti timeline.
 - **Panchangam** — tithi, nakshatra, yoga, karana, vara for any date.
-- **Porutham** — simplified 10-point (Dasakoota) nakshatra compatibility.
+- **Porutham** — simplified 10-point (Dasakoota) from both charts’ Moon nakshatra & rasi.
+- **Jyotish scope** — catalog of what is implemented, partial, or deliberately omitted
+  (Avayogi, Shadbala, dosha packs, KP, etc.).
 
 ## Defaults / design choices
 

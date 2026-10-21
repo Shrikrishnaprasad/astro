@@ -6,6 +6,7 @@ import BirthChartPage from "./pages/BirthChartPage";
 import DasaPage from "./pages/DasaPage";
 import LiveTransitPage from "./pages/LiveTransitPage";
 import PanchangamPage from "./pages/PanchangamPage";
+import JyotishDepthPage from "./pages/JyotishDepthPage";
 import PoruthamPage from "./pages/PoruthamPage";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/dasa" element={<DasaPage />} />
           <Route path="/panchangam" element={<PanchangamPage />} />
           <Route path="/porutham" element={<PoruthamPage />} />
+          <Route path="/jyotish-scope" element={<JyotishDepthPage />} />
         </Routes>
       </main>
       </div>

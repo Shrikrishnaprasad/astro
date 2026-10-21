@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { VIMSHOTTARI_SEQUENCE, VIMSHOTTARI_TOTAL_YEARS } from "../data/dasaSequence";
 import { NAKSHATRA_SPAN_DEGREES } from "../data/nakshatras";
-import { computeVimshottariDasa } from "./dasa";
+import { computeVimshottariDasa, findActiveMahadasaAndBhukti } from "./dasa";
 
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
@@ -92,5 +92,16 @@ describe("computeVimshottariDasa", () => {
     const periods = computeVimshottariDasa(0, birth, 1, 1);
     expect(periods[0].bhuktis).toHaveLength(9); // Bhukti
     expect(periods[0].bhuktis[0].bhuktis).toHaveLength(0); // no Antara
+  });
+
+  it("findActiveMahadasaAndBhukti locates the period containing an instant", () => {
+    const birth = new Date("2000-01-01T00:00:00Z");
+    const periods = computeVimshottariDasa(0, birth);
+    const maha = periods[0];
+    const bhukti = maha.bhuktis[0];
+    const mid = new Date((bhukti.start.getTime() + bhukti.end.getTime()) / 2);
+    const active = findActiveMahadasaAndBhukti(periods, mid);
+    expect(active.mahadasa?.lord).toBe(maha.lord);
+    expect(active.bhukti?.lord).toBe(bhukti.lord);
   });
 });

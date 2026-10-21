@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
+import JyotishScopePanel from "../components/JyotishScopePanel";
 import PlanetTable from "../components/PlanetTable";
 import { NAKSHATRAS } from "../data/nakshatras";
 import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
@@ -9,7 +10,13 @@ import { RASIS } from "../data/rasis";
 import { getSiderealAscendant } from "../engine/ascendant";
 import { houseRasiIndex } from "../engine/houses";
 import { longitudeToNavamsa } from "../engine/navamsa";
-import { computeInduLagna, computeYogi, getTithiType } from "../engine/jaiminiPoints";
+import {
+  AVAYOGI_NOT_IMPLEMENTED_REASON,
+  TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON,
+  computeInduLagna,
+  computeYogi,
+  getTithiType,
+} from "../engine/jaiminiPoints";
 import { computePanchangam } from "../engine/panchanga";
 import { computePushkara } from "../engine/pushkara";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
@@ -226,7 +233,11 @@ export default function BirthChartPage() {
             </div>
           </div>
 
-          <PlanetTable longitudes={chart.planetLongitudes} date={input?.date} />
+          <PlanetTable
+            longitudes={chart.planetLongitudes}
+            date={input?.date}
+            lagnaRasiIndex={chart.lagnaRasiIndex}
+          />
           <h3>Whole-sign Houses</h3>
           <table>
             <thead>
@@ -338,18 +349,34 @@ export default function BirthChartPage() {
                       </td>
                     </tr>
                   )}
+                  <tr>
+                    <th>Avayogi</th>
+                    <td className="fail" title={AVAYOGI_NOT_IMPLEMENTED_REASON}>
+                      Not implemented
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Tithi Shunya Nakshatra</th>
+                    <td className="fail" title={TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON}>
+                      Not implemented
+                      {birthPanchangam && (
+                        <span style={{ fontSize: 12, color: "#9aa0c0" }}>
+                          {" "}
+                          (birth tithi type: {getTithiType(birthPanchangam.tithiIndex)})
+                        </span>
+                      )}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
-              <p style={{ fontSize: 12, color: "#9aa0c0" }}>
-                Indu Lagna and the Yogi point use commonly-cited Jaimini-system formulas that vary
-                somewhat between texts — treat as indicative. Avayogi and Tithi Shunya Nakshatra
-                aren't included here: no formula/source table for either could be verified with
-                confidence (the commonly-repeated "10th nakshatra from Yogi" rule for Avayogi
-                turns out to always resolve to the same graha as Yogi itself, since nakshatra
-                lords repeat on a 9-nakshatra cycle).
-              </p>
+              <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 8 }}>
+                <summary>Why Avayogi &amp; Tithi Shunya are omitted</summary>
+                <p>{AVAYOGI_NOT_IMPLEMENTED_REASON}</p>
+                <p>{TITHI_SHUNYA_NAKSHATRA_NOT_IMPLEMENTED_REASON}</p>
+              </details>
             </>
           )}
+          <JyotishScopePanel pageId="birth-chart" />
         </>
       )}
     </div>
