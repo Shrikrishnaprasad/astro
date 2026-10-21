@@ -1,0 +1,422 @@
+{
+  ".claude/launch.json": {
+    "mtime": 1792487755.2111666,
+    "seen": 1792565465.7608316,
+    "ast_hash": "f27f101b5a21000de172c404293b8c18",
+    "semantic_hash": "f27f101b5a21000de172c404293b8c18"
+  },
+  "package.json": {
+    "mtime": 1792565184.0669158,
+    "seen": 1792565465.7608426,
+    "ast_hash": "670fafd5acfd261a803c7dae30078b77",
+    "semantic_hash": "670fafd5acfd261a803c7dae30078b77"
+  },
+  "src/App.tsx": {
+    "mtime": 1792487653.295237,
+    "seen": 1792565465.7608473,
+    "ast_hash": "b6204b5c1b7ceeb2f254d55ab7b24bd3",
+    "semantic_hash": "b6204b5c1b7ceeb2f254d55ab7b24bd3"
+  },
+  "src/components/DateTimePlaceForm.tsx": {
+    "mtime": 1792494219.1518471,
+    "seen": 1792565465.7608495,
+    "ast_hash": "66f73c82bdd57e8fb77d836c28e60e53",
+    "semantic_hash": "66f73c82bdd57e8fb77d836c28e60e53"
+  },
+  "src/components/NavMenu.tsx": {
+    "mtime": 1792487550.501474,
+    "seen": 1792565465.7608552,
+    "ast_hash": "66959ed8ecc6bd507093d6e2fd176602",
+    "semantic_hash": "66959ed8ecc6bd507093d6e2fd176602"
+  },
+  "src/components/PlaceSelector.tsx": {
+    "mtime": 1792494168.1464863,
+    "seen": 1792565465.7608593,
+    "ast_hash": "0b7e5dfa964afb641c18c2e511dd2eda",
+    "semantic_hash": "0b7e5dfa964afb641c18c2e511dd2eda"
+  },
+  "src/components/PlanetTable.tsx": {
+    "mtime": 1792501611.3497517,
+    "seen": 1792565465.7608633,
+    "ast_hash": "1db569e946c66545e769123dccf15353",
+    "semantic_hash": "1db569e946c66545e769123dccf15353"
+  },
+  "src/components/SouthIndianChart.tsx": {
+    "mtime": 1792503648.148948,
+    "seen": 1792565465.7608666,
+    "ast_hash": "1d6ccaec7e4242f22b3065f93665dd00",
+    "semantic_hash": "1d6ccaec7e4242f22b3065f93665dd00"
+  },
+  "src/data/dasaSequence.ts": {
+    "mtime": 1792486934.5912054,
+    "seen": 1792565465.76087,
+    "ast_hash": "7677dd596882aeb5de8e543b74548220",
+    "semantic_hash": "7677dd596882aeb5de8e543b74548220"
+  },
+  "src/data/jamagraham.ts": {
+    "mtime": 1792489341.3127117,
+    "seen": 1792565465.7608733,
+    "ast_hash": "61c5606f8188774f81849b3d4ec4cbcc",
+    "semantic_hash": "61c5606f8188774f81849b3d4ec4cbcc"
+  },
+  "src/data/muhurtaRules.ts": {
+    "mtime": 1792491903.1480346,
+    "seen": 1792565465.7608762,
+    "ast_hash": "81d45698b0395b77791884588cf88c5b",
+    "semantic_hash": "81d45698b0395b77791884588cf88c5b"
+  },
+  "src/data/nakshatras.ts": {
+    "mtime": 1792486929.0965488,
+    "seen": 1792565465.7608805,
+    "ast_hash": "c06a7612ae00d615c519234f2d745d50",
+    "semantic_hash": "c06a7612ae00d615c519234f2d745d50"
+  },
+  "src/data/panchangaRules.ts": {
+    "mtime": 1792501805.7152548,
+    "seen": 1792565465.7608836,
+    "ast_hash": "1de6a301c9b2e59f321a79a8ffa7bed5",
+    "semantic_hash": "1de6a301c9b2e59f321a79a8ffa7bed5"
+  },
+  "src/data/places.ts": {
+    "mtime": 1792494152.5743303,
+    "seen": 1792565465.7608886,
+    "ast_hash": "6f8b4fe8f4e5a7ea325e35e670a7cee5",
+    "semantic_hash": "6f8b4fe8f4e5a7ea325e35e670a7cee5"
+  },
+  "src/data/planetsTamil.ts": {
+    "mtime": 1792489903.8106875,
+    "seen": 1792565465.7608926,
+    "ast_hash": "c19562039544fc7840407ef0b7ef54e8",
+    "semantic_hash": "c19562039544fc7840407ef0b7ef54e8"
+  },
+  "src/data/poruthamRules.ts": {
+    "mtime": 1792486960.3970323,
+    "seen": 1792565465.7608962,
+    "ast_hash": "c2b5af4eb4edc3c1fd9b56565822fa34",
+    "semantic_hash": "c2b5af4eb4edc3c1fd9b56565822fa34"
+  },
+  "src/data/pushkaraRules.ts": {
+    "mtime": 1792491886.406854,
+    "seen": 1792565465.7608993,
+    "ast_hash": "7bccdc8c1f57b09ec76daf509faacb0f",
+    "semantic_hash": "7bccdc8c1f57b09ec76daf509faacb0f"
+  },
+  "src/data/rasis.ts": {
+    "mtime": 1792486915.4048638,
+    "seen": 1792565465.7609022,
+    "ast_hash": "18d4c992cb204e329fad531f5ec848e5",
+    "semantic_hash": "18d4c992cb204e329fad531f5ec848e5"
+  },
+  "src/data/suryaVeedhi.ts": {
+    "mtime": 1792503566.4734495,
+    "seen": 1792565465.7609057,
+    "ast_hash": "54f63f6f53a21b4d24a55137190e7f96",
+    "semantic_hash": "54f63f6f53a21b4d24a55137190e7f96"
+  },
+  "src/engine/arudha.test.ts": {
+    "mtime": 1792487689.6885448,
+    "seen": 1792565465.7609088,
+    "ast_hash": "d28524f9e47ae7f1f9f24dc826e287d4",
+    "semantic_hash": "d28524f9e47ae7f1f9f24dc826e287d4"
+  },
+  "src/engine/arudha.ts": {
+    "mtime": 1792487457.397245,
+    "seen": 1792565465.760912,
+    "ast_hash": "f8f04bbff40be2e0e3b6a3e344c74f62",
+    "semantic_hash": "f8f04bbff40be2e0e3b6a3e344c74f62"
+  },
+  "src/engine/ascendant.test.ts": {
+    "mtime": 1792499980.7944112,
+    "seen": 1792565465.760919,
+    "ast_hash": "eab893460808fe6d6b7943278c863ee8",
+    "semantic_hash": "eab893460808fe6d6b7943278c863ee8"
+  },
+  "src/engine/ascendant.ts": {
+    "mtime": 1792499941.2566545,
+    "seen": 1792565465.7609262,
+    "ast_hash": "30cba76e6622e6376a6adcf9fa61c28b",
+    "semantic_hash": "30cba76e6622e6376a6adcf9fa61c28b"
+  },
+  "src/engine/ayanamsa.test.ts": {
+    "mtime": 1792487705.6505373,
+    "seen": 1792565465.76093,
+    "ast_hash": "28b4048d0c024f81ed4fe75d2e2dfda1",
+    "semantic_hash": "28b4048d0c024f81ed4fe75d2e2dfda1"
+  },
+  "src/engine/ayanamsa.ts": {
+    "mtime": 1792486997.0489006,
+    "seen": 1792565465.7609363,
+    "ast_hash": "1d2192c326733835946a51dde7a529c5",
+    "semantic_hash": "1d2192c326733835946a51dde7a529c5"
+  },
+  "src/engine/constants.ts": {
+    "mtime": 1792486980.92951,
+    "seen": 1792565465.76094,
+    "ast_hash": "9f1eacab5d1b183331fb93226fe4f1bb",
+    "semantic_hash": "9f1eacab5d1b183331fb93226fe4f1bb"
+  },
+  "src/engine/dasa.test.ts": {
+    "mtime": 1792499204.7471771,
+    "seen": 1792565465.7609441,
+    "ast_hash": "7da9d2e9c8b1650d3f1688a3602146d7",
+    "semantic_hash": "7da9d2e9c8b1650d3f1688a3602146d7"
+  },
+  "src/engine/dasa.ts": {
+    "mtime": 1792499153.8756385,
+    "seen": 1792565465.760948,
+    "ast_hash": "527d1419e3ba1e7fd5c727031e6c12fe",
+    "semantic_hash": "527d1419e3ba1e7fd5c727031e6c12fe"
+  },
+  "src/engine/houses.ts": {
+    "mtime": 1792487449.6068802,
+    "seen": 1792565465.7609515,
+    "ast_hash": "8eb45f091c7c3dba7f99e1079f48d9ff",
+    "semantic_hash": "8eb45f091c7c3dba7f99e1079f48d9ff"
+  },
+  "src/engine/jaiminiPoints.test.ts": {
+    "mtime": 1792500629.9631588,
+    "seen": 1792565465.7609549,
+    "ast_hash": "33f9b5810038bbd073285a0a8b8020ed",
+    "semantic_hash": "33f9b5810038bbd073285a0a8b8020ed"
+  },
+  "src/engine/jaiminiPoints.ts": {
+    "mtime": 1792500620.5179265,
+    "seen": 1792565465.760959,
+    "ast_hash": "fb0fc0085a5c96e3580b56073ac15bc5",
+    "semantic_hash": "fb0fc0085a5c96e3580b56073ac15bc5"
+  },
+  "src/engine/kavippu.test.ts": {
+    "mtime": 1792503600.2816408,
+    "seen": 1792565465.760963,
+    "ast_hash": "e0b2886fd71a46b0d70b3ce4a782ef00",
+    "semantic_hash": "e0b2886fd71a46b0d70b3ce4a782ef00"
+  },
+  "src/engine/kavippu.ts": {
+    "mtime": 1792503581.925512,
+    "seen": 1792565465.7609673,
+    "ast_hash": "65a9fc5a86c551f0592e2bb48d930e5a",
+    "semantic_hash": "65a9fc5a86c551f0592e2bb48d930e5a"
+  },
+  "src/engine/lunarNodes.ts": {
+    "mtime": 1792487390.8285372,
+    "seen": 1792565465.7609708,
+    "ast_hash": "b8decdc9a27e38ea89564311689e16b2",
+    "semantic_hash": "b8decdc9a27e38ea89564311689e16b2"
+  },
+  "src/engine/muhurtas.test.ts": {
+    "mtime": 1792491943.0695937,
+    "seen": 1792565465.7609732,
+    "ast_hash": "df20d8b3b105bf54210ee7e6e00e72df",
+    "semantic_hash": "df20d8b3b105bf54210ee7e6e00e72df"
+  },
+  "src/engine/muhurtas.ts": {
+    "mtime": 1792491919.5499203,
+    "seen": 1792565465.7609773,
+    "ast_hash": "cf65df08d9edd63e9bda2f93e3216d56",
+    "semantic_hash": "cf65df08d9edd63e9bda2f93e3216d56"
+  },
+  "src/engine/panchanga.test.ts": {
+    "mtime": 1792488133.0341213,
+    "seen": 1792565465.760981,
+    "ast_hash": "56429f681d126bbf930b05ebb137b863",
+    "semantic_hash": "56429f681d126bbf930b05ebb137b863"
+  },
+  "src/engine/panchanga.ts": {
+    "mtime": 1792491964.1444218,
+    "seen": 1792565465.760985,
+    "ast_hash": "5bf14194edcc9251ced41caaad2c9dd3",
+    "semantic_hash": "5bf14194edcc9251ced41caaad2c9dd3"
+  },
+  "src/engine/planetaryPositions.ts": {
+    "mtime": 1792487382.7631476,
+    "seen": 1792565465.7609887,
+    "ast_hash": "e540b63a551853a1245525002c45dc90",
+    "semantic_hash": "e540b63a551853a1245525002c45dc90"
+  },
+  "src/engine/porutham.test.ts": {
+    "mtime": 1792487718.5646186,
+    "seen": 1792565465.7609928,
+    "ast_hash": "5a4dfc1777f18d9aeef8fb1fc517252f",
+    "semantic_hash": "5a4dfc1777f18d9aeef8fb1fc517252f"
+  },
+  "src/engine/porutham.ts": {
+    "mtime": 1792487530.0521433,
+    "seen": 1792565465.7609966,
+    "ast_hash": "f8df6c590de046aa2f6c43f2de3f762f",
+    "semantic_hash": "f8df6c590de046aa2f6c43f2de3f762f"
+  },
+  "src/engine/pushkara.test.ts": {
+    "mtime": 1792494101.4479024,
+    "seen": 1792565465.7609997,
+    "ast_hash": "b22d17ab77ff1827893f8cf70f4814d2",
+    "semantic_hash": "b22d17ab77ff1827893f8cf70f4814d2"
+  },
+  "src/engine/pushkara.ts": {
+    "mtime": 1792499090.1193438,
+    "seen": 1792565465.761006,
+    "ast_hash": "ba3ce9ca8272fc4c5bf74a066ebac4ae",
+    "semantic_hash": "ba3ce9ca8272fc4c5bf74a066ebac4ae"
+  },
+  "src/engine/rasiNakshatra.ts": {
+    "mtime": 1792487395.9282095,
+    "seen": 1792565465.7610154,
+    "ast_hash": "cb7be4b2b3e22b0404f302b3daa225c0",
+    "semantic_hash": "cb7be4b2b3e22b0404f302b3daa225c0"
+  },
+  "src/engine/retrograde.test.ts": {
+    "mtime": 1792499734.7540472,
+    "seen": 1792565465.76102,
+    "ast_hash": "6082203d97e0075eed5e08a7e27efd46",
+    "semantic_hash": "6082203d97e0075eed5e08a7e27efd46"
+  },
+  "src/engine/retrograde.ts": {
+    "mtime": 1792499971.2153254,
+    "seen": 1792565465.7610238,
+    "ast_hash": "f96e41d590f316f09a3d2abf94fdbce5",
+    "semantic_hash": "f96e41d590f316f09a3d2abf94fdbce5"
+  },
+  "src/engine/samvatsara.test.ts": {
+    "mtime": 1792491948.1361537,
+    "seen": 1792565465.7610276,
+    "ast_hash": "474f22d23dc7325041664c58e5cdaf85",
+    "semantic_hash": "474f22d23dc7325041664c58e5cdaf85"
+  },
+  "src/engine/samvatsara.ts": {
+    "mtime": 1792491924.3824205,
+    "seen": 1792565465.7610354,
+    "ast_hash": "145b703ad5890a696bf21633d4c21421",
+    "semantic_hash": "145b703ad5890a696bf21633d4c21421"
+  },
+  "src/engine/siderealTime.ts": {
+    "mtime": 1792487408.3976846,
+    "seen": 1792565465.7610397,
+    "ast_hash": "52d1e52da92a1d8069f276f01e6cba0f",
+    "semantic_hash": "52d1e52da92a1d8069f276f01e6cba0f"
+  },
+  "src/engine/specialPoints.test.ts": {
+    "mtime": 1792501963.9762022,
+    "seen": 1792565465.7610435,
+    "ast_hash": "e9ad1b64cddbe4ade4ac7cf4fa6a8698",
+    "semantic_hash": "e9ad1b64cddbe4ade4ac7cf4fa6a8698"
+  },
+  "src/engine/specialPoints.ts": {
+    "mtime": 1792501820.7545652,
+    "seen": 1792565465.7610471,
+    "ast_hash": "5cde9708147227b51e1430a49c77e36b",
+    "semantic_hash": "5cde9708147227b51e1430a49c77e36b"
+  },
+  "src/engine/sunTimes.ts": {
+    "mtime": 1792489317.6830356,
+    "seen": 1792565465.7610495,
+    "ast_hash": "584ceebeb5bca447b35708a5b87c0bd2",
+    "semantic_hash": "584ceebeb5bca447b35708a5b87c0bd2"
+  },
+  "src/engine/types.ts": {
+    "mtime": 1792489887.77172,
+    "seen": 1792565465.7610514,
+    "ast_hash": "be0ce9531a4f6cbe56fc95ceefca3091",
+    "semantic_hash": "be0ce9531a4f6cbe56fc95ceefca3091"
+  },
+  "src/hooks/useBirthChart.ts": {
+    "mtime": 1792489896.197885,
+    "seen": 1792565465.7610538,
+    "ast_hash": "7c538cbabc5a4df7b0e69e70dd94f1bc",
+    "semantic_hash": "7c538cbabc5a4df7b0e69e70dd94f1bc"
+  },
+  "src/hooks/useCurrentTransit.ts": {
+    "mtime": 1792487586.8179762,
+    "seen": 1792565465.7610595,
+    "ast_hash": "7d136aa26e964a20b709da10098780ae",
+    "semantic_hash": "7d136aa26e964a20b709da10098780ae"
+  },
+  "src/hooks/useNow.ts": {
+    "mtime": 1792498136.7722447,
+    "seen": 1792565465.7610629,
+    "ast_hash": "5f011b8fe5e47f09ab0b918ffce22478",
+    "semantic_hash": "5f011b8fe5e47f09ab0b918ffce22478"
+  },
+  "src/main.tsx": {
+    "mtime": 1792565092.8752365,
+    "seen": 1792565465.7610662,
+    "ast_hash": "72a18cba7c1664f93b25dab74f0852fa",
+    "semantic_hash": "72a18cba7c1664f93b25dab74f0852fa"
+  },
+  "src/pages/ArudhaLagnaPage.tsx": {
+    "mtime": 1792503679.5628068,
+    "seen": 1792565465.7610698,
+    "ast_hash": "1031f27622e12137f24debae798976a9",
+    "semantic_hash": "1031f27622e12137f24debae798976a9"
+  },
+  "src/pages/BirthChartPage.tsx": {
+    "mtime": 1792500648.640263,
+    "seen": 1792565465.761073,
+    "ast_hash": "124439217a5466ca49c0f7fe6bd67019",
+    "semantic_hash": "124439217a5466ca49c0f7fe6bd67019"
+  },
+  "src/pages/DasaPage.tsx": {
+    "mtime": 1792499186.396813,
+    "seen": 1792565465.7610767,
+    "ast_hash": "3e0715b68bf0f29127e3a45100e45dfa",
+    "semantic_hash": "3e0715b68bf0f29127e3a45100e45dfa"
+  },
+  "src/pages/LiveTransitPage.tsx": {
+    "mtime": 1792501584.4145381,
+    "seen": 1792565465.7610803,
+    "ast_hash": "2b2536903bf819b38ef5ea77e1d83f02",
+    "semantic_hash": "2b2536903bf819b38ef5ea77e1d83f02"
+  },
+  "src/pages/PanchangamPage.tsx": {
+    "mtime": 1792499527.2813509,
+    "seen": 1792565465.7610836,
+    "ast_hash": "5cf91ef143bf3419fa843d1b059889d7",
+    "semantic_hash": "5cf91ef143bf3419fa843d1b059889d7"
+  },
+  "src/pages/PoruthamPage.tsx": {
+    "mtime": 1792490027.025102,
+    "seen": 1792565465.761087,
+    "ast_hash": "af73981c246b2e6d84883ac6da1fe087",
+    "semantic_hash": "af73981c246b2e6d84883ac6da1fe087"
+  },
+  "src/routes.tsx": {
+    "mtime": 1792487546.4637988,
+    "seen": 1792565465.7610905,
+    "ast_hash": "263c66384636215020b0df305e80cc5c",
+    "semantic_hash": "263c66384636215020b0df305e80cc5c"
+  },
+  "src/utils/format.ts": {
+    "mtime": 1792489908.4975996,
+    "seen": 1792565465.7610939,
+    "ast_hash": "20c35383791b23ea66e2ec54ef2cac0b",
+    "semantic_hash": "20c35383791b23ea66e2ec54ef2cac0b"
+  },
+  "tsconfig.json": {
+    "mtime": 1792486897.1749704,
+    "seen": 1792565465.761098,
+    "ast_hash": "e1441def0e28e1c88587851689a70ba1",
+    "semantic_hash": "e1441def0e28e1c88587851689a70ba1"
+  },
+  "vite.config.ts": {
+    "mtime": 1792486900.1929474,
+    "seen": 1792565465.7611015,
+    "ast_hash": "235523b034142abde675c9e50bf4d013",
+    "semantic_hash": "235523b034142abde675c9e50bf4d013"
+  },
+  "README.md": {
+    "mtime": 1792487838.849119,
+    "seen": 1792565465.7611048,
+    "ast_hash": "0369b5f367f75f7e7d4d34926f5d4f76",
+    "semantic_hash": "0369b5f367f75f7e7d4d34926f5d4f76"
+  },
+  "VERIFICATION.md": {
+    "mtime": 1792487850.708567,
+    "seen": 1792565465.7611084,
+    "ast_hash": "debabe58ed79e468c4a03eb36ce0e8f5",
+    "semantic_hash": "debabe58ed79e468c4a03eb36ce0e8f5"
+  },
+  "index.html": {
+    "mtime": 1792565091.9699447,
+    "seen": 1792565465.7611146,
+    "ast_hash": "50effbff903517119da54356273ebb06",
+    "semantic_hash": "50effbff903517119da54356273ebb06"
+  }
+}
