@@ -27,7 +27,20 @@ npm install
 npm run dev     # start the dev server
 npm test        # run the engine unit tests (Vitest)
 npm run build   # production build
+npm run preview # serve production build locally (HTTPS not required for localhost)
 ```
+
+## PWA (offline / Add to Home Screen)
+
+This app is a **Progressive Web App**: after one online visit, the service worker caches the UI, fonts, and calculation code so charts and panchangam work **offline**.
+
+1. Deploy the `dist/` folder to any host with **HTTPS** (GitHub Pages, Cloudflare Pages, Netlify, etc.).
+2. Open the site once while online so assets cache.
+3. **Install:** browser menu → *Install app* / *Add to Home Screen* (wording varies on Android vs iOS).
+
+Development (`npm run dev`) does not register the service worker; use `npm run build && npm run preview` to test offline (DevTools → Network → Offline).
+
+Regenerate PNG icons after branding changes: `npm run generate:icons` (requires Python + Pillow).
 
 ## Project layout
 

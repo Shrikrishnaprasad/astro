@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import NavMenu from "./components/NavMenu";
+import PwaStatus from "./components/PwaStatus";
 import ArudhaLagnaPage from "./pages/ArudhaLagnaPage";
 import BirthChartPage from "./pages/BirthChartPage";
 import DasaPage from "./pages/DasaPage";
@@ -11,6 +12,8 @@ export default function App() {
   return (
     <div className="app-shell">
       <NavMenu />
+      <div className="main-column">
+      <PwaStatus />
       <main className="content">
         <Routes>
           <Route path="/" element={<LiveTransitPage />} />
@@ -21,6 +24,7 @@ export default function App() {
           <Route path="/porutham" element={<PoruthamPage />} />
         </Routes>
       </main>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { formatDegreeInRasi } from "../utils/format";
 
 export type ChartMarkerKind =
@@ -39,10 +39,45 @@ const RASI_OUTER_EDGE: Record<number, Edge> = {
   9: "left", 10: "left",
 };
 
-const CELL_W = 130;
-const CELL_H = 110;
-const GAP = 2;
-const PAD = 26;
+interface ChartCellMetrics {
+  w: number;
+  h: number;
+  gap: number;
+}
+
+const DESKTOP_METRICS: ChartCellMetrics = { w: 130, h: 110, gap: 2 };
+
+function readChartCellMetrics(): ChartCellMetrics {
+  if (typeof document === "undefined") return DESKTOP_METRICS;
+  const style = getComputedStyle(document.documentElement);
+  const w = parseFloat(style.getPropertyValue("--chart-cell-w"));
+  const h = parseFloat(style.getPropertyValue("--chart-cell-h"));
+  const gap = parseFloat(style.getPropertyValue("--chart-gap"));
+  return {
+    w: Number.isFinite(w) && w > 0 ? w : DESKTOP_METRICS.w,
+    h: Number.isFinite(h) && h > 0 ? h : DESKTOP_METRICS.h,
+    gap: Number.isFinite(gap) && gap >= 0 ? gap : DESKTOP_METRICS.gap,
+  };
+}
+
+function useChartCellMetrics(): ChartCellMetrics {
+  const [metrics, setMetrics] = useState(DESKTOP_METRICS);
+  useEffect(() => {
+    const update = () => setMetrics(readChartCellMetrics());
+    update();
+    window.addEventListener("resize", update);
+    const mq768 = window.matchMedia("(max-width: 768px)");
+    const mq400 = window.matchMedia("(max-width: 400px)");
+    mq768.addEventListener("change", update);
+    mq400.addEventListener("change", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      mq768.removeEventListener("change", update);
+      mq400.removeEventListener("change", update);
+    };
+  }, []);
+  return metrics;
+}
 
 function cellPosition(rasiIndex: number): { row: number; col: number } {
   for (let row = 0; row < GRID.length; row++) {
@@ -66,42 +101,49 @@ const KIND_CLASS: Record<ChartMarkerKind, string> = {
 // Spreads multiple outer markers along the tangential axis of the edge so
 // they don't stack on top of each other (e.g. several transiting planets
 // landing in the same rasi).
-function outerTagOffset(index: number, total: number): number {
+function outerTagOffset(index: number, total: number, cellW: number): number {
   if (total <= 1) return 0;
-  const spacing = 34;
+  const spacing = Math.max(22, cellW * 0.26);
   return (index - (total - 1) / 2) * spacing;
 }
 
-function outerTagStyle(rasiIndex: number, index = 0, total = 1): CSSProperties {
+function outerTagStyle(
+  rasiIndex: number,
+  metrics: ChartCellMetrics,
+  index = 0,
+  total = 1,
+): CSSProperties {
+  const { w: cellW, h: cellH, gap } = metrics;
   const { row, col } = cellPosition(rasiIndex);
-  const left = col * (CELL_W + GAP);
-  const top = row * (CELL_H + GAP);
+  const left = col * (cellW + gap);
+  const top = row * (cellH + gap);
   const edge = RASI_OUTER_EDGE[rasiIndex];
-  const offset = outerTagOffset(index, total);
+  const offset = outerTagOffset(index, total, cellW);
+  const pad = Math.max(10, cellW * 0.11);
 
   switch (edge) {
     case "top":
       return {
-        left: left + CELL_W / 2 + offset,
-        top: -14,
+        left: left + cellW / 2 + offset,
+        top: -pad,
         transform: "translate(-50%, -100%)",
       };
     case "bottom":
       return {
-        left: left + CELL_W / 2 + offset,
-        top: top + CELL_H + 14,
+        left: left + cellW / 2 + offset,
+        top: top + cellH + pad,
         transform: "translate(-50%, 0)",
       };
     case "left":
       return {
-        left: -14,
-        top: top + CELL_H / 2 + offset,
+        left: -pad,
+        top: top + cellH / 2 + offset,
         transform: "translate(-100%, -50%)",
       };
     case "right":
       return {
-        left: left + CELL_W + 14,
-        top: top + CELL_H / 2 + offset,
+        left: left + cellW + pad,
+        top: top + cellH / 2 + offset,
         transform: "translate(0, -50%)",
       };
   }
@@ -114,7 +156,10 @@ export default function SouthIndianChart({
   cellContents: Record<number, ChartMarker[]>;
   outerMarkers?: Record<number, ChartMarker[]>;
 }) {
+  const cellMetrics = useChartCellMetrics();
+
   return (
+    <div className="chart-scroll" aria-label="Rasi chart">
     <div className="south-indian-chart-wrap">
       <div className="south-indian-chart">
         {GRID.flatMap((row, rowIndex) =>
@@ -156,7 +201,7 @@ export default function SouthIndianChart({
           <span
             key={`${rasiIndex}-${i}`}
             className={`chart-marker chart-outer-marker ${KIND_CLASS[marker.kind]}`}
-            style={outerTagStyle(rasiIndex, i, markers.length)}
+            style={outerTagStyle(rasiIndex, cellMetrics, i, markers.length)}
             title={marker.title}
           >
             <span className="tamil">
@@ -169,6 +214,7 @@ export default function SouthIndianChart({
           </span>
         ));
       })}
+    </div>
     </div>
   );
 }

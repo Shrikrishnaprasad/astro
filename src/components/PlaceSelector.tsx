@@ -8,6 +8,7 @@ import {
   nearestPlace,
   type ResolvedPlace,
 } from "../data/places";
+import SearchableSelect from "./SearchableSelect";
 
 type GeoStatus = "idle" | "locating" | "located" | "denied" | "unsupported";
 
@@ -91,39 +92,35 @@ export default function PlaceSelector({
     onChange(resolve(country.name, state.name, name));
   };
 
+  const countryOptions = useMemo(() => COUNTRIES.map((c) => c.name), []);
+  const stateOptions = useMemo(() => country.states.map((s) => s.name), [country]);
+  const cityOptions = useMemo(() => state.cities.map((c) => c.name), [state]);
+
   return (
     <div className="place-selector">
-      <div className="field-row">
-        <label>
-          Country
-          <select value={country.name} onChange={(e) => handleCountryChange(e.target.value)}>
-            {COUNTRIES.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          State
-          <select value={state.name} onChange={(e) => handleStateChange(e.target.value)}>
-            {country.states.map((s) => (
-              <option key={s.name} value={s.name}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          City
-          <select value={cityName} onChange={(e) => handleCityChange(e.target.value)}>
-            {state.cities.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="field-row place-selector__fields">
+        <SearchableSelect
+          label="Country"
+          value={country.name}
+          options={countryOptions}
+          onChange={handleCountryChange}
+          searchPlaceholder="Search country…"
+        />
+        <SearchableSelect
+          label="State"
+          value={state.name}
+          options={stateOptions}
+          onChange={handleStateChange}
+          searchPlaceholder="Search state…"
+        />
+        <SearchableSelect
+          label="City"
+          value={cityName}
+          options={cityOptions}
+          onChange={handleCityChange}
+          searchPlaceholder="Search city / district…"
+          wide
+        />
         <button type="button" onClick={detectLocation} disabled={geoStatus === "locating"}>
           {geoStatus === "locating" ? "Locating…" : "📍 Use my location"}
         </button>
