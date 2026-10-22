@@ -2,12 +2,16 @@
 export type JyotishPageId =
   | "live-transit"
   | "birth-chart"
+  | "divisional-charts"
+  | "ashtakavarga"
   | "jamakkol-arudam"
   | "dasa"
   | "panchangam"
+  | "muhurta"
   | "porutham"
   | "advanced-jyotish"
   | "prasna"
+  | "ephemeris"
   | "global";
 
 export type JyotishFeatureStatus = "implemented" | "partial" | "not-planned";
@@ -24,18 +28,38 @@ export interface JyotishFeature {
 export const JYOTISH_FEATURES: JyotishFeature[] = [
   {
     id: "sidereal-chart",
-    name: "Sidereal birth chart (D1) + Navamsa (D9)",
+    name: "Sidereal birth chart (D1) + Shodashavarga (D1–D60)",
     status: "implemented",
-    summary: "Lahiri sidereal lagna, graha longitudes, whole-sign houses, Navamsa chart.",
-    pages: ["birth-chart"],
+    summary:
+      "Lahiri sidereal lagna, graha longitudes, whole-sign houses, all 16 Parashari divisional charts (D1–D60), Vargottama, D60 Shashtiamsa deities, and 20-point Vimshopaka Bala.",
+    pages: ["birth-chart", "divisional-charts", "advanced-jyotish"],
   },
   {
     id: "ephemeris-precision",
     name: "Ephemeris precision & options",
-    status: "partial",
+    status: "implemented",
     summary: "Optional Lahiri+nutation, Raman, KP ayanamsa; mean or true node; not Swiss Ephemeris.",
-    detail: "Use Ephemeris accuracy → Calculation options. Ascendant formula unchanged.",
-    pages: ["global", "birth-chart", "live-transit", "panchangam", "dasa", "porutham", "jamakkol-arudam"],
+    detail:
+      "Calculation options on Ephemeris and Ephemeris accuracy pages; charts, panchanga, retrograde, and mandhi use the same settings.",
+    pages: [
+      "global",
+      "ephemeris",
+      "birth-chart",
+      "live-transit",
+      "panchangam",
+      "dasa",
+      "porutham",
+      "jamakkol-arudam",
+      "advanced-jyotish",
+      "prasna",
+    ],
+  },
+  {
+    id: "ephemeris-table",
+    name: "Ephemeris table (sidereal positions)",
+    status: "implemented",
+    summary: "Single-moment graha table with sidereal λ, lagna, ayanamsa; optional daily 0/6/12/18 local sheet.",
+    pages: ["ephemeris"],
   },
   {
     id: "planet-houses",
@@ -117,11 +141,19 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     pages: ["porutham"],
   },
   {
+    id: "ashtakavarga-full",
+    name: "Ashtakavarga (337-bindu SAV, 8 BAVs, Shodhana, Pinda, Kakshya)",
+    status: "implemented",
+    summary:
+      "Full 337-bindu Sarvashtakavarga, 7 planet BAVs + Lagna BAV, South Indian bindu chart, Trikona & Ekadhipatya Shodhana, Rasi/Graha/Sodhya Pinda, 8×12 Prastara, and Kakshya transit analysis.",
+    pages: ["ashtakavarga", "birth-chart", "advanced-jyotish"],
+  },
+  {
     id: "shadbala",
-    name: "Shadbala / Ashtakavarga",
+    name: "Shadbala",
     status: "partial",
-    summary: "Parashari Ashtakavarga (SAV/BAV) + Sthana/dignity proxy only — not full six-fold Shadbala.",
-    pages: ["advanced-jyotish", "birth-chart"],
+    summary: "Sthana/dignity proxy + 20-point Vimshopaka Bala — not full six-fold Shadbala in virupas yet.",
+    pages: ["advanced-jyotish", "birth-chart", "divisional-charts"],
   },
   {
     id: "yoga-dosha-packs",
@@ -141,8 +173,16 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     id: "muhurta-panchangam",
     name: "Muhurta, Choghadiya, Disha Shool",
     status: "implemented",
-    summary: "Daily auspicious/inauspicious windows on the Panchangam page.",
-    pages: ["panchangam"],
+    summary: "Daily windows on Panchangam; range search with activity presets on Muhurta picker.",
+    pages: ["panchangam", "muhurta"],
+  },
+  {
+    id: "muhurta-picker",
+    name: "Muhurta picker (activity search)",
+    status: "implemented",
+    summary:
+      "365-day search across 31 activities; Varjyam & Amrita Kalam, Durmuhurtam, Choghadiya + Tamil Gowri Panchangam, Siddha/Amrita/Marana & Anandadi Yogas, Sarvartha/Amrita Siddhi/Tripushkara/Dagdha/Visha, Mahadoshas (Guru/Shukra Maudhya, Sankranti, Masa Shunya), Lagna Kundali Shuddhi (8th Ashtama, Papa Kartari, Bhrigu Shatka), single & couple Tarabala/Chandrabala.",
+    pages: ["muhurta", "panchangam"],
   },
 ];
 

@@ -15,6 +15,7 @@ import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde"
 import { computeJamagraham, computeMandhi } from "../engine/specialPoints";
 import type { BirthInput } from "../engine/types";
 import { PLANETS } from "../engine/types";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { planetRasiIndexMap, useBirthChart } from "../hooks/useBirthChart";
 import { useRefreshableNow } from "../hooks/useNow";
 import { formatDegreeInRasi } from "../utils/format";
@@ -25,6 +26,7 @@ const ARUDHA_LABEL: Record<number, string> = {
 };
 
 export default function ArudhaLagnaPage() {
+  const { resolved } = useEphemerisSettings();
   const [live, setLive] = useState(true);
   const [place, setPlace] = useState<ResolvedPlace>(defaultPlace());
   const [formInput, setFormInput] = useState<BirthInput | null>(null);
@@ -49,13 +51,14 @@ export default function ArudhaLagnaPage() {
   );
 
   const mandhi = useMemo(
-    () => (input ? computeMandhi(input.date, input.latitude, input.longitude) : null),
-    [input],
+    () =>
+      input ? computeMandhi(input.date, input.latitude, input.longitude, resolved) : null,
+    [input, resolved],
   );
 
   const retrograde = useMemo(
-    () => (input ? getRetrogradeStatus(input.date) : null),
-    [input],
+    () => (input ? getRetrogradeStatus(input.date, undefined, resolved) : null),
+    [input, resolved],
   );
 
   const jamagraham = useMemo(

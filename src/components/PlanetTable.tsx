@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { NAKSHATRAS } from "../data/nakshatras";
 import { RASIS } from "../data/rasis";
 import { PLANET_TAMIL_NAME } from "../data/planetsTamil";
@@ -7,12 +8,13 @@ import { longitudeToRasiNakshatra } from "../engine/rasiNakshatra";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
 import type { LongitudeMap } from "../engine/types";
 import { PLANETS } from "../engine/types";
-import { formatDegreeInRasi } from "../utils/format";
+import { formatDegreeInRasi, formatSiderealLongitude } from "../utils/format";
 
 export default function PlanetTable({
   longitudes,
   date,
   lagnaRasiIndex,
+  showSiderealLongitude = false,
 }: {
   longitudes: LongitudeMap;
   // Moment the longitudes are for, used to flag vakram (retrograde) grahas.
@@ -21,14 +23,20 @@ export default function PlanetTable({
   date?: Date;
   /** Whole-sign house (1–12) from lagna; omit to hide the House column. */
   lagnaRasiIndex?: number;
+  showSiderealLongitude?: boolean;
 }) {
-  const retrograde = useMemo(() => (date ? getRetrogradeStatus(date) : null), [date]);
+  const { resolved } = useEphemerisSettings();
+  const retrograde = useMemo(
+    () => (date ? getRetrogradeStatus(date, undefined, resolved) : null),
+    [date, resolved],
+  );
 
   return (
     <table>
       <thead>
         <tr>
           <th>Planet</th>
+          {showSiderealLongitude && <th>Sidereal λ</th>}
           <th>Degree</th>
           <th>Rasi</th>
           <th>Nakshatra</th>
@@ -57,6 +65,9 @@ export default function PlanetTable({
                   </span>
                 )}
               </td>
+              {showSiderealLongitude && (
+                <td>{formatSiderealLongitude(info.longitude)}</td>
+              )}
               <td>{formatDegreeInRasi(info.degreeInRasi)}</td>
               <td>
                 {rasi.nameEnglish} <span className="tamil">({rasi.nameTamil})</span>

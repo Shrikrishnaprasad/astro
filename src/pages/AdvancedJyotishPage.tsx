@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
+import AshtakavargaPanel from "../components/AshtakavargaPanel";
+import ShodashavargaPanel from "../components/ShodashavargaPanel";
 import { NAKSHATRAS } from "../data/nakshatras";
-import { RASIS } from "../data/rasis";
-import { computeAshtakavarga } from "../engine/ashtakavarga";
 import { computeAvayogi, computeYogi } from "../engine/jaiminiPoints";
 import { kpLordChainsForChart } from "../engine/kp";
 import { computePanchangam } from "../engine/panchanga";
@@ -13,9 +13,11 @@ import { computeYogaDoshaPack } from "../engine/yogaDosha";
 import type { BirthInput } from "../engine/types";
 import { PLANETS } from "../engine/types";
 import { planetHouses } from "../engine/houses";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { useBirthChart } from "../hooks/useBirthChart";
 
 export default function AdvancedJyotishPage() {
+  const { resolved } = useEphemerisSettings();
   const [input, setInput] = useState<BirthInput | null>(null);
   const chart = useBirthChart(input);
 
@@ -30,16 +32,9 @@ export default function AdvancedJyotishPage() {
 
   const tithiShunya = useMemo(() => {
     if (!chart || !input) return null;
-    const p = computePanchangam(input.date, input.latitude, input.longitude);
+    const p = computePanchangam(input.date, input.latitude, input.longitude, resolved);
     return computeTithiShunya(p.tithiIndex, chart.planetRasi.Moon.nakshatraIndex);
-  }, [chart, input]);
-
-  const ashtakavarga = useMemo(() => {
-    if (!chart) return null;
-    const rasiMap = {} as Record<(typeof PLANETS)[number], number>;
-    for (const p of PLANETS) rasiMap[p] = chart.planetRasi[p].rasiIndex;
-    return computeAshtakavarga(rasiMap, chart.lagnaRasiIndex);
-  }, [chart]);
+  }, [chart, input, resolved]);
 
   const shadbala = useMemo(() => {
     if (!chart) return null;
@@ -166,35 +161,11 @@ export default function AdvancedJyotishPage() {
         </section>
       )}
 
-      {ashtakavarga && (
-        <section className="card">
-          <h3>Ashtakavarga</h3>
-          <p>Sarvashtakavarga total bindus: {ashtakavarga.sarvaTotal}</p>
-          <h4>SAV by house from lagna</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>House</th>
-                <th>Bindus</th>
-                <th>Rasi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ashtakavarga.sarva.map((bindus, i) => {
-                const rasi = RASIS[(chart!.lagnaRasiIndex + i) % 12];
-                return (
-                  <tr key={i}>
-                    <td>{i + 1}</td>
-                    <td>{bindus}</td>
-                    <td>
-                      {rasi.nameEnglish} <span className="tamil">({rasi.nameTamil})</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </section>
+      {chart && (
+        <>
+          <AshtakavargaPanel chart={chart} />
+          <ShodashavargaPanel chart={chart} />
+        </>
       )}
 
       {kp && (

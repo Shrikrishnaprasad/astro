@@ -1,6 +1,10 @@
 import { NAKSHATRAS } from "../data/nakshatras";
 import { RASIS, rasiLord } from "../data/rasis";
 import { computePanchangam } from "./panchanga";
+import {
+  DEFAULT_EPHEMERIS_SETTINGS,
+  type EphemerisSettings,
+} from "./ephemerisSettings";
 import type { BirthInput, ChartResult } from "./types";
 import { kpLordChainAtLongitude } from "./kp";
 import { rasiToHouseNumber } from "./houses";
@@ -18,8 +22,12 @@ export interface PrasnaResult {
   hints: string[];
 }
 
-export function computePrasna(input: BirthInput, chart: ChartResult): PrasnaResult {
-  const panch = computePanchangam(input.date, input.latitude, input.longitude);
+export function computePrasna(
+  input: BirthInput,
+  chart: ChartResult,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): PrasnaResult {
+  const panch = computePanchangam(input.date, input.latitude, input.longitude, settings);
   const lagnaChain = kpLordChainAtLongitude(chart.lagnaLongitude);
   const moonHouse = rasiToHouseNumber(chart.lagnaRasiIndex, chart.planetRasi.Moon.rasiIndex);
   const lagnaLord = rasiLord(chart.lagnaRasiIndex);

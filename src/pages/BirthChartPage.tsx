@@ -7,12 +7,19 @@ import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import JyotishScopePanel from "../components/JyotishScopePanel";
 import PlanetTable from "../components/PlanetTable";
 import PushkaraAtBirthTable from "../components/PushkaraAtBirthTable";
+import AshtakavargaPanel from "../components/AshtakavargaPanel";
+import ShodashavargaPanel from "../components/ShodashavargaPanel";
 import { NAKSHATRAS } from "../data/nakshatras";
 import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { getSiderealAscendant } from "../engine/ascendant";
 import { houseRasiIndex } from "../engine/houses";
 import { longitudeToNavamsa } from "../engine/navamsa";
+import {
+  computeVargaPlacement,
+  SHODASHAVARGA_DEFS,
+  type VargaId,
+} from "../engine/vargas";
 import {
   computeAvayogi,
   computeInduLagna,
@@ -27,6 +34,7 @@ import { computeMandhi } from "../engine/specialPoints";
 import type { Planet } from "../engine/types";
 import { PLANETS } from "../engine/types";
 import type { BirthInput } from "../engine/types";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { useBirthChart } from "../hooks/useBirthChart";
 import { useCurrentTransit } from "../hooks/useCurrentTransit";
 import { formatDegreeInRasi } from "../utils/format";
@@ -36,40 +44,49 @@ function planetTamil(name: string): string {
 }
 
 export default function BirthChartPage() {
+  const { resolved } = useEphemerisSettings();
   const [input, setInput] = useState<BirthInput | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [companionVarga, setCompanionVarga] = useState<VargaId>("D9");
   const chart = useBirthChart(input);
   const { now: transitNow, longitudes: transitLongitudes, refresh } = useCurrentTransit(
     autoRefresh ? 60000 : 0,
   );
 
   const mandhi = useMemo(
-    () => (input ? computeMandhi(input.date, input.latitude, input.longitude) : null),
-    [input],
+    () =>
+      input ? computeMandhi(input.date, input.latitude, input.longitude, resolved) : null,
+    [input, resolved],
   );
 
   const birthRetrograde = useMemo(
-    () => (input ? getRetrogradeStatus(input.date) : null),
-    [input],
+    () => (input ? getRetrogradeStatus(input.date, undefined, resolved) : null),
+    [input, resolved],
   );
-  const transitRetrograde = useMemo(() => getRetrogradeStatus(transitNow), [transitNow]);
+  const transitRetrograde = useMemo(
+    () => getRetrogradeStatus(transitNow, undefined, resolved),
+    [transitNow, resolved],
+  );
 
   // Live (current-moment) lagna and mandhi, at the same place as the birth
   // input, for the outer transit ring.
   const transitLagna = useMemo(
-    () => (input ? getSiderealAscendant(transitNow, input.latitude, input.longitude) : null),
-    [transitNow, input],
+    () =>
+      input ? getSiderealAscendant(transitNow, input.latitude, input.longitude, resolved) : null,
+    [transitNow, input, resolved],
   );
   const transitMandhi = useMemo(
-    () => (input ? computeMandhi(transitNow, input.latitude, input.longitude) : null),
-    [transitNow, input],
+    () =>
+      input ? computeMandhi(transitNow, input.latitude, input.longitude, resolved) : null,
+    [transitNow, input, resolved],
   );
 
   // Panchanga and other Jyotish reference points computed at the birth
   // moment itself (not "live" - these describe the natal chart).
   const birthPanchangam = useMemo(
-    () => (input ? computePanchangam(input.date, input.latitude, input.longitude) : null),
-    [input],
+    () =>
+      input ? computePanchangam(input.date, input.latitude, input.longitude, resolved) : null,
+    [input, resolved],
   );
   const birthSamvatsara = useMemo(() => (input ? computeSamvatsara(input.date) : null), [input]);
   const induLagna = useMemo(
@@ -126,6 +143,11 @@ export default function BirthChartPage() {
     return cells;
   }, [chart, mandhi, birthRetrograde]);
 
+  const companionVargaDef = useMemo(
+    () => SHODASHAVARGA_DEFS.find((d) => d.id === companionVarga) ?? SHODASHAVARGA_DEFS[5],
+    [companionVarga],
+  );
+
   const navamsaCellContents = useMemo(() => {
     const cells: Record<number, ChartMarker[]> = {};
     const push = (rasiIndex: number, marker: ChartMarker) => {
@@ -134,26 +156,46 @@ export default function BirthChartPage() {
 
     if (!chart) return cells;
 
+    if (companionVarga === "D9") {
+      for (const planet of PLANETS) {
+        const nav = longitudeToNavamsa(chart.planetLongitudes[planet]);
+        const isRetrograde = shouldShowRetrograde(planet, birthRetrograde);
+        push(nav.rasiIndex, {
+          label: PLANET_TAMIL_ABBR[planet],
+          kind: "planet",
+          title: `${planet} (${PLANET_TAMIL_NAME[planet]}) — Navamsa${isRetrograde ? " - Vakram (retrograde)" : ""}`,
+          degree: nav.degreeInRasi,
+          retrograde: isRetrograde,
+        });
+      }
+      const lagnaNav = longitudeToNavamsa(chart.lagnaLongitude);
+      push(lagnaNav.rasiIndex, {
+        label: "லக்",
+        kind: "lagna",
+        title: "நவாம்ச லக்னம் (Navamsa Lagna)",
+        degree: lagnaNav.degreeInRasi,
+      });
+      return cells;
+    }
+
     for (const planet of PLANETS) {
-      const nav = longitudeToNavamsa(chart.planetLongitudes[planet]);
+      const vp = computeVargaPlacement(chart.planetLongitudes[planet], companionVarga);
       const isRetrograde = shouldShowRetrograde(planet, birthRetrograde);
-      push(nav.rasiIndex, {
+      push(vp.rasiIndex, {
         label: PLANET_TAMIL_ABBR[planet],
         kind: "planet",
-        title: `${planet} (${PLANET_TAMIL_NAME[planet]}) — Navamsa${isRetrograde ? " - Vakram (retrograde)" : ""}`,
-        degree: nav.degreeInRasi,
+        title: `${planet} (${PLANET_TAMIL_NAME[planet]}) — ${companionVarga} (${companionVargaDef.nameSanskrit})${vp.isVargottama ? " ★ Vargottama" : ""}${isRetrograde ? " - Vakram" : ""}`,
         retrograde: isRetrograde,
       });
     }
-    const lagnaNav = longitudeToNavamsa(chart.lagnaLongitude);
-    push(lagnaNav.rasiIndex, {
+    const lagnaVp = computeVargaPlacement(chart.lagnaLongitude, companionVarga);
+    push(lagnaVp.rasiIndex, {
       label: "லக்",
       kind: "lagna",
-      title: "நவாம்ச லக்னம் (Navamsa Lagna)",
-      degree: lagnaNav.degreeInRasi,
+      title: `${companionVarga} Lagna (${RASIS[lagnaVp.rasiIndex].nameEnglish})`,
     });
     return cells;
-  }, [chart, birthRetrograde]);
+  }, [chart, birthRetrograde, companionVarga, companionVargaDef]);
 
   // Outer ring: where each planet (+ lagna, + mandhi) is transiting right
   // now, with its current degree.
@@ -234,8 +276,32 @@ export default function BirthChartPage() {
               <p className="chart-pair__hint">Outer ring: live Gochara at birth location</p>
             </div>
             <div className="chart-pair__item">
-              <h3 className="chart-pair__title">Navamsa (D9)</h3>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 6,
+                }}
+              >
+                <h3 className="chart-pair__title" style={{ margin: 0 }}>
+                  {companionVargaDef.nameSanskrit} ({companionVargaDef.id})
+                </h3>
+                <select
+                  value={companionVarga}
+                  onChange={(e) => setCompanionVarga(e.target.value as VargaId)}
+                  style={{ fontSize: 12, padding: "2px 6px" }}
+                >
+                  {SHODASHAVARGA_DEFS.filter((d) => d.id !== "D1").map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.id} — {d.nameSanskrit} ({d.nameEnglish})
+                    </option>
+                  ))}
+                </select>
+              </div>
               <SouthIndianChart cellContents={navamsaCellContents} />
+              <p className="chart-pair__hint">{companionVargaDef.signification}</p>
             </div>
           </div>
 
@@ -395,9 +461,29 @@ export default function BirthChartPage() {
                 </tbody>
               </table>
               <PushkaraAtBirthTable chart={chart} />
+
+              <details className="card" style={{ marginTop: 14 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600, fontSize: 16 }}>
+                  Shodashavarga — All 16 Divisional Charts (D1–D60) &amp; Vimshopaka Bala
+                </summary>
+                <div style={{ marginTop: 12 }}>
+                  <ShodashavargaPanel chart={chart} retrograde={birthRetrograde} />
+                </div>
+              </details>
+
+              <details className="card" style={{ marginTop: 14 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600, fontSize: 16 }}>
+                  Ashtakavarga — 337-Bindu SAV, BAV, Reductions &amp; Kakshya
+                </summary>
+                <div style={{ marginTop: 12 }}>
+                  <AshtakavargaPanel chart={chart} transitLongitudes={transitLongitudes} />
+                </div>
+              </details>
+
               <p style={{ fontSize: 13 }}>
-                <Link to="/advanced-jyotish">Advanced Jyotish</Link> — Shadbala (partial), Ashtakavarga,
-                Mangal dosha, KP sublords.
+                <Link to="/divisional-charts">Divisional Charts (D1–D60)</Link> ·{" "}
+                <Link to="/ashtakavarga">Ashtakavarga</Link> ·{" "}
+                <Link to="/advanced-jyotish">Advanced Jyotish</Link>
               </p>
             </>
           )}

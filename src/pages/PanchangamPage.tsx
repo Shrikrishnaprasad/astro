@@ -1,11 +1,20 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import PlaceSelector from "../components/PlaceSelector";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
 import { PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { CHOGHADIYA_NATURE } from "../data/muhurtaRules";
 import { getSiderealAscendant } from "../engine/ascendant";
+import {
+  computeDurmuhurtam,
+  computeGowriPanchangam,
+  computeMahadoshas,
+  computeSpecialDayYogas,
+  computeVarjyamAndAmrita,
+} from "../engine/classicalMuhurta";
 import { computePanchangam, type TimeWindow } from "../engine/panchanga";
 import { computeChoghadiya, computeMuhurtas, getDishaShool } from "../engine/muhurtas";
 import { getSiderealLongitudes } from "../engine/planetaryPositions";
@@ -35,8 +44,21 @@ function fmtEndsAt(d: Date | null): string {
 }
 
 export default function PanchangamPage() {
-  const [dateStr, setDateStr] = useState(() => new Date().toISOString().slice(0, 10));
+  const { resolved } = useEphemerisSettings();
+  const [searchParams] = useSearchParams();
+  const [dateStr, setDateStr] = useState(() => {
+    const paramDate = searchParams.get("date");
+    if (paramDate && /^\d{4}-\d{2}-\d{2}$/.test(paramDate)) return paramDate;
+    return new Date().toISOString().slice(0, 10);
+  });
   const [city, setCity] = useState<ResolvedPlace>(defaultPlace());
+
+  useEffect(() => {
+    const paramDate = searchParams.get("date");
+    if (paramDate && /^\d{4}-\d{2}-\d{2}$/.test(paramDate)) {
+      setDateStr(paramDate);
+    }
+  }, [searchParams]);
 
   const date = useMemo(() => {
     const [y, m, d] = dateStr.split("-").map(Number);
@@ -45,8 +67,8 @@ export default function PanchangamPage() {
   }, [dateStr]);
 
   const panchangam = useMemo(
-    () => (date ? computePanchangam(date, city.lat, city.lon) : null),
-    [date, city],
+    () => (date ? computePanchangam(date, city.lat, city.lon, resolved) : null),
+    [date, city, resolved],
   );
 
   const muhurtas = useMemo(
@@ -59,6 +81,35 @@ export default function PanchangamPage() {
     [date, city],
   );
 
+  const gowri = useMemo(
+    () => (date ? computeGowriPanchangam(date, city.lat, city.lon) : null),
+    [date, city],
+  );
+
+  const varjyamAmrita = useMemo(
+    () => (date ? computeVarjyamAndAmrita(date, resolved) : null),
+    [date, resolved],
+  );
+
+  const durmuhurtams = useMemo(
+    () => (date ? computeDurmuhurtam(date, city.lat, city.lon) : []),
+    [date, city],
+  );
+
+  const dayYogas = useMemo(
+    () =>
+      date && panchangam
+        ? computeSpecialDayYogas(date.getUTCDay(), panchangam.tithiIndex, panchangam.nakshatraIndex)
+        : null,
+    [date, panchangam],
+  );
+
+  const mahadoshas = useMemo(
+    () =>
+      date && panchangam ? computeMahadoshas(date, panchangam.tithiIndex, resolved) : null,
+    [date, panchangam, resolved],
+  );
+
   const dishaShool = date ? getDishaShool(date) : null;
   const samvatsara = date ? computeSamvatsara(date) : null;
 
@@ -68,8 +119,8 @@ export default function PanchangamPage() {
   // below search the whole day for each body independently.
   const pushkaraEntities = useMemo(() => {
     if (!date) return [];
-    const longitudes = getSiderealLongitudes(date);
-    const lagnaLongitude = getSiderealAscendant(date, city.lat, city.lon);
+    const longitudes = getSiderealLongitudes(date, resolved);
+    const lagnaLongitude = getSiderealAscendant(date, city.lat, city.lon, resolved);
     return [
       {
         key: "Lagna",
@@ -78,18 +129,18 @@ export default function PanchangamPage() {
         // The Lagna sweeps 360°/day (~0.25°/min), so it needs a much finer
         // sampling step than a planet to not skip over a ~13-minute-wide
         // Pushkara Navamsa window between samples.
-        longitudeAt: (d: Date) => getSiderealAscendant(d, city.lat, city.lon),
+        longitudeAt: (d: Date) => getSiderealAscendant(d, city.lat, city.lon, resolved),
         stepMinutes: 2,
       },
       ...PLANETS.map((planet) => ({
         key: planet,
         label: `${planet} (${PLANET_TAMIL_NAME[planet]})`,
         longitude: longitudes[planet],
-        longitudeAt: (d: Date) => getSiderealLongitudes(d)[planet],
+        longitudeAt: (d: Date) => getSiderealLongitudes(d, resolved)[planet],
         stepMinutes: 10,
       })),
     ];
-  }, [date, city]);
+  }, [date, city, resolved]);
 
   // Pushkara Navamsa window(s) for the Panchangam day (sunrise to next sunrise,
   // falling back to the UTC calendar day when sunrise can't be resolved).
@@ -327,6 +378,24 @@ export default function PanchangamPage() {
                   <td>{fmtWindow(muhurtas.nishitaMuhurta)}</td>
                 </tr>
               )}
+              {varjyamAmrita && (
+                <tr>
+                  <th className="pass">Amrita Kalam (Nakshatra)</th>
+                  <td>{fmtWindow(varjyamAmrita.amritaKalam)}</td>
+                </tr>
+              )}
+              {varjyamAmrita && (
+                <tr>
+                  <th className="fail">Varjyam (Vishaghati)</th>
+                  <td>{fmtWindow(varjyamAmrita.varjyam)}</td>
+                </tr>
+              )}
+              {durmuhurtams.length > 0 && (
+                <tr>
+                  <th className="fail">Durmuhurtam</th>
+                  <td>{durmuhurtams.map((w) => fmtWindow(w)).join(", ")}</td>
+                </tr>
+              )}
               <tr>
                 <th className="fail">Rahu Kalam</th>
                 <td>{fmtWindow(panchangam.rahuKalam)}</td>
@@ -341,6 +410,108 @@ export default function PanchangamPage() {
               </tr>
             </tbody>
           </table>
+
+          {dayYogas && mahadoshas && (
+            <>
+              <h3>Classical Yogas &amp; Mahadosha Checks</h3>
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Tamil Siddha / Marana Yoga</th>
+                    <td className={dayYogas.siddhaNature === "auspicious" ? "pass" : "fail"}>
+                      {dayYogas.siddhaYoga}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Anandadi Yoga</th>
+                    <td
+                      className={
+                        dayYogas.anandadiYoga.nature === "auspicious"
+                          ? "pass"
+                          : dayYogas.anandadiYoga.nature === "inauspicious"
+                            ? "fail"
+                            : ""
+                      }
+                    >
+                      {dayYogas.anandadiYoga.name} ({dayYogas.anandadiYoga.nature})
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Special 3-Way / 2-Way Yogas</th>
+                    <td>
+                      {dayYogas.specialYogas.length === 0
+                        ? "None today"
+                        : dayYogas.specialYogas.map((sy) => (
+                            <span
+                              key={sy.name}
+                              className={sy.nature === "auspicious" ? "pass" : "fail"}
+                              style={{ marginRight: 12 }}
+                            >
+                              {sy.name} ({sy.description})
+                            </span>
+                          ))}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mahadosha Status</th>
+                    <td className={mahadoshas.activeDoshas.length > 0 ? "fail" : "pass"}>
+                      {mahadoshas.activeDoshas.length > 0
+                        ? mahadoshas.activeDoshas.join(", ")
+                        : "Clean (No Guru/Shukra Maudhya, Sankranti, or Masa Shunya Tithi)"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </>
+          )}
+
+          {gowri && (
+            <>
+              <h3>Tamil Gowri Panchangam (Day &amp; Night)</h3>
+              <div className="field-row" style={{ alignItems: "flex-start" }}>
+                <table style={{ flex: 1 }}>
+                  <thead>
+                    <tr>
+                      <th>Day Period</th>
+                      <th>Gowri Name</th>
+                      <th>Nature</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gowri.day.map((slot, i) => (
+                      <tr key={i}>
+                        <td>{fmtWindow(slot)}</td>
+                        <td>{slot.name}</td>
+                        <td className={slot.nature === "inauspicious" ? "fail" : "pass"}>
+                          {slot.nature}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <table style={{ flex: 1 }}>
+                  <thead>
+                    <tr>
+                      <th>Night Period</th>
+                      <th>Gowri Name</th>
+                      <th>Nature</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gowri.night.map((slot, i) => (
+                      <tr key={i}>
+                        <td>{fmtWindow(slot)}</td>
+                        <td>{slot.name}</td>
+                        <td className={slot.nature === "inauspicious" ? "fail" : "pass"}>
+                          {slot.nature}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
 
           {choghadiya && (
             <>

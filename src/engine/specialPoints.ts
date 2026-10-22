@@ -1,6 +1,10 @@
 import { GULIKA_KALAM_SLOT, GULIKA_NIGHT_SLOT } from "../data/panchangaRules";
 import { JAMAGRAHAM_PERIOD_HOURS, JAMAGRAHAM_SEQUENCE, WEEKDAY_LORD } from "../data/jamagraham";
 import { getSiderealAscendant } from "./ascendant";
+import {
+  DEFAULT_EPHEMERIS_SETTINGS,
+  type EphemerisSettings,
+} from "./ephemerisSettings";
 import { dividedWindow } from "./panchanga";
 import { getMostRecentSunrise, getSunriseSunset } from "./sunTimes";
 import type { Planet } from "./types";
@@ -22,6 +26,7 @@ export function computeMandhi(
   date: Date,
   latitude: number,
   longitude: number,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
 ): { longitude: number; rasiIndex: number; windowStart: Date } | null {
   const { sunrise, sunset } = getSunriseSunset(date, latitude, longitude);
   if (!sunrise || !sunset || sunset <= sunrise) return null;
@@ -59,7 +64,7 @@ export function computeMandhi(
   }
 
   const window = dividedWindow(windowStartBound, windowEndBound, 8, slotTable[weekday]);
-  const mandhiLongitude = getSiderealAscendant(window.start, latitude, longitude);
+  const mandhiLongitude = getSiderealAscendant(window.start, latitude, longitude, settings);
 
   return {
     longitude: mandhiLongitude,

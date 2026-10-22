@@ -11,20 +11,28 @@ import { getSiderealAscendant } from "../engine/ascendant";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
 import { computeMandhi } from "../engine/specialPoints";
 import { PLANETS } from "../engine/types";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { useCurrentTransit } from "../hooks/useCurrentTransit";
 
 export default function LiveTransitPage() {
+  const { resolved } = useEphemerisSettings();
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [place, setPlace] = useState<ResolvedPlace>(defaultPlace());
   const { now, longitudes, refresh } = useCurrentTransit(autoRefresh ? 60000 : 0);
 
-  const retrograde = useMemo(() => getRetrogradeStatus(now), [now]);
+  const retrograde = useMemo(
+    () => getRetrogradeStatus(now, undefined, resolved),
+    [now, resolved],
+  );
 
   const lagna = useMemo(
-    () => getSiderealAscendant(now, place.lat, place.lon),
-    [now, place],
+    () => getSiderealAscendant(now, place.lat, place.lon, resolved),
+    [now, place, resolved],
   );
-  const mandhi = useMemo(() => computeMandhi(now, place.lat, place.lon), [now, place]);
+  const mandhi = useMemo(
+    () => computeMandhi(now, place.lat, place.lon, resolved),
+    [now, place, resolved],
+  );
 
   const cellContents = useMemo(() => {
     const cells: Record<number, ChartMarker[]> = {};

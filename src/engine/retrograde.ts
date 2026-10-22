@@ -1,3 +1,8 @@
+import {
+  DEFAULT_EPHEMERIS_SETTINGS,
+  resolveEphemerisSettings,
+  type EphemerisSettings,
+} from "./ephemerisSettings";
 import { getSiderealLongitudes } from "./planetaryPositions";
 import type { LongitudeMap, Planet } from "./types";
 import { PLANETS } from "./types";
@@ -19,10 +24,21 @@ function signedDiff(a: number, b: number): number {
  * and Ketu (mean nodes) always move backward by construction and so are
  * always reported true.
  */
-export function getRetrogradeStatus(date: Date, deltaHours = DELTA_HOURS): RetrogradeMap {
+export function getRetrogradeStatus(
+  date: Date,
+  deltaHours = DELTA_HOURS,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): RetrogradeMap {
+  const resolved = resolveEphemerisSettings(settings);
   const deltaMs = deltaHours * 60 * 60 * 1000;
-  const before: LongitudeMap = getSiderealLongitudes(new Date(date.getTime() - deltaMs));
-  const after: LongitudeMap = getSiderealLongitudes(new Date(date.getTime() + deltaMs));
+  const before: LongitudeMap = getSiderealLongitudes(
+    new Date(date.getTime() - deltaMs),
+    resolved,
+  );
+  const after: LongitudeMap = getSiderealLongitudes(
+    new Date(date.getTime() + deltaMs),
+    resolved,
+  );
 
   const result = {} as RetrogradeMap;
   for (const planet of PLANETS) {

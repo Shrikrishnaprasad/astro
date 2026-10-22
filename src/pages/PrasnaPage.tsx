@@ -4,16 +4,18 @@ import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import { RASIS } from "../data/rasis";
 import { computePrasna } from "../engine/prasna";
 import type { BirthInput } from "../engine/types";
+import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import { useBirthChart } from "../hooks/useBirthChart";
 
 export default function PrasnaPage() {
+  const { resolved } = useEphemerisSettings();
   const [input, setInput] = useState<BirthInput | null>(null);
   const [question, setQuestion] = useState("");
   const chart = useBirthChart(input);
 
   const prasna = useMemo(
-    () => (chart && input ? computePrasna(input, chart) : null),
-    [chart, input],
+    () => (chart && input ? computePrasna(input, chart, resolved) : null),
+    [chart, input, resolved],
   );
 
   return (

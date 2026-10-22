@@ -8,6 +8,11 @@ import {
   YAMAGANDAM_SLOT,
 } from "../data/panchangaRules";
 import { normalizeDegrees } from "./constants";
+import {
+  DEFAULT_EPHEMERIS_SETTINGS,
+  resolveEphemerisSettings,
+  type EphemerisSettings,
+} from "./ephemerisSettings";
 import { getSiderealLongitudes } from "./planetaryPositions";
 import { getMoonriseMoonset, getSunriseSunset } from "./sunTimes";
 
@@ -102,24 +107,28 @@ function nextBoundaryCrossing(
   return null;
 }
 
-function tithiNumberAt(date: Date): number {
-  const { Sun, Moon } = getSiderealLongitudes(date);
-  return Math.floor(normalizeDegrees(Moon - Sun) / 12);
-}
-
-function nakshatraIndexAt(date: Date): number {
-  const { Moon } = getSiderealLongitudes(date);
-  return Math.floor(normalizeDegrees(Moon) / NAKSHATRA_SPAN_DEGREES);
-}
-
-function yogaIndexAt(date: Date): number {
-  const { Sun, Moon } = getSiderealLongitudes(date);
-  return Math.floor(normalizeDegrees(Sun + Moon) / NAKSHATRA_SPAN_DEGREES);
-}
-
-function karanaNumberAt(date: Date): number {
-  const { Sun, Moon } = getSiderealLongitudes(date);
-  return Math.floor(normalizeDegrees(Moon - Sun) / 6);
+function panchangaLongitudeHelpers(settings: EphemerisSettings) {
+  const resolved = resolveEphemerisSettings(settings);
+  const at = (d: Date) => getSiderealLongitudes(d, resolved);
+  return {
+    tithiNumberAt: (d: Date) => {
+      const { Sun, Moon } = at(d);
+      return Math.floor(normalizeDegrees(Moon - Sun) / 12);
+    },
+    nakshatraIndexAt: (d: Date) => {
+      const { Moon } = at(d);
+      return Math.floor(normalizeDegrees(Moon) / NAKSHATRA_SPAN_DEGREES);
+    },
+    yogaIndexAt: (d: Date) => {
+      const { Sun, Moon } = at(d);
+      return Math.floor(normalizeDegrees(Sun + Moon) / NAKSHATRA_SPAN_DEGREES);
+    },
+    karanaNumberAt: (d: Date) => {
+      const { Sun, Moon } = at(d);
+      return Math.floor(normalizeDegrees(Moon - Sun) / 6);
+    },
+    longitudesAt: at,
+  };
 }
 
 export function dividedWindow(sunrise: Date, sunset: Date, parts: number, slot1Indexed: number): TimeWindow {
@@ -130,28 +139,42 @@ export function dividedWindow(sunrise: Date, sunset: Date, parts: number, slot1I
   return { start, end };
 }
 
+export interface ComputePanchangamOptions {
+  /** Compute tithi/nakshatra/yoga/karana end timestamps via bisection (default true). */
+  includeEndTimes?: boolean;
+  /** Compute moonrise/moonset timestamps (default true). */
+  includeMoonRiseSet?: boolean;
+}
+
 export function computePanchangam(
   date: Date,
   latitude?: number,
   longitude?: number,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+  options?: ComputePanchangamOptions,
 ): PanchangamResult {
-  const { Sun, Moon } = getSiderealLongitudes(date);
+  const includeEndTimes = options?.includeEndTimes ?? true;
+  const includeMoonRiseSet = options?.includeMoonRiseSet ?? true;
+  const helpers = panchangaLongitudeHelpers(settings);
+  const { Sun, Moon } = helpers.longitudesAt(date);
 
   const moonMinusSun = normalizeDegrees(Moon - Sun);
   const tithiNumber = Math.floor(moonMinusSun / 12); // 0-29
   const paksha: "Shukla" | "Krishna" = tithiNumber < 15 ? "Shukla" : "Krishna";
   const tithiIndex = tithiNumber % 15;
   const tithiName = tithiIndex === 14 ? TITHI_NAMES[14] : TITHI_NAMES[tithiIndex];
-  const tithiEndsAt = nextBoundaryCrossing(date, tithiNumberAt);
+  const tithiEndsAt = includeEndTimes ? nextBoundaryCrossing(date, helpers.tithiNumberAt) : null;
 
   const nakshatraIndex = Math.floor(normalizeDegrees(Moon) / NAKSHATRA_SPAN_DEGREES);
   const nakshatraName = NAKSHATRAS[nakshatraIndex].nameEnglish;
-  const nakshatraEndsAt = nextBoundaryCrossing(date, nakshatraIndexAt);
+  const nakshatraEndsAt = includeEndTimes
+    ? nextBoundaryCrossing(date, helpers.nakshatraIndexAt)
+    : null;
 
   const yogaSum = normalizeDegrees(Sun + Moon);
   const yogaIndex = Math.floor(yogaSum / NAKSHATRA_SPAN_DEGREES);
   const yogaName = YOGA_NAMES[yogaIndex % YOGA_NAMES.length];
-  const yogaEndsAt = nextBoundaryCrossing(date, yogaIndexAt);
+  const yogaEndsAt = includeEndTimes ? nextBoundaryCrossing(date, helpers.yogaIndexAt) : null;
 
   // Karana: half-tithi (6° steps), 60 per lunar month; first and last of each
   // fortnight pair are fixed, the rest cycle through the 7 movable karanas.
@@ -160,7 +183,9 @@ export function computePanchangam(
   if (karanaNumber === 0) karanaName = FIXED_KARANAS[3]; // Kimstughna
   else if (karanaNumber >= 57) karanaName = FIXED_KARANAS[karanaNumber - 57];
   else karanaName = KARANA_NAMES[(karanaNumber - 1) % 7];
-  const karanaEndsAt = nextBoundaryCrossing(date, karanaNumberAt, 15);
+  const karanaEndsAt = includeEndTimes
+    ? nextBoundaryCrossing(date, helpers.karanaNumberAt, 15)
+    : null;
 
   const vara = VARA_NAMES[date.getUTCDay()];
 
@@ -185,7 +210,9 @@ export function computePanchangam(
 
   if (latitude !== undefined && longitude !== undefined) {
     ({ sunrise, sunset } = getSunriseSunset(date, latitude, longitude));
-    ({ moonrise, moonset } = getMoonriseMoonset(date, latitude, longitude));
+    if (includeMoonRiseSet) {
+      ({ moonrise, moonset } = getMoonriseMoonset(date, latitude, longitude));
+    }
 
     if (sunrise && sunset && sunset > sunrise) {
       const weekday = date.getUTCDay();
