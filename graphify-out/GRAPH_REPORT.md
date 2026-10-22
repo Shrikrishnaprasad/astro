@@ -1,148 +1,140 @@
-# Graph Report - Astro  (2026-10-21)
+# Graph Report - Astro  (2026-10-22)
 
 ## Corpus Check
-- Corpus is ~29,402 words - fits in a single context window. You may not need a graph.
+- Corpus is ~37,324 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 380 nodes · 950 edges · 25 communities (15 shown, 10 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 10 edges (avg confidence: 0.82)
+- 496 nodes · 1395 edges · 22 communities (14 shown, 8 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- Chart Pages & UI
+- App Shell & Routes
+- Chart UI & Arudha
+- Ephemeris & Ayanamsa
+- Dasa & Advanced Jyotish
+- Porutham & Yogas
 - Panchangam Engine
-- npm Dependencies
-- Places & Live Transit
-- Vimshottari Dasa
-- Pushkara & Special Points
-- Birth Form & Geo Data
-- Porutham Rules
-- Ayanamsa & Ascendant
-- App Shell & PWA UI
+- Build Tooling
+- Muhurta & Panchang UI
+- Places & Location
+- Pushkara & Kavippu
 - TypeScript Config
-- India Places Generator
-- South Indian Chart Layout
-- PWA Icon Scripts
-- PWA Assets & Meta
-- README App Overview
-- Vite Client Bootstrap
-- Engine Test Docs
-- Dasa Menu Doc
-- Arudha Menu Doc
-- Panchangam Menu Doc
-- Porutham Menu Doc
+- India Places Script
+- Shadbala Scoring
+- PWA Icon Script
+- Verification Docs
+- PWA Branding
+- README Overview
+- HTML Entry
+- Apple Touch Icon
+- PWA 192 Icon
+- PWA 512 Icon
 
 ## God Nodes (most connected - your core abstractions)
-1. `normalizeDegrees()` - 28 edges
-2. `BirthChartPage()` - 22 edges
-3. `getSiderealLongitudes()` - 20 edges
-4. `computePanchangam()` - 19 edges
-5. `PanchangamPage()` - 19 edges
-6. `ArudhaLagnaPage()` - 18 edges
-7. `react` - 17 edges
-8. `vitest` - 15 edges
-9. `getSiderealAscendant()` - 15 edges
-10. `compilerOptions` - 15 edges
+1. `normalizeDegrees()` - 33 edges
+2. `BirthChartPage()` - 26 edges
+3. `computePanchangam()` - 23 edges
+4. `getSiderealLongitudes()` - 21 edges
+5. `react` - 20 edges
+6. `PanchangamPage()` - 20 edges
+7. `ArudhaLagnaPage()` - 19 edges
+8. `vitest` - 18 edges
+9. `EphemerisAccuracyNotice()` - 18 edges
+10. `getSiderealAscendant()` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Apple touch icon PNG` --conceptually_related_to--> `PWA offline after install`  [INFERRED]
-  public/apple-touch-icon.png → README.md
-- `PWA icon 192x192` --conceptually_related_to--> `PWA offline after install`  [INFERRED]
-  public/pwa-192x192.png → README.md
-- `PWA icon 512x512` --conceptually_related_to--> `PWA offline after install`  [INFERRED]
-  public/pwa-512x512.png → README.md
 - `PWA and mobile web app meta tags` --references--> `SVG favicon branding`  [INFERRED]
   index.html → public/favicon.svg
+- `PlanetDignityScore` --references--> `Planet`  [EXTRACTED]
+  src/engine/shadbala.ts → src/engine/types.ts
+- `App()` --calls--> `EphemerisSettingsProvider()`  [EXTRACTED]
+  src/App.tsx → src/context/EphemerisSettingsContext.tsx
 - `App()` --calls--> `ArudhaLagnaPage()`  [EXTRACTED]
   src/App.tsx → src/pages/ArudhaLagnaPage.tsx
+- `App()` --calls--> `BirthChartPage()`  [EXTRACTED]
+  src/App.tsx → src/pages/BirthChartPage.tsx
 
 ## Import Cycles
 - None detected.
 
-## Hyperedges (group relationships)
-- **Six main app menus** — readme_live_transit, readme_birth_rasi_chart, readme_jamakkol_arudam, readme_dasa_bhukti, readme_panchangam, readme_porutham [EXTRACTED 1.00]
+## Communities (22 total, 8 thin omitted)
 
-## Communities (25 total, 10 thin omitted)
+### Community 0 - "App Shell & Routes"
+Cohesion: 0.08
+Nodes (48): @fontsource/noto-sans-tamil, react, react-dom, react-router-dom, App(), birthFormToInput(), DateTimePlaceForm(), DEFAULT_VALUE (+40 more)
 
-### Community 0 - "Chart Pages & UI"
-Cohesion: 0.14
-Nodes (34): react, DateTimePlaceForm(), PlanetTable(), ChartMarker, SouthIndianChart(), PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME, SURYA_VEEDHI_RASI (+26 more)
+### Community 1 - "Chart UI & Arudha"
+Cohesion: 0.09
+Nodes (45): PlanetTable(), PushkaraAtBirthTable(), cellPosition(), ChartCellMetrics, ChartMarker, ChartMarkerKind, DESKTOP_METRICS, Edge (+37 more)
 
-### Community 1 - "Panchangam Engine"
+### Community 2 - "Ephemeris & Ayanamsa"
+Cohesion: 0.11
+Nodes (38): EphemerisSettingsContext, EphemerisSettingsContextValue, EphemerisSettingsProvider(), loadSettings(), useEphemerisSettings(), getLagnaRasiIndex(), getTropicalAscendant(), horizonAzimuthForEclipticLongitude() (+30 more)
+
+### Community 3 - "Dasa & Advanced Jyotish"
+Cohesion: 0.08
+Nodes (38): vitest, dasaIndexForLord(), DasaLordDuration, VIMSHOTTARI_SEQUENCE, VIMSHOTTARI_TOTAL_YEARS, Nakshatra, NAKSHATRA_SPAN_DEGREES, NAKSHATRAS (+30 more)
+
+### Community 4 - "Porutham & Yogas"
+Cohesion: 0.07
+Nodes (39): ASHTAKAVARGA_BINDU_HOUSES, ASHTAKAVARGA_CONTRIBUTORS, AshtakavargaContributor, GANA, NADI, RAJJU, VASYA_GROUP, YONI (+31 more)
+
+### Community 5 - "Panchangam Engine"
 Cohesion: 0.11
 Nodes (36): JAMAGRAHAM_PERIOD_HOURS, JAMAGRAHAM_SEQUENCE, WEEKDAY_LORD, ayanaForRasi(), GULIKA_KALAM_SLOT, GULIKA_NIGHT_SLOT, RAHU_KALAM_SLOT, Ritu (+28 more)
 
-### Community 2 - "npm Dependencies"
+### Community 6 - "Build Tooling"
 Cohesion: 0.06
 Nodes (32): dependencies, astronomy-engine, @fontsource/noto-sans-tamil, react, react-dom, react-router-dom, devDependencies, @types/react (+24 more)
 
-### Community 3 - "Places & Live Transit"
+### Community 7 - "Muhurta & Panchang UI"
+Cohesion: 0.15
+Nodes (23): CHOGHADIYA_CYCLE, CHOGHADIYA_DAY_OPENER, CHOGHADIYA_NATURE, ChoghadiyaName, DISHA_SHOOL, addDays(), buildChoghadiyaSlots(), ChoghadiyaSlot (+15 more)
+
+### Community 8 - "Places & Location"
+Cohesion: 0.15
+Nodes (19): BirthFormValue, GeoStatus, PlaceSelector(), resolve(), SearchableSelect(), ALL_PLACES, COUNTRIES, DEFAULT_CITY_NAME (+11 more)
+
+### Community 9 - "Pushkara & Kavippu"
 Cohesion: 0.13
-Nodes (27): PlaceSelector(), CHOGHADIYA_CYCLE, CHOGHADIYA_DAY_OPENER, CHOGHADIYA_NATURE, ChoghadiyaName, DISHA_SHOOL, defaultPlace(), addDays() (+19 more)
-
-### Community 4 - "Vimshottari Dasa"
-Cohesion: 0.12
-Nodes (22): dasaIndexForLord(), DasaLordDuration, VIMSHOTTARI_SEQUENCE, VIMSHOTTARI_TOTAL_YEARS, Nakshatra, NAKSHATRA_SPAN_DEGREES, NAKSHATRAS, NAMES (+14 more)
-
-### Community 5 - "Pushkara & Special Points"
-Cohesion: 0.13
-Nodes (17): vitest, NAVAMSA_SPAN_DEGREES, PUSHKARA_BHAGA_DEGREE, PUSHKARA_NAVAMSA_PADAS, Rasi, RASIS, calculateKavippu(), KavippuInput (+9 more)
-
-### Community 6 - "Birth Form & Geo Data"
-Cohesion: 0.14
-Nodes (19): birthFormToInput(), BirthFormValue, DEFAULT_VALUE, GeoStatus, resolve(), SearchableSelect(), ALL_PLACES, COUNTRIES (+11 more)
-
-### Community 7 - "Porutham Rules"
-Cohesion: 0.13
-Nodes (18): GANA, NADI, RAJJU, VASYA_GROUP, YONI, YONI_COMPATIBLE_PAIRS, rasiLord(), computeAllArudhaPadas() (+10 more)
-
-### Community 8 - "Ayanamsa & Ascendant"
-Cohesion: 0.20
-Nodes (16): getLagnaRasiIndex(), getTropicalAscendant(), horizonAzimuthForEclipticLongitude(), getLahiriAyanamsa(), AYANAMSA_MODE, AyanamsaMode, LAHIRI, julianCenturiesSinceJ2000() (+8 more)
-
-### Community 9 - "App Shell & PWA UI"
-Cohesion: 0.18
-Nodes (11): @fontsource/noto-sans-tamil, react-dom, react-router-dom, App(), NavMenu(), PwaStatus(), DasaPage(), DasaRow() (+3 more)
+Nodes (17): NAVAMSA_SPAN_DEGREES, PUSHKARA_BHAGA_DEGREE, PUSHKARA_NAVAMSA_PADAS, Rasi, calculateKavippu(), KavippuInput, KavippuResult, normalizeRasiIndex() (+9 more)
 
 ### Community 10 - "TypeScript Config"
 Cohesion: 0.12
 Nodes (16): compilerOptions, isolatedModules, jsx, lib, module, moduleResolution, noEmit, noFallthroughCasesInSwitch (+8 more)
 
-### Community 11 - "India Places Generator"
+### Community 11 - "India Places Script"
 Cohesion: 0.13
 Nodes (9): byState, cityCount, districtsJson, lines, outPath, root, stateNames, statesJson (+1 more)
 
-### Community 12 - "South Indian Chart Layout"
-Cohesion: 0.19
-Nodes (12): cellPosition(), ChartCellMetrics, ChartMarkerKind, DESKTOP_METRICS, Edge, GRID, KIND_CLASS, outerTagOffset() (+4 more)
+### Community 12 - "Shadbala Scoring"
+Cohesion: 0.29
+Nodes (7): computePartialShadbala(), DEBILITATION, dignityScore(), EXALTATION, FRIENDS, OWN_SIGNS, PlanetDignityScore
 
-### Community 14 - "PWA Assets & Meta"
-Cohesion: 0.33
-Nodes (6): PWA and mobile web app meta tags, Apple touch icon PNG, SVG favicon branding, PWA icon 192x192, PWA icon 512x512, PWA offline after install
-
-### Community 15 - "README App Overview"
-Cohesion: 0.67
-Nodes (3): Birth Rasi Chart menu, Live Transit Gochara menu, Astro Vedic Tamil Astrology Web App
+### Community 14 - "Verification Docs"
+Cohesion: 0.50
+Nodes (3): Chennai 2000 spot-check pipeline, Ephemeris accuracy limits, Vitest engine test suite
 
 ## Knowledge Gaps
-- **17 isolated node(s):** `@types/react`, `@types/react-dom`, `typescript`, `LAHIRI`, `Vitest automated engine tests` (+12 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 128 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **14 isolated node(s):** `@types/react`, `@types/react-dom`, `typescript`, `LAHIRI`, `PWA and mobile web app meta tags` (+9 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 149 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `Chart Pages & UI` to `npm Dependencies`, `Places & Live Transit`, `Vimshottari Dasa`, `Birth Form & Geo Data`, `App Shell & PWA UI`, `South Indian Chart Layout`?**
-  _High betweenness centrality (0.110) - this node is a cross-community bridge._
+- **Why does `react` connect `App Shell & Routes` to `Chart UI & Arudha`, `Ephemeris & Ayanamsa`, `Build Tooling`, `Muhurta & Panchang UI`, `Places & Location`?**
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `computePanchangam()` (e.g. with `karanaNumberAt()` and `nakshatraIndexAt()`) actually correct?**
   _`computePanchangam()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `@types/react`, `@types/react-dom`, `typescript` to the rest of the system?**
-  _17 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Chart Pages & UI` be split into smaller, more focused modules?**
-  _Cohesion score 0.14122448979591837 - nodes in this community are weakly interconnected._
-- **Why does `vitest` connect `Pushkara & Special Points` to `Chart Pages & UI`, `Panchangam Engine`, `npm Dependencies`, `Places & Live Transit`, `Vimshottari Dasa`, `Porutham Rules`, `Ayanamsa & Ascendant`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Should `Panchangam Engine` be split into smaller, more focused modules?**
-  _Cohesion score 0.11033681765389082 - nodes in this community are weakly interconnected._
-- **Should `npm Dependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.062388591800356503 - nodes in this community are weakly interconnected._
+  _14 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `App Shell & Routes` be split into smaller, more focused modules?**
+  _Cohesion score 0.07505827505827506 - nodes in this community are weakly interconnected._
+- **Why does `vitest` connect `Dasa & Advanced Jyotish` to `Chart UI & Arudha`, `Ephemeris & Ayanamsa`, `Porutham & Yogas`, `Panchangam Engine`, `Build Tooling`, `Muhurta & Panchang UI`, `Pushkara & Kavippu`?**
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
+- **Should `Chart UI & Arudha` be split into smaller, more focused modules?**
+  _Cohesion score 0.09275793650793651 - nodes in this community are weakly interconnected._
+- **Why does `normalizeDegrees()` connect `Panchangam Engine` to `Chart UI & Arudha`, `Ephemeris & Ayanamsa`, `Dasa & Advanced Jyotish`, `Pushkara & Kavippu`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
