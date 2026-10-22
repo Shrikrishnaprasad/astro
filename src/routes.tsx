@@ -17,5 +17,6 @@ export const MENU_ROUTES: MenuRoute[] = [
   { path: "/jyotish-scope", label: "Jyotish scope" },
   { path: "/accuracy", label: "Ephemeris accuracy" },
   { path: "/advanced-jyotish", label: "Advanced Jyotish" },
+  { path: "/kp", label: "KP Astrology" },
   { path: "/prasna", label: "Prasna" },
 ];

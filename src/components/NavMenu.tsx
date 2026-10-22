@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MENU_ROUTES } from "../routes";
+import { openKarakamPopup } from "./KarakamPopup";
 
 export default function NavMenu() {
   const [open, setOpen] = useState(false);
@@ -55,6 +56,16 @@ export default function NavMenu() {
             {route.label}
           </NavLink>
         ))}
+        <button
+          type="button"
+          className="nav-karakam"
+          onClick={() => {
+            setOpen(false);
+            openKarakamPopup();
+          }}
+        >
+          Karakam reference <span className="tamil">(காரகம்)</span>
+        </button>
       </nav>
     </>
   );

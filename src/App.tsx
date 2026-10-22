@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { EphemerisSettingsProvider } from "./context/EphemerisSettingsContext";
+import KarakamPopup from "./components/KarakamPopup";
 import NavMenu from "./components/NavMenu";
 import PwaStatus from "./components/PwaStatus";
 import ArudhaLagnaPage from "./pages/ArudhaLagnaPage";
@@ -13,6 +14,7 @@ import MuhurtaPage from "./pages/MuhurtaPage";
 import AdvancedJyotishPage from "./pages/AdvancedJyotishPage";
 import EphemerisAccuracyPage from "./pages/EphemerisAccuracyPage";
 import EphemerisPage from "./pages/EphemerisPage";
+import KpAstrologyPage from "./pages/KpAstrologyPage";
 import PrasnaPage from "./pages/PrasnaPage";
 import JyotishDepthPage from "./pages/JyotishDepthPage";
 import PoruthamPage from "./pages/PoruthamPage";
@@ -39,10 +41,12 @@ export default function App() {
           <Route path="/ephemeris" element={<EphemerisPage />} />
           <Route path="/accuracy" element={<EphemerisAccuracyPage />} />
           <Route path="/advanced-jyotish" element={<AdvancedJyotishPage />} />
+          <Route path="/kp" element={<KpAstrologyPage />} />
           <Route path="/prasna" element={<PrasnaPage />} />
         </Routes>
       </main>
       </div>
+      <KarakamPopup />
     </div>
     </EphemerisSettingsProvider>
   );

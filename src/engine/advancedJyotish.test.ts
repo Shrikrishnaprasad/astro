@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { computeAshtakavarga, evaluateKakshyaPlacements } from "./ashtakavarga";
 import { computeAvayogi, computeYogi } from "./jaiminiPoints";
-import { kpLordChainAtLongitude } from "./kp";
+import {
+  computeFullKpSystem,
+  computeKpPlacidusCusps,
+  getKp249Table,
+  kpLordChainAtLongitude,
+} from "./kp";
 import { computeTithiShunya } from "./tithiShunya";
 import {
   computeAllShodashavarga,
@@ -32,12 +37,43 @@ describe("computeTithiShunya", () => {
   });
 });
 
-describe("kpLordChainAtLongitude", () => {
-  it("returns star, sub, and sub-sub lords", () => {
+describe("kpLordChainAtLongitude & Full KP System", () => {
+  it("returns star, sub, sub-sub, and prana lords", () => {
     const chain = kpLordChainAtLongitude(100);
     expect(chain.nakshatraLord).toBeTruthy();
     expect(chain.subLord).toBeTruthy();
     expect(chain.subSubLord).toBeTruthy();
+    expect(chain.pranaLord).toBeTruthy();
+  });
+
+  it("generates exact 249 entries in the KP 1–249 Sub-Table", () => {
+    const table = getKp249Table();
+    expect(table).toHaveLength(249);
+    expect(table[0].number).toBe(1);
+    expect(table[0].startLongitude).toBeCloseTo(0, 6);
+    expect(table[248].number).toBe(249);
+    expect(table[248].endLongitude).toBeCloseTo(360, 6);
+  });
+
+  it("computes 12 Placidus Cusps, 4-Step Significators, 1–249 Horary, Ruling Planets, and Event Promises", () => {
+    const d = new Date("2026-06-01T06:30:00Z");
+    const cusps = computeKpPlacidusCusps(d, 13.0827, 80.2707);
+    expect(cusps).toHaveLength(12);
+    // Opposite cusps (1 & 7, 4 & 10) are separated by 180°
+    expect(Math.abs(((cusps[6].longitude - cusps[0].longitude + 360) % 360) - 180)).toBeLessThan(
+      1e-4,
+    );
+    expect(Math.abs(((cusps[9].longitude - cusps[3].longitude + 360) % 360) - 180)).toBeLessThan(
+      1e-4,
+    );
+
+    const kp = computeFullKpSystem(d, 13.0827, 80.2707, undefined, 108);
+    expect(kp.horaryEntry?.number).toBe(108);
+    expect(kp.cusps[0].longitude).toBeCloseTo(kp.horaryEntry!.startLongitude, 4);
+    expect(kp.houseSignificators).toHaveLength(12);
+    expect(kp.planetSignificators).toHaveLength(9);
+    expect(kp.eventPromises).toHaveLength(9);
+    expect(kp.rulingPlanets.rankedUnique.length).toBeGreaterThan(0);
   });
 });
 

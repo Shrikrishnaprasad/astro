@@ -1,0 +1,241 @@
+import type { KarakaEntry } from "./types";
+
+export const SPECIAL_KARAKAS: KarakaEntry[] = [
+  {
+    id: "special-chara",
+    index: 1,
+    section: "special",
+    titleEnglish: "Chara Karakas (Jaimini)",
+    titleTamil: "சர காரகங்கள் — ஜைமினி",
+    subtitle: "Variable significators ranked by degree within sign (highest degree first)",
+    badge: "7 or 8 karaka scheme",
+    attributes: [
+      { label: "How to rank", value: "Sort Sun to Saturn by degrees within their sign, highest first. In the 8-karaka scheme Rahu is included using 30° minus its degree." },
+      { label: "Ties", value: "If two planets have the same degree, the one with more minutes/seconds ranks higher." },
+      { label: "7-karaka scheme", value: "Putrakaraka is merged with Matrukaraka; Rahu excluded (Parashara alternative)." },
+    ],
+    categories: [
+      {
+        category: "Karakas in order (காரக வரிசை)",
+        categoryTamil: "வரிசை",
+        items: [
+          "1. Atmakaraka (AK — ஆத்மகாரகன்): Self, soul, king of the chart, soul's desire",
+          "2. Amatyakaraka (AmK — அமாத்யகாரகன்): Minister, career, advisors, means of livelihood",
+          "3. Bhratrukaraka (BK — பிராத்ருகாரகன்): Siblings, courage, guru (in some views)",
+          "4. Matrukaraka (MK — மாத்ருகாரகன்): Mother, education, home, property",
+          "5. Pitrukaraka (PiK — பித்ருகாரகன்): Father, elders, authority (8-karaka scheme only)",
+          "6. Putrakaraka (PK — புத்திரகாரகன்): Children, intelligence, followers",
+          "7. Gnatikaraka (GK — ஞாதிகாரகன்): Cousins, enemies, disease, obstacles, competition",
+          "8. Darakaraka (DK — தாரகாரகன்): Spouse, partnerships, business associates",
+        ],
+      },
+      {
+        category: "Key uses (பயன்பாடு)",
+        categoryTamil: "பயன்பாடு",
+        items: [
+          "Karakamsa: Navamsa sign of the Atmakaraka — shows spiritual path and Ishta Devata (12th from Karakamsa)",
+          "Swamsa / Karakamsa Lagna used for profession, spirituality and moksha analysis",
+          "AK–AmK or AK–DK conjunction/aspect forms Jaimini Raja Yoga",
+          "Chara Dasa timing uses these karakas for event prediction",
+        ],
+      },
+    ],
+  },
+  {
+    id: "special-sthira",
+    index: 2,
+    section: "special",
+    titleEnglish: "Sthira Karakas (Fixed Significators)",
+    titleTamil: "ஸ்திர காரகங்கள்",
+    subtitle: "Fixed relationship significators, used in Jaimini for longevity of relatives",
+    badge: "Fixed",
+    attributes: [
+      { label: "Usage", value: "Used to time the longevity and events of relatives (Sthira Dasa / Shoola Dasa)." },
+    ],
+    categories: [
+      {
+        category: "Planet to relative (கிரகம் — உறவு)",
+        categoryTamil: "உறவு",
+        items: [
+          "Sun or Venus (whichever is stronger): Father",
+          "Moon or Mars (whichever is stronger): Mother",
+          "Mars: Younger siblings, brother-in-law",
+          "Mercury: Maternal relatives, maternal uncle",
+          "Jupiter: Paternal grandfather, husband (female chart), children",
+          "Venus: Wife, father-in-law, mother-in-law",
+          "Saturn: Sons, elder siblings",
+          "Rahu: Paternal grandfather (Pitamaha), maternal grandmother",
+          "Ketu: Maternal grandfather (Matamaha), paternal grandmother",
+        ],
+      },
+    ],
+  },
+  {
+    id: "special-bhava-karakas",
+    index: 3,
+    section: "special",
+    titleEnglish: "Naisargika Bhava Karakas (House Significators)",
+    titleTamil: "பாவ காரகங்கள் — 12 பாவங்கள்",
+    subtitle: "Planet that naturally signifies each house (Parashara / Phaladeepika)",
+    badge: "12 houses",
+    attributes: [
+      { label: "Rule", value: "Judge a house through its lord, its occupants AND its karaka planet together." },
+    ],
+    categories: [
+      {
+        category: "House to Karaka (பாவம் — காரகன்)",
+        categoryTamil: "பாவ காரகன்",
+        items: [
+          "1st (Lagna): Sun — self, vitality, body",
+          "2nd (Dhana): Jupiter — wealth; Mercury — speech",
+          "3rd (Sahaja): Mars — younger siblings, courage",
+          "4th (Sukha): Moon — mother; Mercury — education; Venus — vehicles; Mars — land",
+          "5th (Putra): Jupiter — children, wisdom",
+          "6th (Ari): Mars — enemies; Saturn — disease, service",
+          "7th (Kalatra): Venus — wife / spouse; Jupiter — husband (female chart)",
+          "8th (Ayur): Saturn — longevity",
+          "9th (Bhagya): Jupiter — fortune, guru; Sun — father",
+          "10th (Karma): Sun, Mercury, Jupiter, Saturn — profession, authority",
+          "11th (Labha): Jupiter — gains, elder siblings",
+          "12th (Vyaya): Saturn — losses; Ketu — moksha; Venus — bed pleasures",
+        ],
+      },
+      {
+        category: "Karako Bhava Nashaya (காரகோ பாவ நாசாய)",
+        categoryTamil: "காரக நாசம்",
+        items: [
+          "A karaka placed in its own signified house can harm that house's significations",
+          "Classic examples: Jupiter in 5th (children delayed), Venus in 7th (marital issues), Saturn in 8th (exception — gives long life), Sun in 9th (father issues), Mars in 3rd (sibling issues)",
+          "Mitigated if the karaka is in own sign, exalted, or aspected by benefics",
+        ],
+      },
+    ],
+  },
+  {
+    id: "special-classifications",
+    index: 4,
+    section: "special",
+    titleEnglish: "Graha Classifications & Groupings",
+    titleTamil: "கிரக வகைப்பாடுகள்",
+    subtitle: "Cabinet, Dhatu-Moola-Jeeva, benefic/malefic, gender, guna, element",
+    badge: "Reference",
+    attributes: [],
+    categories: [
+      {
+        category: "Planetary Cabinet (கிரக அமைச்சரவை)",
+        categoryTamil: "அமைச்சரவை",
+        items: [
+          "King: Sun & Moon",
+          "Commander-in-chief: Mars",
+          "Prince / heir: Mercury",
+          "Ministers: Jupiter & Venus",
+          "Servant: Saturn",
+          "Army: Rahu & Ketu",
+        ],
+      },
+      {
+        category: "Dhatu — Moola — Jeeva",
+        categoryTamil: "தாது / மூலம் / ஜீவன்",
+        items: [
+          "Dhatu (minerals, metals): Mars, Saturn, Rahu",
+          "Moola (plants, roots): Sun, Moon, Ketu",
+          "Jeeva (living beings): Mercury, Jupiter, Venus",
+        ],
+      },
+      {
+        category: "Natural Benefics & Malefics (சுபர் / பாபர்)",
+        categoryTamil: "சுப / பாப",
+        items: [
+          "Benefics: Jupiter, Venus, waxing Moon, unafflicted Mercury",
+          "Malefics: Saturn, Mars, Sun, Rahu, Ketu, waning Moon, afflicted Mercury",
+          "Functional benefic/malefic status depends on Lagna (house lordship)",
+        ],
+      },
+      {
+        category: "Gender, Guna & Element (பால் / குணம் / பூதம்)",
+        categoryTamil: "பால் & குணம்",
+        items: [
+          "Male: Sun, Mars, Jupiter • Female: Moon, Venus, Rahu • Neutral: Mercury, Saturn, Ketu",
+          "Sattva: Sun, Moon, Jupiter • Rajas: Mercury, Venus • Tamas: Mars, Saturn, Rahu, Ketu",
+          "Fire: Sun, Mars, Ketu • Earth: Mercury • Air: Saturn, Rahu • Water: Moon, Venus • Ether: Jupiter",
+        ],
+      },
+      {
+        category: "Varna (Caste) of Grahas",
+        categoryTamil: "வர்ணம்",
+        items: [
+          "Brahmana: Jupiter, Venus",
+          "Kshatriya: Sun, Mars",
+          "Vaishya: Moon, Mercury",
+          "Shudra: Saturn",
+          "Outcaste / Mleccha: Rahu, Ketu",
+        ],
+      },
+      {
+        category: "Planetary Aspects (கிரக பார்வை)",
+        categoryTamil: "பார்வை",
+        items: [
+          "All planets aspect the 7th house from themselves (full aspect)",
+          "Mars: special aspects on 4th and 8th",
+          "Jupiter: special aspects on 5th and 9th",
+          "Saturn: special aspects on 3rd and 10th",
+          "Rahu & Ketu: 5th, 7th and 9th (per many traditions)",
+        ],
+      },
+    ],
+  },
+  {
+    id: "special-sapta-dhatu",
+    index: 5,
+    section: "special",
+    titleEnglish: "Body Tissues, Senses & Age Karakas",
+    titleTamil: "சப்த தாது, இந்திரியங்கள் & வயது",
+    subtitle: "Sapta Dhatu, Jnanendriya, planetary maturity age and natural life periods",
+    badge: "Reference",
+    attributes: [],
+    categories: [
+      {
+        category: "Sapta Dhatu (ஏழு தாதுக்கள்)",
+        categoryTamil: "தாது",
+        items: [
+          "Bones (Asthi): Sun",
+          "Blood (Rakta): Moon",
+          "Marrow (Majja): Mars",
+          "Skin (Twak): Mercury",
+          "Fat (Medas): Jupiter",
+          "Semen / Ovum (Shukra): Venus",
+          "Nerves / Muscles (Snayu): Saturn",
+        ],
+      },
+      {
+        category: "Sense Organs (ஞானேந்திரியங்கள்)",
+        categoryTamil: "இந்திரியம்",
+        items: [
+          "Sight (Eyes): Sun & Moon",
+          "Taste (Tongue): Moon & Venus",
+          "Smell (Nose): Mercury",
+          "Hearing (Ears): Jupiter",
+          "Touch (Skin): Saturn & Mercury",
+        ],
+      },
+      {
+        category: "Age of Maturity (கிரக பக்குவ வயது)",
+        categoryTamil: "பக்குவ வயது",
+        items: [
+          "Jupiter: 16 • Sun: 22 • Moon: 24 • Venus: 25",
+          "Mars: 28 • Mercury: 32 • Saturn: 36",
+          "Rahu: 42 • Ketu: 48",
+        ],
+      },
+      {
+        category: "Natural Life Periods (வாழ்க்கைப் பருவங்கள்)",
+        categoryTamil: "பருவம்",
+        items: [
+          "Infancy: Moon • Childhood: Mercury • Youth: Venus",
+          "Prime/Adulthood: Sun • Middle age: Mars",
+          "Mature age: Jupiter • Old age: Saturn",
+        ],
+      },
+    ],
+  },
+];

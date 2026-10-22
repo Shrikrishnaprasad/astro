@@ -10,6 +10,7 @@ export type JyotishPageId =
   | "muhurta"
   | "porutham"
   | "advanced-jyotish"
+  | "kp"
   | "prasna"
   | "ephemeris"
   | "global";
@@ -164,10 +165,11 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
   },
   {
     id: "kp-prasna",
-    name: "KP sublords & Prasna",
-    status: "partial",
-    summary: "Vimshottari-proportional star/sub/sub-sub lords; basic Prasna page with lagna/Moon hints.",
-    pages: ["advanced-jyotish", "prasna"],
+    name: "KP Astrology System (Placidus Cusps, 4-Step Significators, 1–249 Horary, RP)",
+    status: "implemented",
+    summary:
+      "12 Placidus House Cusps (Sign/Star/Sub/Sub-Sub/Prana), Bhava Chalit, 4-Fold Significators (A/B/C/D + Rahu/Ketu rules), 1–249 Horary Number Chart, Ruling Planets (RP), and 9 Cuspal Sub-Lord Event Promise analyzers.",
+    pages: ["kp", "prasna", "advanced-jyotish"],
   },
   {
     id: "muhurta-panchangam",
