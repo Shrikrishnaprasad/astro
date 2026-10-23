@@ -9,18 +9,32 @@ import {
   computeMahadoshas,
   computeSpecialDayYogas,
   computeVarjyamAndAmrita,
+  computeVishtiWindows,
   evaluateMuhurtaKundali,
+  evaluatePointShuddhi,
   type DayYogaAnalysis,
   type KundaliShuddhiResult,
   type MahadoshaAnalysis,
 } from "./classicalMuhurta";
 import type { EphemerisSettings } from "./ephemerisSettings";
 import { DEFAULT_EPHEMERIS_SETTINGS } from "./ephemerisSettings";
+import {
+  preferredGowriNames,
+  preferredHoraPlanets,
+  prepareNatalDasa,
+  scoreCoupleFromStars,
+  scoreCoupleMatch,
+  scoreNatalBala,
+} from "./muhurtaNatal";
 import { computeChoghadiya, computeMuhurtas, getDishaShool } from "./muhurtas";
+import { longitudeToNavamsa } from "./navamsa";
 import { computePanchangam, type TimeWindow } from "./panchanga";
 import { getSiderealLongitudes } from "./planetaryPositions";
+import { computePushkaraForLongitude } from "./pushkara";
+import { longitudeToRasiNakshatra } from "./rasiNakshatra";
+import { computeMandhi } from "./specialPoints";
 import { getSunriseSunset } from "./sunTimes";
-import type { LongitudeMap } from "./types";
+import type { ChartResult, LongitudeMap } from "./types";
 
 export const MAX_MUHURTA_RANGE_DAYS = 365;
 
@@ -47,6 +61,12 @@ export interface MuhurtaSearchInput {
   /** Max top days to return (default 60). */
   maxResults?: number;
   settings?: EphemerisSettings;
+  /** Full natal chart for Person 1 (Dasa, SAV, Sade Sati, natal Lagna). */
+  natalChart?: ChartResult;
+  natalBirthDate?: Date;
+  /** Full natal chart for Person 2. */
+  secondNatalChart?: ChartResult;
+  secondNatalBirthDate?: Date;
 }
 
 export interface SuggestedMuhurtaSlot {
@@ -71,6 +91,14 @@ export interface SuggestedMuhurtaSlot {
   slotScore: number;
   /** Short natural-language explanation of what makes this time window special/auspicious. */
   specialDescription: string;
+  nakshatraPada: number;
+  navamsaLagnaName: string;
+  pushkaraLagna: boolean;
+  pushkaraMoon: boolean;
+  lagnaGandanta: boolean;
+  lagnaMrityuBhaga: boolean;
+  isPreferredHora: boolean;
+  isPreferredGowri: boolean;
 }
 
 export interface MuhurtaDayResult {
@@ -101,6 +129,11 @@ export interface MuhurtaDayResult {
   secondChandrabalaGood: boolean | null;
   flags: string[];
   slots: SuggestedMuhurtaSlot[];
+  natalDasaLabel: string | null;
+  secondNatalDasaLabel: string | null;
+  sadeSati: boolean;
+  couplePoruthamLabel: string | null;
+  vishtiWindows: TimeWindow[];
 }
 
 const TARABALA_NAMES = [
@@ -286,6 +319,7 @@ function allInauspiciousWindows(
   panch: ReturnType<typeof computePanchangam>,
   durmuhurtams: TimeWindow[],
   varjyam: TimeWindow,
+  vishtiWindows: TimeWindow[],
 ): TimeWindow[] {
   const out: TimeWindow[] = [];
   if (panch.rahuKalam) out.push(panch.rahuKalam);
@@ -293,6 +327,7 @@ function allInauspiciousWindows(
   if (panch.gulikaKalam) out.push(panch.gulikaKalam);
   out.push(...durmuhurtams);
   out.push(varjyam);
+  out.push(...vishtiWindows);
   return out;
 }
 
@@ -335,7 +370,7 @@ function enrichSlot(
   latitude: number,
   longitude: number,
   panch: ReturnType<typeof computePanchangam>,
-  dayLongitudes: LongitudeMap,
+  _dayLongitudes: LongitudeMap,
   gowri: ReturnType<typeof computeGowriPanchangam>,
   nextSunrise: Date | null,
   activity: MuhurtaActivityDef,
@@ -345,6 +380,8 @@ function enrichSlot(
 ): SuggestedMuhurtaSlot {
   const mid = new Date((cleanWindow.start.getTime() + cleanWindow.end.getTime()) / 2);
   const lagnaLon = getSiderealAscendant(mid, latitude, longitude, settings);
+  const slotLongitudes = getSiderealLongitudes(mid, settings);
+  const mandi = computeMandhi(mid, latitude, longitude, settings);
   const lagnaRasiIndex = Math.floor(lagnaLon / 30) % 12;
   const lagnaName = RASIS[lagnaRasiIndex].nameEnglish;
   const isPreferredLagna = activity.preferredLagnaRasis.includes(lagnaRasiIndex);
@@ -358,8 +395,12 @@ function enrichSlot(
   const weekday = date.getUTCDay();
   const horaPlanet = getPlanetaryHora(mid, panch.sunrise, panch.sunset, nextSunrise, weekday);
   const isBeneficHora = BENEFIC_HORA_PLANETS.has(horaPlanet);
+  const horaPreferred = preferredHoraPlanets(activity.id);
+  const isPreferredHora = horaPreferred.includes(horaPlanet);
 
   const activeGowri = findActiveGowri(mid, gowri);
+  const gowriPreferred = preferredGowriNames(activity.id);
+  const isPreferredGowri = activeGowri.name ? gowriPreferred.includes(activeGowri.name) : false;
 
   const lunarTithi1To30 =
     (panch.paksha === "Shukla" ? 0 : 15) + (panch.tithiIndex % 15) + 1;
@@ -370,13 +411,22 @@ function enrichSlot(
     lagnaRasiIndex,
   );
 
-  const kundali = evaluateMuhurtaKundali(lagnaRasiIndex, dayLongitudes);
+  const kundali = evaluateMuhurtaKundali(lagnaRasiIndex, slotLongitudes, mandi?.rasiIndex);
+  const lagnaPoint = evaluatePointShuddhi(lagnaLon, "lagna");
+  const moonPoint = evaluatePointShuddhi(slotLongitudes.Moon, "moon");
+  const pushkaraLagna = computePushkaraForLongitude(lagnaLon);
+  const pushkaraMoon = computePushkaraForLongitude(slotLongitudes.Moon);
+  const navamsaLagna = longitudeToNavamsa(lagnaLon);
+  const nakshatraPada = longitudeToRasiNakshatra(slotLongitudes.Moon).pada;
 
   let slotScore = 0;
   if (isPreferredLagna) slotScore += 8;
   if (isAshtamaLagna) slotScore -= 15;
-  if (isBeneficHora) slotScore += 5;
-  if (activeGowri.auspicious) slotScore += 5;
+  if (isPreferredHora) slotScore += 7;
+  else if (isBeneficHora) slotScore += 3;
+  else slotScore -= 3;
+  if (isPreferredGowri) slotScore += 6;
+  else if (activeGowri.auspicious) slotScore += 3;
   else slotScore -= 6;
   if (panchaka.isClean) slotScore += 6;
   else slotScore -= 8;
@@ -385,13 +435,25 @@ function enrichSlot(
   if (kundali.hasBhriguShatka) slotScore -= 8;
   if (kundali.hasPapaKartari) slotScore -= 10;
   if (kundali.beneficsInKendraTrikona.length >= 2) slotScore += 5;
+  if (kundali.maleficsInKendra.length > 0) slotScore -= 4 * kundali.maleficsInKendra.length;
+  if (kundali.moonDusthana) slotScore -= 8;
+  if (kundali.mandiInDusthana) slotScore -= 6;
+  if (pushkaraLagna.isPushkaraNavamsa) slotScore += 8;
+  if (pushkaraMoon.isPushkaraNavamsa) slotScore += 6;
+  if (pushkaraLagna.isNearPushkaraBhaga) slotScore += 4;
+  if (lagnaPoint.nakshatraGandanta || lagnaPoint.rasiGandanta) slotScore -= 12;
+  if (moonPoint.nakshatraGandanta || moonPoint.rasiGandanta) slotScore -= 10;
+  if (lagnaPoint.mrityuBhaga) slotScore -= 12;
+  if (moonPoint.mrityuBhaga) slotScore -= 10;
 
   const highlights: string[] = [];
   highlights.push(label);
   if (activeGowri.name && activeGowri.auspicious && !label.includes("Gowri")) {
     highlights.push(`auspicious Gowri ${activeGowri.name}`);
   }
-  if (isBeneficHora) {
+  if (isPreferredHora) {
+    highlights.push(`preferred ${horaPlanet} Hora`);
+  } else if (isBeneficHora) {
     highlights.push(`benefic ${horaPlanet} Hora`);
   }
   if (isPreferredLagna) {
@@ -399,12 +461,15 @@ function enrichSlot(
   } else if (!isAshtamaLagna) {
     highlights.push(`${lagnaName} Lagna`);
   }
+  highlights.push(`D9 ${RASIS[navamsaLagna.rasiIndex].nameEnglish}`);
   if (kundali.isAshtamaShuddhi) {
     highlights.push("8th house empty (Ashtama Shuddhi)");
   }
   if (kundali.beneficsInKendraTrikona.length > 0) {
     highlights.push(`benefics (${kundali.beneficsInKendraTrikona.join(", ")}) in Kendra/Trikona`);
   }
+  if (pushkaraLagna.isPushkaraNavamsa) highlights.push("Pushkara Lagna");
+  if (pushkaraMoon.isPushkaraNavamsa) highlights.push("Pushkara Moon");
   if (panchaka.isClean) {
     highlights.push("Panchaka Rahita (dosha-free)");
   }
@@ -416,9 +481,16 @@ function enrichSlot(
   }
   if (kundali.hasPapaKartari) cautions.push("Papa Kartari on Lagna");
   if (kundali.hasBhriguShatka) cautions.push("Venus in 6th (Bhrigu Shatka)");
+  if (kundali.moonDusthana) cautions.push(`Moon in ${kundali.moonHouse}th`);
+  if (kundali.maleficsInKendra.length) {
+    cautions.push(`malefics in Kendra (${kundali.maleficsInKendra.join(", ")})`);
+  }
+  if (kundali.mandiInDusthana) cautions.push(`Mandi in ${kundali.mandiHouse}th`);
+  if (lagnaPoint.nakshatraGandanta || lagnaPoint.rasiGandanta) cautions.push("Lagna Gandanta");
+  if (lagnaPoint.mrityuBhaga) cautions.push("Lagna Mrityu Bhaga");
   if (!panchaka.isClean) cautions.push(panchaka.name);
 
-  let specialDescription = `Combines ${highlights.join(" + ")} — 100% clear of Rahu Kalam, Yamagandam, Gulika, Durmuhurtam & Varjyam.`;
+  let specialDescription = `Combines ${highlights.join(" + ")} — clear of Rahu Kalam, Yamagandam, Gulika, Durmuhurtam, Varjyam & Vishti.`;
   if (cautions.length > 0) {
     specialDescription += ` (Note: ${cautions.join("; ")}).`;
   }
@@ -441,6 +513,14 @@ function enrichSlot(
     kundali,
     slotScore,
     specialDescription,
+    nakshatraPada,
+    navamsaLagnaName: RASIS[navamsaLagna.rasiIndex].nameEnglish,
+    pushkaraLagna: pushkaraLagna.isPushkaraNavamsa,
+    pushkaraMoon: pushkaraMoon.isPushkaraNavamsa,
+    lagnaGandanta: lagnaPoint.nakshatraGandanta || lagnaPoint.rasiGandanta,
+    lagnaMrityuBhaga: lagnaPoint.mrityuBhaga,
+    isPreferredHora,
+    isPreferredGowri,
   };
 }
 
@@ -453,6 +533,7 @@ function collectSlotsForDay(
   durmuhurtams: TimeWindow[],
   varjyam: TimeWindow,
   amritaKalam: TimeWindow,
+  vishtiWindows: TimeWindow[],
   activity: MuhurtaActivityDef,
   birthRasiIndex: number | undefined,
   secondBirthRasiIndex: number | undefined,
@@ -465,7 +546,7 @@ function collectSlotsForDay(
   const gowri = computeGowriPanchangam(date, latitude, longitude);
   const nextDayDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
   const nextSunrise = getSunriseSunset(nextDayDate, latitude, longitude).sunrise;
-  const exclusions = allInauspiciousWindows(panch, durmuhurtams, varjyam);
+  const exclusions = allInauspiciousWindows(panch, durmuhurtams, varjyam, vishtiWindows);
   const slots: SuggestedMuhurtaSlot[] = [];
 
   const useChoghadiya = slotSystem === "both" || slotSystem === "choghadiya";
@@ -506,7 +587,7 @@ function collectSlotsForDay(
     if (includeNightSlots) {
       for (const slot of chogh.night) {
         if (!choghadiyaOk(slot.name, activity)) continue;
-        const cleanPieces = subtractTimeWindows(slot, [varjyam, ...durmuhurtams], 15);
+        const cleanPieces = subtractTimeWindows(slot, [varjyam, ...durmuhurtams, ...vishtiWindows], 15);
         for (const piece of cleanPieces) {
           slots.push(
             enrichSlot(
@@ -562,7 +643,7 @@ function collectSlotsForDay(
     if (includeNightSlots) {
       for (const slot of gowri.night) {
         if (slot.nature !== "auspicious") continue;
-        const cleanPieces = subtractTimeWindows(slot, [varjyam, ...durmuhurtams], 15);
+        const cleanPieces = subtractTimeWindows(slot, [varjyam, ...durmuhurtams, ...vishtiWindows], 15);
         for (const piece of cleanPieces) {
           slots.push(
             enrichSlot(
@@ -631,7 +712,7 @@ function collectSlotsForDay(
     const cleanPieces =
       period === "day"
         ? subtractTimeWindows(w, exclusions, 10)
-        : subtractTimeWindows(w, [varjyam, ...durmuhurtams], 10);
+        : subtractTimeWindows(w, [varjyam, ...durmuhurtams, ...vishtiWindows], 10);
     const label =
       key === "abhijit"
         ? "Abhijit Muhurta"
@@ -848,6 +929,34 @@ function scoreDay(
     score -= maudhyaSensitive ? 30 : 8;
     flags.push("Shukra Maudhya (Venus Combust)");
   }
+  if (mahadoshas.budhaMaudhya) {
+    score -= 6;
+    flags.push("Budha Maudhya (Mercury Combust)");
+  }
+  if (mahadoshas.grahaYuddha) {
+    score -= 16;
+    flags.push("Graha Yuddha");
+  }
+  if (mahadoshas.moonGandanta) {
+    score -= 16;
+    flags.push("Moon Gandanta");
+  }
+  if (mahadoshas.tithiGandanta) {
+    score -= 12;
+    flags.push("Tithi Gandanta");
+  }
+  if (mahadoshas.mrityuBhagaMoon) {
+    score -= 14;
+    flags.push("Moon Mrityu Bhaga");
+  }
+  if (mahadoshas.lattaHits.length) {
+    score -= 8;
+    flags.push(...mahadoshas.lattaHits);
+  }
+  if (mahadoshas.vedhaHits.length) {
+    score -= 8;
+    flags.push(...mahadoshas.vedhaHits);
+  }
 
   const weekday = date.getUTCDay();
   if (activity.preferredWeekdays.includes(weekday)) {
@@ -900,6 +1009,25 @@ export function searchMuhurtaDays(input: MuhurtaSearchInput): MuhurtaDayResult[]
   const maxResults = Math.min(Math.max(1, input.maxResults ?? 60), 365);
   const slotSystem = input.slotSystem ?? "both";
   const results: MuhurtaDayResult[] = [];
+  const p1Dasa = input.natalChart && input.natalBirthDate
+    ? prepareNatalDasa(input.natalChart, input.natalBirthDate)
+    : undefined;
+  const p2Dasa = input.secondNatalChart && input.secondNatalBirthDate
+    ? prepareNatalDasa(input.secondNatalChart, input.secondNatalBirthDate)
+    : undefined;
+  const coupleMatch =
+    input.natalChart && input.secondNatalChart
+      ? scoreCoupleMatch(input.natalChart, input.secondNatalChart)
+      : input.birthNakshatraIndex !== undefined &&
+          input.secondBirthNakshatraIndex !== undefined &&
+          (input.activity.id === "wedding" || input.activity.id === "betrothal")
+        ? scoreCoupleFromStars(
+            input.birthNakshatraIndex,
+            input.secondBirthNakshatraIndex,
+            input.birthRasiIndex,
+            input.secondBirthRasiIndex,
+          )
+        : null;
 
   for (let i = 0; i < range; i++) {
     const dateStr = addCalendarDays(input.startDateStr, i);
@@ -916,6 +1044,13 @@ export function searchMuhurtaDays(input: MuhurtaSearchInput): MuhurtaDayResult[]
     const mahadoshas = computeMahadoshas(date, panch.tithiIndex, settings);
     const { varjyam, amritaKalam } = computeVarjyamAndAmrita(date, settings);
     const durmuhurtams = computeDurmuhurtam(date, input.latitude, input.longitude);
+    const vishtiDayStart = panch.sunrise ?? new Date(date.getTime() - 6 * 3600_000);
+    const vishtiDayEnd =
+      panch.sunset && !input.includeNightSlots
+        ? panch.sunset
+        : getSunriseSunset(new Date(date.getTime() + 24 * 3600_000), input.latitude, input.longitude)
+            .sunrise ?? new Date(date.getTime() + 18 * 3600_000);
+    const vishtiWindows = computeVishtiWindows(date, vishtiDayStart, vishtiDayEnd, settings);
 
     let {
       score,
@@ -951,6 +1086,7 @@ export function searchMuhurtaDays(input: MuhurtaSearchInput): MuhurtaDayResult[]
       durmuhurtams,
       varjyam,
       amritaKalam,
+      vishtiWindows,
       input.activity,
       input.birthRasiIndex,
       input.secondBirthRasiIndex,
@@ -964,6 +1100,53 @@ export function searchMuhurtaDays(input: MuhurtaSearchInput): MuhurtaDayResult[]
     } else {
       const bestSlotBonus = Math.max(...slots.map((s) => s.slotScore));
       score += Math.max(0, Math.min(15, Math.round(bestSlotBonus / 2)));
+    }
+
+    const bestLagna = slots[0]
+      ? [...slots].sort((a, b) => b.slotScore - a.slotScore)[0].lagnaRasiIndex
+      : undefined;
+    let natalDasaLabel: string | null = null;
+    let secondNatalDasaLabel: string | null = null;
+    let sadeSati = false;
+    if (input.natalChart) {
+      const natal = scoreNatalBala(
+        "P1 ",
+        input.natalChart,
+        input.natalBirthDate,
+        p1Dasa,
+        date,
+        panch.moonRasiIndex,
+        panch.nakshatraIndex,
+        Math.floor(dayLongitudes.Saturn / 30) % 12,
+        Math.floor(dayLongitudes.Jupiter / 30) % 12,
+        bestLagna,
+      );
+      score += natal.deltaScore;
+      flags.push(...natal.flags);
+      natalDasaLabel = natal.dasaLabel;
+      sadeSati = natal.sadeSati || natal.ashtamaSani;
+    }
+    if (input.secondNatalChart) {
+      const natal2 = scoreNatalBala(
+        "P2 ",
+        input.secondNatalChart,
+        input.secondNatalBirthDate,
+        p2Dasa,
+        date,
+        panch.moonRasiIndex,
+        panch.nakshatraIndex,
+        Math.floor(dayLongitudes.Saturn / 30) % 12,
+        Math.floor(dayLongitudes.Jupiter / 30) % 12,
+        bestLagna,
+      );
+      score += natal2.deltaScore;
+      flags.push(...natal2.flags);
+      secondNatalDasaLabel = natal2.dasaLabel;
+      sadeSati = sadeSati || natal2.sadeSati || natal2.ashtamaSani;
+    }
+    if (coupleMatch) {
+      score += coupleMatch.deltaScore;
+      flags.push(...coupleMatch.flags);
     }
 
     if (input.activity.id === "travel") {
@@ -1002,6 +1185,9 @@ export function searchMuhurtaDays(input: MuhurtaSearchInput): MuhurtaDayResult[]
     if (secondTarabalaGood && secondTarabalaLabel) {
       dayReasons.push(`Partner Tarabala (${secondTarabalaLabel})`);
     }
+    if (natalDasaLabel) dayReasons.push(`running ${natalDasaLabel} Dasa`);
+    if (coupleMatch) dayReasons.push(`couple match ${coupleMatch.label}`);
+    if (!sadeSati && input.natalChart) dayReasons.push("not under Sade Sati");
     if (slots.length > 0) {
       const topSlot = [...slots].sort((a, b) => b.slotScore - a.slotScore)[0];
       dayReasons.push(
@@ -1038,6 +1224,11 @@ export function searchMuhurtaDays(input: MuhurtaSearchInput): MuhurtaDayResult[]
       secondChandrabalaGood,
       flags,
       slots,
+      natalDasaLabel,
+      secondNatalDasaLabel,
+      sadeSati,
+      couplePoruthamLabel: coupleMatch?.label ?? null,
+      vishtiWindows,
     });
   }
 

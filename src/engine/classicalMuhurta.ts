@@ -5,14 +5,26 @@ import {
   ANANDADI_YOGAS,
   DAGDHA_TITHI_BY_VARA,
   DAY_DURMUHURTAM_SLOTS,
+  GANDANTA_HEAD_NAK,
+  GANDANTA_HEAD_RASI,
+  GANDANTA_NAK_PADA_DEG,
+  GANDANTA_RASI_DEG,
+  GANDANTA_TAIL_NAK,
+  GANDANTA_TAIL_RASI,
+  GANDANTA_TITHI_ORB_DEG,
   GOWRI_DAY_TABLE,
   GOWRI_NATURE,
   GOWRI_NIGHT_TABLE,
+  LATTA_COUNT_INCLUSIVE,
   MASA_SHUNYA_TITHIS_BY_SUN_RASI,
+  MRITYU_BHAGA_LAGNA,
+  MRITYU_BHAGA_MOON,
+  NIGHT_DURMUHURTAM_SLOTS,
   SARVARTHA_SIDDHI_BY_VARA,
   TAMIL_AMRITA_NAK_BY_VARA,
   TAMIL_MARANA_NAK_BY_VARA,
   VARJYAM_START_GHATI,
+  VEDHA_NAKSHATRA,
   VISHA_TITHI_BY_VARA,
   type GowriName,
 } from "../data/classicalMuhurtaRules";
@@ -50,9 +62,18 @@ export interface DayYogaAnalysis {
 export interface MahadoshaAnalysis {
   guruMaudhya: boolean;
   shukraMaudhya: boolean;
+  budhaMaudhya: boolean;
   sankrantiDosha: boolean;
   masaShunyaTithi: boolean;
   eclipseProximity: boolean;
+  grahaYuddha: boolean;
+  vyatipataYoga: boolean;
+  vaidhritiYoga: boolean;
+  moonGandanta: boolean;
+  tithiGandanta: boolean;
+  mrityuBhagaMoon: boolean;
+  lattaHits: string[];
+  vedhaHits: string[];
   activeDoshas: string[];
 }
 
@@ -62,6 +83,22 @@ export interface KundaliShuddhiResult {
   hasBhriguShatka: boolean;
   hasPapaKartari: boolean;
   beneficsInKendraTrikona: Planet[];
+  maleficsInKendra: Planet[];
+  moonDusthana: boolean;
+  moonHouse: number;
+  mandiHouse: number | null;
+  mandiInDusthana: boolean;
+}
+
+export interface PointShuddhi {
+  nakshatraGandanta: boolean;
+  rasiGandanta: boolean;
+  mrityuBhaga: boolean;
+}
+
+export interface LattaVedhaResult {
+  lattaHits: string[];
+  vedhaHits: string[];
 }
 
 function angularDistance(lonA: number, lonB: number): number {
@@ -128,7 +165,7 @@ export function computeVarjyamAndAmrita(
 }
 
 /**
- * Compute daytime (and Tuesday nighttime) Durmuhurtam windows (each 1/15th of day/night).
+ * Compute daytime and nighttime Durmuhurtam windows (each 1/15th of day/night).
  */
 export function computeDurmuhurtam(
   date: Date,
@@ -144,12 +181,12 @@ export function computeDurmuhurtam(
     dividedWindow(sunrise, sunset, 15, slot1Idx),
   );
 
-  // On Tuesday, the 2nd Durmuhurtam is in the 7th Muhurta of the night (Nishita-adjacent)
-  if (weekday === 2) {
-    const nextDay = new Date(date.getTime() + 24 * 3600_000);
-    const nextSunrise = getSunriseSunset(nextDay, latitude, longitude).sunrise;
-    if (nextSunrise && nextSunrise > sunset) {
-      windows.push(dividedWindow(sunset, nextSunrise, 15, 7));
+  const nextDay = new Date(date.getTime() + 24 * 3600_000);
+  const nextSunrise = getSunriseSunset(nextDay, latitude, longitude).sunrise;
+  if (nextSunrise && nextSunrise > sunset) {
+    const nightSlots = NIGHT_DURMUHURTAM_SLOTS[weekday] ?? [];
+    for (const slot1Idx of nightSlots) {
+      windows.push(dividedWindow(sunset, nextSunrise, 15, slot1Idx));
     }
   }
 
@@ -277,13 +314,132 @@ export function computeSpecialDayYogas(
   };
 }
 
+export function nakshatraIndexFromLongitude(longitude: number): number {
+  return Math.floor(normalizeDegrees(longitude) / NAKSHATRA_SPAN_DEGREES) % 27;
+}
+
+export function lattaNakshatra(planetNakshatra: number, planet: string): number | null {
+  const count = LATTA_COUNT_INCLUSIVE[planet];
+  if (!count) return null;
+  return (planetNakshatra + count - 1) % 27;
+}
+
+export function computeLattaVedha(
+  moonNakshatra: number,
+  planetNakshatras: Partial<Record<Planet, number>>,
+): LattaVedhaResult {
+  const lattaHits: string[] = [];
+  const vedhaHits: string[] = [];
+  for (const p of PLANETS) {
+    const pNak = planetNakshatras[p];
+    if (pNak === undefined) continue;
+    const latta = lattaNakshatra(pNak, p);
+    if (latta === moonNakshatra) lattaHits.push(`${p} Latta`);
+    if (VEDHA_NAKSHATRA[pNak] === moonNakshatra && p !== "Moon") {
+      vedhaHits.push(`${p} Vedha`);
+    }
+  }
+  return { lattaHits, vedhaHits };
+}
+
+export function evaluatePointShuddhi(
+  longitude: number,
+  kind: "moon" | "lagna",
+): PointShuddhi {
+  const lon = normalizeDegrees(longitude);
+  const nak = Math.floor(lon / NAKSHATRA_SPAN_DEGREES) % 27;
+  const degIntoNak = lon - nak * NAKSHATRA_SPAN_DEGREES;
+  const rasi = Math.floor(lon / 30) % 12;
+  const degIntoRasi = lon - rasi * 30;
+
+  const nakshatraGandanta =
+    (GANDANTA_TAIL_NAK.includes(nak) && degIntoNak >= NAKSHATRA_SPAN_DEGREES - GANDANTA_NAK_PADA_DEG) ||
+    (GANDANTA_HEAD_NAK.includes(nak) && degIntoNak <= GANDANTA_NAK_PADA_DEG);
+
+  const rasiGandanta =
+    (GANDANTA_TAIL_RASI.includes(rasi) && degIntoRasi >= 30 - GANDANTA_RASI_DEG) ||
+    (GANDANTA_HEAD_RASI.includes(rasi) && degIntoRasi <= GANDANTA_RASI_DEG);
+
+  const table = kind === "moon" ? MRITYU_BHAGA_MOON : MRITYU_BHAGA_LAGNA;
+  const mrityuDeg = table[rasi] ?? 15;
+  const mrityuBhaga = Math.abs(degIntoRasi - (mrityuDeg - 0.5)) <= 0.75;
+
+  return { nakshatraGandanta, rasiGandanta, mrityuBhaga };
+}
+
+function isTithiGandanta(moonLon: number, sunLon: number): boolean {
+  const elong = normalizeDegrees(moonLon - sunLon);
+  return (
+    elong <= GANDANTA_TITHI_ORB_DEG ||
+    elong >= 360 - GANDANTA_TITHI_ORB_DEG ||
+    Math.abs(elong - 180) <= GANDANTA_TITHI_ORB_DEG
+  );
+}
+
+const YUDDHA_PLANETS: Planet[] = ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
+
+function hasGrahaYuddha(lons: LongitudeMap): boolean {
+  for (let i = 0; i < YUDDHA_PLANETS.length; i++) {
+    for (let j = i + 1; j < YUDDHA_PLANETS.length; j++) {
+      if (angularDistance(lons[YUDDHA_PLANETS[i]], lons[YUDDHA_PLANETS[j]]) < 1) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /**
- * Evaluate classical Mahadoshas at the day's reference instant:
- * - Guru Maudhya (Jupiter combust within 11° of Sun)
- * - Shukra Maudhya (Venus combust within 10° direct / 8° retrograde of Sun)
- * - Ravi Sankramana / Sankranti Dosha (Sun within 1° of sign ingress)
- * - Masa Shunya Tithi
- * - Eclipse Proximity (Amavasya/Purnima with Sun/Moon within 13° of Rahu/Ketu)
+ * Vishti (Bhadra) + fixed malefic Karana windows overlapping [dayStart, dayEnd).
+ * Uses linear Moon−Sun interpolation around `date` (2 ephemeris calls).
+ */
+export function computeVishtiWindows(
+  date: Date,
+  dayStart: Date,
+  dayEnd: Date,
+  settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+): TimeWindow[] {
+  const resolved = resolveEphemerisSettings(settings);
+  const dtHours = 12;
+  const before = new Date(date.getTime() - dtHours * 3600_000);
+  const after = new Date(date.getTime() + dtHours * 3600_000);
+  const now = getSiderealLongitudes(date, resolved);
+  const prev = getSiderealLongitudes(before, resolved);
+  const next = getSiderealLongitudes(after, resolved);
+  const elongNow = normalizeDegrees(now.Moon - now.Sun);
+  let delta = normalizeDegrees(next.Moon - next.Sun) - normalizeDegrees(prev.Moon - prev.Sun);
+  if (delta < 0) delta += 360;
+  const degPerMs =
+    delta > 4 && delta < 20 ? delta / (2 * dtHours * 3600_000) : 12.2 / 86_400_000;
+
+  const isMaleficKarana = (n: number) => {
+    const k = ((n % 60) + 60) % 60;
+    if (k === 0 || k >= 57) return true;
+    return (k - 1) % 7 === 6;
+  };
+
+  const windows: TimeWindow[] = [];
+  const startElong = elongNow + (dayStart.getTime() - date.getTime()) * degPerMs;
+  const endElong = elongNow + (dayEnd.getTime() - date.getTime()) * degPerMs;
+  const startN = Math.floor(startElong / 6);
+  const endN = Math.floor(endElong / 6);
+  for (let n = startN; n <= endN; n++) {
+    if (!isMaleficKarana(n)) continue;
+    const segStartElong = n * 6;
+    const segEndElong = (n + 1) * 6;
+    const segStart = new Date(date.getTime() + (segStartElong - elongNow) / degPerMs);
+    const segEnd = new Date(date.getTime() + (segEndElong - elongNow) / degPerMs);
+    const clippedStart = new Date(Math.max(segStart.getTime(), dayStart.getTime()));
+    const clippedEnd = new Date(Math.min(segEnd.getTime(), dayEnd.getTime()));
+    if (clippedEnd.getTime() - clippedStart.getTime() >= 5 * 60_000) {
+      windows.push({ start: clippedStart, end: clippedEnd });
+    }
+  }
+  return windows;
+}
+
+/**
+ * Evaluate classical Mahadoshas at the day's reference instant.
  */
 export function computeMahadoshas(
   date: Date,
@@ -295,14 +451,17 @@ export function computeMahadoshas(
   const retro = getRetrogradeStatus(date, undefined, resolved);
 
   const sunLon = normalizeDegrees(lons.Sun);
+  const moonLon = normalizeDegrees(lons.Moon);
   const jupLon = normalizeDegrees(lons.Jupiter);
   const venLon = normalizeDegrees(lons.Venus);
+  const merLon = normalizeDegrees(lons.Mercury);
   const rahuLon = normalizeDegrees(lons.Rahu);
   const ketuLon = normalizeDegrees(lons.Ketu);
 
   const guruMaudhya = angularDistance(sunLon, jupLon) < 11;
   const shukraLimit = retro.Venus ? 8 : 10;
   const shukraMaudhya = angularDistance(sunLon, venLon) < shukraLimit;
+  const budhaMaudhya = angularDistance(sunLon, merLon) < 14;
 
   const sunRasiIndex = Math.floor(sunLon / 30) % 12;
   const sunDegInRasi = sunLon - sunRasiIndex * 30;
@@ -315,49 +474,85 @@ export function computeMahadoshas(
     tithiIndex0To14 === 14 &&
     (angularDistance(sunLon, rahuLon) < 13.5 || angularDistance(sunLon, ketuLon) < 13.5);
 
+  const grahaYuddha = hasGrahaYuddha(lons);
+  const yogaIndex = Math.floor(normalizeDegrees(sunLon + moonLon) / NAKSHATRA_SPAN_DEGREES) % 27;
+  const vyatipataYoga = yogaIndex === 16;
+  const vaidhritiYoga = yogaIndex === 26;
+  const moonPoint = evaluatePointShuddhi(moonLon, "moon");
+  const moonGandanta = moonPoint.nakshatraGandanta || moonPoint.rasiGandanta;
+  const tithiGandanta = isTithiGandanta(moonLon, sunLon);
+  const mrityuBhagaMoon = moonPoint.mrityuBhaga;
+
+  const planetNaks = {} as Record<Planet, number>;
+  for (const p of PLANETS) {
+    planetNaks[p] = nakshatraIndexFromLongitude(lons[p]);
+  }
+  const moonNak = planetNaks.Moon;
+  const { lattaHits, vedhaHits } = computeLattaVedha(moonNak, planetNaks);
+
   const activeDoshas: string[] = [];
   if (guruMaudhya) activeDoshas.push("Guru Maudhya (Jupiter Combust)");
   if (shukraMaudhya) activeDoshas.push("Shukra Maudhya (Venus Combust)");
+  if (budhaMaudhya) activeDoshas.push("Budha Maudhya (Mercury Combust)");
   if (sankrantiDosha) activeDoshas.push("Sankranti (Solar Ingress)");
   if (masaShunyaTithi) activeDoshas.push("Masa Shunya Tithi");
   if (eclipseProximity) activeDoshas.push("Grahan / Eclipse Proximity");
+  if (grahaYuddha) activeDoshas.push("Graha Yuddha");
+  if (vyatipataYoga) activeDoshas.push("Vyatipata Yoga");
+  if (vaidhritiYoga) activeDoshas.push("Vaidhriti Yoga");
+  if (moonGandanta) activeDoshas.push("Moon Gandanta");
+  if (tithiGandanta) activeDoshas.push("Tithi Gandanta");
+  if (mrityuBhagaMoon) activeDoshas.push("Moon Mrityu Bhaga");
+  if (lattaHits.length) activeDoshas.push(...lattaHits);
+  if (vedhaHits.length) activeDoshas.push(...vedhaHits);
 
   return {
     guruMaudhya,
     shukraMaudhya,
+    budhaMaudhya,
     sankrantiDosha,
     masaShunyaTithi,
     eclipseProximity,
+    grahaYuddha,
+    vyatipataYoga,
+    vaidhritiYoga,
+    moonGandanta,
+    tithiGandanta,
+    mrityuBhagaMoon,
+    lattaHits,
+    vedhaHits,
     activeDoshas,
   };
 }
 
 /**
- * Evaluate Kundali-level Lagna Shuddhi for a candidate Muhurta Lagna:
- * - Ashtama Shuddhi (no planets in 8th house from rising Lagna)
- * - Bhrigu Shatka (Venus in 6th house from rising Lagna)
- * - Papa Kartari on Lagna (malefics in both 2nd and 12th houses from rising Lagna)
- * - Benefics in Kendra/Trikona (1, 4, 5, 7, 9, 10)
+ * Evaluate Kundali-level Lagna Shuddhi for a candidate Muhurta Lagna.
  */
 export function evaluateMuhurtaKundali(
   lagnaRasiIndex: number,
   planetLongitudes: LongitudeMap,
+  mandiRasiIndex?: number,
 ): KundaliShuddhiResult {
   const houseOf = (rasiIdx: number) => (((rasiIdx - lagnaRasiIndex) % 12 + 12) % 12) + 1;
 
   const planetsIn8th: Planet[] = [];
   const beneficsInKendraTrikona: Planet[] = [];
+  const maleficsInKendra: Planet[] = [];
   let hasBhriguShatka = false;
   let maleficIn2nd = false;
   let maleficIn12th = false;
+  let moonHouse = 1;
 
   const MALEFICS = new Set<Planet>(["Sun", "Mars", "Saturn", "Rahu", "Ketu"]);
   const BENEFICS = new Set<Planet>(["Jupiter", "Venus", "Mercury"]);
   const KENDRA_TRIKONA = new Set([1, 4, 5, 7, 9, 10]);
+  const KENDRA = new Set([1, 4, 7, 10]);
+  const DUSTHANA = new Set([6, 8, 12]);
 
   for (const p of PLANETS) {
     const rasi = Math.floor(normalizeDegrees(planetLongitudes[p]) / 30) % 12;
     const h = houseOf(rasi);
+    if (p === "Moon") moonHouse = h;
     if (h === 8) planetsIn8th.push(p);
     if (p === "Venus" && h === 6) hasBhriguShatka = true;
     if (MALEFICS.has(p) && h === 2) maleficIn2nd = true;
@@ -365,7 +560,12 @@ export function evaluateMuhurtaKundali(
     if (BENEFICS.has(p) && KENDRA_TRIKONA.has(h)) {
       beneficsInKendraTrikona.push(p);
     }
+    if (MALEFICS.has(p) && KENDRA.has(h)) {
+      maleficsInKendra.push(p);
+    }
   }
+
+  const mandiHouse = mandiRasiIndex === undefined ? null : houseOf(mandiRasiIndex);
 
   return {
     isAshtamaShuddhi: planetsIn8th.length === 0,
@@ -373,5 +573,10 @@ export function evaluateMuhurtaKundali(
     hasBhriguShatka,
     hasPapaKartari: maleficIn2nd && maleficIn12th,
     beneficsInKendraTrikona,
+    maleficsInKendra,
+    moonDusthana: DUSTHANA.has(moonHouse),
+    moonHouse,
+    mandiHouse,
+    mandiInDusthana: mandiHouse !== null && DUSTHANA.has(mandiHouse),
   };
 }

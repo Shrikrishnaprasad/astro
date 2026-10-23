@@ -3,11 +3,34 @@ import { MUHURTA_ACTIVITIES, muhurtaActivityById } from "../data/muhurtaActiviti
 import {
   computeDurmuhurtam,
   computeGowriPanchangam,
+  computeLattaVedha,
   computeMahadoshas,
   computeSpecialDayYogas,
   computeVarjyamAndAmrita,
   evaluateMuhurtaKundali,
+  evaluatePointShuddhi,
+  lattaNakshatra,
 } from "./classicalMuhurta";
+import { getSiderealAscendant } from "./ascendant";
+import { getSiderealLongitudes } from "./planetaryPositions";
+import { longitudeToRasiNakshatra } from "./rasiNakshatra";
+import { PLANETS, type ChartResult } from "./types";
+
+function chartAt(date: Date, lat: number, lon: number): ChartResult {
+  const planetLongitudes = getSiderealLongitudes(date);
+  const lagnaLongitude = getSiderealAscendant(date, lat, lon);
+  const planetRasi = {} as ChartResult["planetRasi"];
+  for (const planet of PLANETS) {
+    planetRasi[planet] = longitudeToRasiNakshatra(planetLongitudes[planet]);
+  }
+  return {
+    lagnaRasiIndex: Math.floor(lagnaLongitude / 30),
+    lagnaLongitude,
+    lagnaDegreeInRasi: lagnaLongitude - Math.floor(lagnaLongitude / 30) * 30,
+    planetLongitudes,
+    planetRasi,
+  };
+}
 import {
   chandrabalaHouse,
   computePanchaka,
@@ -94,6 +117,41 @@ describe("searchMuhurtaDays & classicalMuhurta", () => {
     expect(kundali.planetsIn8th).toContain("Mars");
     expect(kundali.hasBhriguShatka).toBe(true);
     expect(kundali.hasPapaKartari).toBe(true);
+    expect(kundali.moonDusthana).toBe(false);
+    expect(kundali.maleficsInKendra.length).toBeGreaterThan(0);
+  });
+
+  it("flags Gandanta, Mrityu Bhaga, Latta, and night Durmuhurtam", () => {
+    const moonGandanta = evaluatePointShuddhi(359.6, "moon"); // late Meena / Revati tail
+    expect(moonGandanta.nakshatraGandanta || moonGandanta.rasiGandanta).toBe(true);
+
+    const lattaMoonFromSun = lattaNakshatra(0, "Sun"); // Ashwini + 12 inclusive = 11 U.Phalguni
+    expect(lattaMoonFromSun).toBe(11);
+
+    const lv = computeLattaVedha(17, { Sun: 0 }); // Ashwini vedha is Jyeshtha
+    expect(lv.vedhaHits.some((h) => h.includes("Sun"))).toBe(true);
+
+    const monday = new Date("2026-06-01T12:00:00Z"); // Monday
+    const dur = computeDurmuhurtam(monday, CHENNAI.lat, CHENNAI.lon);
+    expect(dur.length).toBeGreaterThanOrEqual(2); // 2 day + 1 night
+  });
+
+  it("uses a natal chart for Dasa / Sade Sati scoring when provided", () => {
+    const natal = chartAt(new Date("1990-03-15T06:30:00Z"), CHENNAI.lat, CHENNAI.lon);
+    const rows = searchMuhurtaDays({
+      startDateStr: "2026-06-01",
+      rangeDays: 10,
+      latitude: CHENNAI.lat,
+      longitude: CHENNAI.lon,
+      activity: muhurtaActivityById("wedding"),
+      natalChart: natal,
+      natalBirthDate: new Date("1990-03-15T06:30:00Z"),
+      birthNakshatraIndex: natal.planetRasi.Moon.nakshatraIndex,
+      birthRasiIndex: natal.planetRasi.Moon.rasiIndex,
+    });
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.some((r) => r.natalDasaLabel !== null)).toBe(true);
+    expect(rows[0].slots[0].navamsaLagnaName.length).toBeGreaterThan(0);
   });
 
   it("slices out Rahu/Yama/Gulika overlaps cleanly in subtractTimeWindows", () => {

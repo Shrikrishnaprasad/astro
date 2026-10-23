@@ -69,6 +69,10 @@ function exportMuhurtaCsv(rows: MuhurtaDayResult[], activityLabel: string, place
     "P1 Chandrabala",
     "P2 Tarabala",
     "P2 Chandrabala",
+    "P1 Dasa",
+    "P2 Dasa",
+    "Sade Sati",
+    "Couple Porutham",
     "Why Picked (Day Summary)",
     "Notes",
     "Suggested Slots",
@@ -100,6 +104,10 @@ function exportMuhurtaCsv(rows: MuhurtaDayResult[], activityLabel: string, place
       r.chandrabalaLabel ?? "",
       r.secondTarabalaLabel ?? "",
       r.secondChandrabalaLabel ?? "",
+      r.natalDasaLabel ?? "",
+      r.secondNatalDasaLabel ?? "",
+      r.sadeSati ? "Yes" : "",
+      r.couplePoruthamLabel ?? "",
       r.dayDescription,
       r.flags.join("; "),
       slotText,
@@ -207,6 +215,10 @@ export default function MuhurtaPage() {
       birthRasiIndex: effectiveBirthRasi,
       secondBirthNakshatraIndex: effectiveSecondNakshatra,
       secondBirthRasiIndex: effectiveSecondRasi,
+      natalChart: personalMode === "birth-chart" ? birthChart ?? undefined : undefined,
+      natalBirthDate: personalMode === "birth-chart" ? birthInput?.date : undefined,
+      secondNatalChart: secondMode === "birth-chart" ? secondBirthChart ?? undefined : undefined,
+      secondNatalBirthDate: secondMode === "birth-chart" ? secondBirthInput?.date : undefined,
       includeNightSlots,
       slotSystem,
       maxResults,
@@ -222,6 +234,12 @@ export default function MuhurtaPage() {
     effectiveBirthRasi,
     effectiveSecondNakshatra,
     effectiveSecondRasi,
+    birthChart,
+    birthInput,
+    secondBirthChart,
+    secondBirthInput,
+    personalMode,
+    secondMode,
     includeNightSlots,
     slotSystem,
     maxResults,
@@ -272,11 +290,12 @@ export default function MuhurtaPage() {
         <strong>Varjyam (Vishaghati) &amp; Amrita Kalam</strong>, <strong>Durmuhurtam</strong>,{" "}
         <strong>Tamil Siddha / Amrita / Marana &amp; 28-Anandadi Yogas</strong>,{" "}
         <strong>Sarvartha Siddhi / Amrita Siddhi / Tripushkara / Dagdha / Visha Yogas</strong>,{" "}
-        <strong>21-Mahadoshas</strong> (<em>Guru/Shukra Maudhya, Sankranti, Masa Shunya, Eclipse</em>),{" "}
-        <strong>Choghadiya &amp; Tamil Gowri Panchangam</strong>,{" "}
-        <strong>Panchaka Rahita</strong>, <strong>Lagna Kundali Shuddhi</strong> (
-        <em>8th-house Ashtama Shuddhi, Papa Kartari, Bhrigu Shatka</em>),{" "}
-        <strong>Planetary Hora</strong>, and <strong>Single or Couple Tarabala &amp; Chandrabala</strong>.
+        <strong>21-Mahadoshas</strong> (Maudhya, Sankranti, Eclipse, Graha Yuddha, Gandanta,
+        Mrityu Bhaga, Latta, Vedha), <strong>Vishti windows</strong>,{" "}
+        <strong>Pushkara &amp; Navamsa Lagna</strong>,{" "}
+        <strong>Panchaka Rahita</strong>, <strong>full Lagna Kundali Shuddhi</strong>,{" "}
+        <strong>activity Hora &amp; Gowri</strong>. With a birth chart:{" "}
+        <strong>Dasa–Bhukti, Ashtakavarga, Sade Sati, Jupiter Gochara, natal Lagna &amp; Porutham</strong>.
       </p>
 
       <div className="card">
@@ -461,7 +480,7 @@ export default function MuhurtaPage() {
       </div>
 
       <div className="card">
-        <h3>2. Personal &amp; Couple Bala — Tarabala &amp; Chandrabala (Optional)</h3>
+        <h3>2. Personal &amp; Couple Bala — Birth chart, Tarabala, Dasa, SAV (Optional)</h3>
         <div className="field-row">
           <label>
             Person 1 (Primary / Bride / Groom)
@@ -486,6 +505,11 @@ export default function MuhurtaPage() {
             </select>
           </label>
         </div>
+        <p style={{ fontSize: 12, color: "#9aa0c0", marginTop: 6 }}>
+          Manual mode uses Moon star/sign only (Tarabala &amp; Chandrabala). Birth-chart mode also
+          scores Dasa–Bhukti, Ashtakavarga bindus, Sade Sati, Jupiter gochara, natal Lagna, Latta
+          and Vedha. Two birth charts add couple Porutham for wedding/engagement.
+        </p>
 
         {personalMode === "manual" && (
           <div className="field-row" style={{ marginTop: 8 }}>
@@ -645,7 +669,7 @@ export default function MuhurtaPage() {
                   <th>Vara, Tithi &amp; Star</th>
                   <th>Siddha, Anandadi &amp; Special Yogas</th>
                   <th>Varjyam, Amrita &amp; Doshas</th>
-                  {hasPersonalBala && <th>Tarabala &amp; Chandrabala</th>}
+                  {hasPersonalBala && <th>Tarabala, Dasa &amp; Natal</th>}
                   <th>Clean Sub-Windows (Lagna · 8th Shuddhi · Hora · Gowri · Panchaka)</th>
                 </tr>
               </thead>
@@ -761,6 +785,10 @@ export default function MuhurtaPage() {
                             P2 Chandra: {row.secondChandrabalaLabel}
                           </div>
                         )}
+                        {row.natalDasaLabel && <div>P1 Dasa: {row.natalDasaLabel}</div>}
+                        {row.secondNatalDasaLabel && <div>P2 Dasa: {row.secondNatalDasaLabel}</div>}
+                        {row.sadeSati && <div className="fail">Sade Sati / Ashtama Sani</div>}
+                        {row.couplePoruthamLabel && <div>Porutham: {row.couplePoruthamLabel}</div>}
                       </td>
                     )}
                     <td style={{ fontSize: 12, minWidth: 360 }}>
@@ -799,8 +827,16 @@ export default function MuhurtaPage() {
                               {s.kundali.hasBhriguShatka && (
                                 <span className="fail"> · Bhrigu Shatka</span>
                               )}
+                              {s.kundali.moonDusthana && (
+                                <span className="fail"> · Moon {s.kundali.moonHouse}th</span>
+                              )}
+                              {s.pushkaraLagna && <span className="pass"> · Pushkara Lagna</span>}
+                              {s.lagnaGandanta && <span className="fail"> · Lagna Gandanta</span>}
+                              {s.lagnaMrityuBhaga && <span className="fail"> · Lagna Mrityu</span>}
                               {" · "}
-                              <span className={s.isBeneficHora ? "pass" : ""}>
+                              D9 {s.navamsaLagnaName} · Pada {s.nakshatraPada}
+                              {" · "}
+                              <span className={s.isPreferredHora ? "pass" : s.isBeneficHora ? "pass" : ""}>
                                 Hora: {s.horaPlanet}
                               </span>
                               {s.gowriName && (

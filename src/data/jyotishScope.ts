@@ -194,7 +194,7 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     name: "Muhurta picker (activity search)",
     status: "implemented",
     summary:
-      "365-day search across 31 activities; Varjyam & Amrita Kalam, Durmuhurtam, Choghadiya + Tamil Gowri Panchangam, Siddha/Amrita/Marana & Anandadi Yogas, Sarvartha/Amrita Siddhi/Tripushkara/Dagdha/Visha, Mahadoshas (Guru/Shukra Maudhya, Sankranti, Masa Shunya), Lagna Kundali Shuddhi (8th Ashtama, Papa Kartari, Bhrigu Shatka), single & couple Tarabala/Chandrabala.",
+      "365-day search across 31 activities; Varjyam & Amrita, day+night Durmuhurtam, Vishti windows, Choghadiya + Gowri, Siddha/Anandadi/special yogas, 21 Mahadoshas (Maudhya, Sankranti, eclipse, Graha Yuddha, Gandanta, Mrityu Bhaga, Latta, Vedha), Lagna Shuddhi (8th, Kartari, Bhrigu, Moon dusthana, Mandi, kendra malefics), Pushkara & Navamsa Lagna, activity Hora/Gowri. Optional natal: Dasa–Bhukti, SAV, Sade Sati, Jupiter gochara, natal Lagna ashtama, couple Porutham.",
     pages: ["muhurta", "panchangam"],
   },
 ];

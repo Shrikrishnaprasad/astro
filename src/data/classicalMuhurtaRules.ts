@@ -85,6 +85,63 @@ export const DAY_DURMUHURTAM_SLOTS: number[][] = [
   [1, 2],   // Saturday: 1st and 2nd muhurtas after sunrise
 ];
 
+/**
+ * Night Durmuhurtam slots (1-indexed out of 15 Muhurtas from sunset to next sunrise).
+ * Tuesday's 7th is the most widely cited; other weekdays follow common Drik/Tamil tables.
+ */
+export const NIGHT_DURMUHURTAM_SLOTS: number[][] = [
+  [10], // Sunday
+  [8],  // Monday
+  [7],  // Tuesday
+  [4],  // Wednesday
+  [10], // Thursday
+  [9],  // Friday
+  [5],  // Saturday
+];
+
+/**
+ * Mrityu Bhaga integer degree-in-sign (1–30) for Moon and Lagna (Muhurta Chintamani /
+ * commonly cited Parashari table). Orb in the engine is ±0.5°.
+ */
+export const MRITYU_BHAGA_MOON: number[] = [26, 12, 13, 25, 24, 11, 26, 14, 13, 25, 5, 12];
+export const MRITYU_BHAGA_LAGNA: number[] = [8, 9, 22, 22, 25, 14, 4, 23, 18, 20, 21, 10];
+
+/**
+ * Latta count from a graha's nakshatra, inclusive of that star
+ * (Muhurta Chintamani: Sun 12, Moon 22, Mars 3, Mercury 6, Jupiter 8, Venus 5, Saturn 8, Rahu 9).
+ */
+export const LATTA_COUNT_INCLUSIVE: Record<string, number> = {
+  Sun: 12,
+  Moon: 22,
+  Mars: 3,
+  Mercury: 6,
+  Jupiter: 8,
+  Venus: 5,
+  Saturn: 8,
+  Rahu: 9,
+};
+
+/**
+ * Vedha partner nakshatra (0=Ashwini..26=Revati). First 18 are the classical
+ * pairwise vedhas; the last 9 follow the common Mula–Revati grouping.
+ */
+export const VEDHA_NAKSHATRA: number[] = [
+  17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 26, 25, 24, 23, 21, 21, 20, 19, 18,
+];
+
+/** First/last pada (3°20′) of these nakshatras is Nakshatra Gandanta. */
+export const GANDANTA_TAIL_NAK: number[] = [8, 17, 26]; // Ashlesha, Jyeshtha, Revati
+export const GANDANTA_HEAD_NAK: number[] = [0, 9, 18]; // Ashwini, Magha, Mula
+export const GANDANTA_NAK_PADA_DEG = 3 + 20 / 60;
+
+/** First/last 1° of these rasis is Rasi Gandanta. */
+export const GANDANTA_TAIL_RASI: number[] = [3, 7, 11]; // Kataka, Vrischika, Meena
+export const GANDANTA_HEAD_RASI: number[] = [0, 4, 8]; // Mesha, Simha, Dhanu
+export const GANDANTA_RASI_DEG = 1;
+
+/** Tithi Gandanta: last/first 0.8° of Moon−Sun around Amavasya (0°) and Purnima (180°). */
+export const GANDANTA_TITHI_ORB_DEG = 0.8;
+
 export type GowriName =
   | "Uthi"
   | "Amirtham"
