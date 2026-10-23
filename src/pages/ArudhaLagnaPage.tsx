@@ -6,7 +6,7 @@ import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
 import { JAMAGRAHAM_SEQUENCE } from "../data/jamagraham";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
-import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { suryaVeedhiRasiIndex } from "../data/suryaVeedhi";
 import { computeAllArudhaPadas } from "../engine/arudha";
@@ -111,7 +111,7 @@ export default function ArudhaLagnaPage() {
         });
       }
       push(chart.lagnaRasiIndex, {
-        label: "உத",
+        label: LAGNA_TAMIL,
         kind: "lagna",
         title: "உதயம் (Udhayam / Lagna)",
         degree: chart.lagnaDegreeInRasi,
@@ -125,9 +125,9 @@ export default function ArudhaLagnaPage() {
     });
     if (mandhi) {
       push(mandhi.rasiIndex, {
-        label: "மாந்",
+        label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "மாந்தி (Mandhi / Gulika)",
+        title: "மாந் (Mandhi / Gulika)",
         degree: mandhi.longitude - mandhi.rasiIndex * 30,
       });
     }
@@ -170,7 +170,7 @@ export default function ArudhaLagnaPage() {
     <div>
       <h2>ஜாமக்கோள் ஆரூடம் (Jamakkol Arudam)</h2>
       <EphemerisAccuracyNotice />
-      <p className="tamil">உதயம், ஆரூடம், மாந்தி ஆகியவை தென்னிந்திய முறை ராசி சக்கரத்தில்.</p>
+      <p className="tamil">உதயம், ஆரூடம், மாந் ஆகியவை தென்னிந்திய முறை ராசி சக்கரத்தில்.</p>
 
       <div className="card field-row">
         <label>

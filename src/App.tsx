@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { EphemerisSettingsProvider } from "./context/EphemerisSettingsContext";
 import KarakamPopup from "./components/KarakamPopup";
 import NavMenu from "./components/NavMenu";
@@ -15,6 +15,7 @@ import AdvancedJyotishPage from "./pages/AdvancedJyotishPage";
 import EphemerisAccuracyPage from "./pages/EphemerisAccuracyPage";
 import EphemerisPage from "./pages/EphemerisPage";
 import KpAstrologyPage from "./pages/KpAstrologyPage";
+import GkDegreePage from "./pages/GkDegreePage";
 import PrasnaPage from "./pages/PrasnaPage";
 import JyotishDepthPage from "./pages/JyotishDepthPage";
 import PoruthamPage from "./pages/PoruthamPage";
@@ -42,6 +43,8 @@ export default function App() {
           <Route path="/accuracy" element={<EphemerisAccuracyPage />} />
           <Route path="/advanced-jyotish" element={<AdvancedJyotishPage />} />
           <Route path="/kp" element={<KpAstrologyPage />} />
+          <Route path="/degree-system" element={<GkDegreePage />} />
+          <Route path="/gk-degree" element={<Navigate to="/degree-system" replace />} />
           <Route path="/prasna" element={<PrasnaPage />} />
         </Routes>
       </main>

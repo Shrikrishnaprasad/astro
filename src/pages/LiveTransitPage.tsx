@@ -4,7 +4,7 @@ import SouthIndianChart from "../components/SouthIndianChart";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
 import PlanetTable from "../components/PlanetTable";
-import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import type { ResolvedPlace } from "../data/places";
 import { defaultPlace } from "../data/places";
 import { getSiderealAscendant } from "../engine/ascendant";
@@ -54,16 +54,16 @@ export default function LiveTransitPage() {
     }
     const lagnaRasiIndex = Math.floor(lagna / 30);
     push(lagnaRasiIndex, {
-      label: "லக்",
+      label: LAGNA_TAMIL,
       kind: "lagna",
-      title: "லக்னம் (Lagna)",
+      title: "ல (Lagna)",
       degree: lagna - lagnaRasiIndex * 30,
     });
     if (mandhi) {
       push(mandhi.rasiIndex, {
-        label: "மாந்",
+        label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "மாந்தி (Mandhi / Gulika)",
+        title: "மாந் (Mandhi / Gulika)",
         degree: mandhi.longitude - mandhi.rasiIndex * 30,
       });
     }

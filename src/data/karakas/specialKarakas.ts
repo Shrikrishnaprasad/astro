@@ -199,8 +199,8 @@ export const SPECIAL_KARAKAS: KarakaEntry[] = [
     ],
     categories: [
       {
-        category: "Sun combinations (சூரியன் சேர்க்கை)",
-        categoryTamil: "சூரியன்",
+        category: "Sun combinations (சூரி சேர்க்கை)",
+        categoryTamil: "சூரி",
         items: [
           "Sun + Moon: Amavasya yoga — father and mother themes mixed, government and public life; mind dominated by ego. Modern: politics, public sector, public-facing leadership",
           "Sun + Mars: courage, leadership, military, surgery, engineering; anger, BP, accidents, conflicts with father",
@@ -213,8 +213,8 @@ export const SPECIAL_KARAKAS: KarakaEntry[] = [
         ],
       },
       {
-        category: "Moon combinations (சந்திரன் சேர்க்கை)",
-        categoryTamil: "சந்திரன்",
+        category: "Moon combinations (சந் சேர்க்கை)",
+        categoryTamil: "சந்",
         items: [
           "Moon + Mars: Chandra-Mangala yoga — wealth through trade, real estate, food and liquids; emotional temper, blood disorders",
           "Moon + Mercury: intelligent, writer, trader, witty; nervous anxiety, overthinking. Modern: media, content creation",
@@ -226,8 +226,8 @@ export const SPECIAL_KARAKAS: KarakaEntry[] = [
         ],
       },
       {
-        category: "Mars combinations (செவ்வாய் சேர்க்கை)",
-        categoryTamil: "செவ்வாய்",
+        category: "Mars combinations (செவ் சேர்க்கை)",
+        categoryTamil: "செவ்",
         items: [
           "Mars + Mercury: technical skill, engineering, coding, debate, sharp speech; skin and nervous issues",
           "Mars + Jupiter: Guru-Mangala yoga — righteous courage, law, real estate, administration, sports coaching",
@@ -238,8 +238,8 @@ export const SPECIAL_KARAKAS: KarakaEntry[] = [
         ],
       },
       {
-        category: "Mercury combinations (புதன் சேர்க்கை)",
-        categoryTamil: "புதன்",
+        category: "Mercury combinations (புத சேர்க்கை)",
+        categoryTamil: "புத",
         items: [
           "Mercury + Jupiter: scholarship, teaching, law, publishing, astrology, financial advisory",
           "Mercury + Venus: Lakshmi-Narayana yoga — arts, writing, music, design, commerce, fashion business",
@@ -259,8 +259,8 @@ export const SPECIAL_KARAKAS: KarakaEntry[] = [
         ],
       },
       {
-        category: "Venus, Saturn combinations (சுக்கிரன், சனி சேர்க்கை)",
-        categoryTamil: "சுக்கிரன் & சனி",
+        category: "Venus, Saturn combinations (சுக், சனி சேர்க்கை)",
+        categoryTamil: "சுக் & சனி",
         items: [
           "Venus + Saturn: late but stable marriage, disciplined arts, luxury industry, fashion business; kidney issues",
           "Venus + Rahu: glamour, film industry, foreign spouse, luxury cars; addictions, unconventional relationships",

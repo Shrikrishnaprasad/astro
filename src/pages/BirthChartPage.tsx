@@ -10,7 +10,7 @@ import PushkaraAtBirthTable from "../components/PushkaraAtBirthTable";
 import AshtakavargaPanel from "../components/AshtakavargaPanel";
 import ShodashavargaPanel from "../components/ShodashavargaPanel";
 import { NAKSHATRAS } from "../data/nakshatras";
-import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { getSiderealAscendant } from "../engine/ascendant";
 import { houseRasiIndex } from "../engine/houses";
@@ -126,17 +126,17 @@ export default function BirthChartPage() {
         });
       }
       push(chart.lagnaRasiIndex, {
-        label: "லக்",
+        label: LAGNA_TAMIL,
         kind: "lagna",
-        title: "லக்னம் (Lagna)",
+        title: "ல (Lagna)",
         degree: chart.lagnaDegreeInRasi,
       });
     }
     if (mandhi) {
       push(mandhi.rasiIndex, {
-        label: "மாந்",
+        label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "மாந்தி (Mandhi / Gulika)",
+        title: "மாந் (Mandhi / Gulika)",
         degree: mandhi.longitude - mandhi.rasiIndex * 30,
       });
     }
@@ -170,9 +170,9 @@ export default function BirthChartPage() {
       }
       const lagnaNav = longitudeToNavamsa(chart.lagnaLongitude);
       push(lagnaNav.rasiIndex, {
-        label: "லக்",
+        label: LAGNA_TAMIL,
         kind: "lagna",
-        title: "நவாம்ச லக்னம் (Navamsa Lagna)",
+        title: "நவாம்ச ல (Navamsa Lagna)",
         degree: lagnaNav.degreeInRasi,
       });
       return cells;
@@ -190,7 +190,7 @@ export default function BirthChartPage() {
     }
     const lagnaVp = computeVargaPlacement(chart.lagnaLongitude, companionVarga);
     push(lagnaVp.rasiIndex, {
-      label: "லக்",
+      label: LAGNA_TAMIL,
       kind: "lagna",
       title: `${companionVarga} Lagna (${RASIS[lagnaVp.rasiIndex].nameEnglish})`,
     });
@@ -220,17 +220,17 @@ export default function BirthChartPage() {
     if (transitLagna !== null) {
       const rasiIndex = Math.floor(transitLagna / 30);
       push(rasiIndex, {
-        label: "லக்",
+        label: LAGNA_TAMIL,
         kind: "lagna",
-        title: "நடப்பு லக்னம் (Transit Lagna)",
+        title: "நடப்பு ல (Transit Lagna)",
         degree: transitLagna - rasiIndex * 30,
       });
     }
     if (transitMandhi) {
       push(transitMandhi.rasiIndex, {
-        label: "மாந்",
+        label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "நடப்பு மாந்தி (Transit Mandhi)",
+        title: "நடப்பு மாந் (Transit Mandhi)",
         degree: transitMandhi.longitude - transitMandhi.rasiIndex * 30,
       });
     }

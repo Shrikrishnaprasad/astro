@@ -11,6 +11,7 @@ export type JyotishPageId =
   | "porutham"
   | "advanced-jyotish"
   | "kp"
+  | "degree-system"
   | "prasna"
   | "ephemeris"
   | "global";
@@ -74,7 +75,7 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     name: "Live Gochara overlay",
     status: "implemented",
     summary: "Current transits at birth location on the D1 chart.",
-    pages: ["birth-chart", "live-transit"],
+    pages: ["birth-chart", "live-transit", "degree-system"],
   },
   {
     id: "panchanga-birth",
@@ -162,6 +163,16 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     status: "partial",
     summary: "Mangal dosha from Lagna/Moon/Venus with common cancellations; other yogas not packed yet.",
     pages: ["advanced-jyotish", "birth-chart", "porutham"],
+  },
+  {
+    id: "degree-system",
+    name: "Degree System (பாகை முறை)",
+    status: "implemented",
+    summary:
+      "Rank grahas by degree-in-sign, ±3° yogas across rasis (including 6/8), highest/lowest keys, Jupiter strengthen / Rahu-Ketu weaken, Bhrigu Bindu, D1 chart with natal inside and live Gochara (grahas + Lagna + Mandhi) on the outer ring, Chandra Naadi (transit Moon query/past/next and 6/8/12), transit Lagna/Moon timing, Dasa health flag, and second-chart degree synastry.",
+    detail:
+      "Uses published degree-system and Chandra Naadi computational rules (3° orb, degree-in-sign, transit-Moon conjunction/aspect, 6/8/12). Question–answer rows are built from this app's graha-karaka and two-planet yoga list — not a reprint of any book. Transit Lagna and the outer ring are calculated at the natal place.",
+    pages: ["degree-system"],
   },
   {
     id: "kp-prasna",

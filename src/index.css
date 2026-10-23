@@ -1052,6 +1052,38 @@ body.karakam-open {
   }
 }
 
+.gk-highlow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.gk-theme {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #9aa0c0;
+}
+
+.gk-degree-table .gk-row--high td {
+  background: #1d2f24;
+}
+
+.gk-degree-table .gk-row--low td {
+  background: #2a2230;
+}
+
+.qa-table td {
+  vertical-align: top;
+}
+
+.qa-tone-past {
+  color: #c4b5fd;
+}
+
+.qa-tone-next {
+  color: #93c5fd;
+}
+
 @media (max-width: 400px) {
   :root {
     --chart-cell-w: 72px;

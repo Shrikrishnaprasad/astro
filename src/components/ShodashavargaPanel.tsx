@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import { LAGNA_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS, rasiLord } from "../data/rasis";
 import { rasiToHouseNumber } from "../engine/houses";
 import { shouldShowRetrograde, type RetrogradeMap } from "../engine/retrograde";
@@ -38,7 +38,7 @@ function buildVargaCells(
   }
 
   push(vc.lagnaRasiIndex, {
-    label: "லக்",
+    label: LAGNA_TAMIL,
     kind: "lagna",
     title: `${vc.def.id} Lagna (${RASIS[vc.lagnaRasiIndex].nameEnglish})`,
   });

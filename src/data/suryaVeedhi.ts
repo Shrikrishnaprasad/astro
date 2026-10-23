@@ -3,7 +3,7 @@
 //
 // VERIFIED empirically: reproduced from https://hindupanchangam.in/tools/jamakol-prasannam/
 // by querying all 12 Sun-rasi cases directly (not inferred/guessed) and
-// reading the page's own "சூரியன் X → Y" line for each. Confirmed
+// reading the page's own "சூரி X → Y" line for each. Confirmed
 // independent of weekday (same Sun rasi on two different weekdays gave the
 // same veedhi). No closed-form rule or textual source was found to explain
 // *why* the table has this shape (it is not a simple offset or trine

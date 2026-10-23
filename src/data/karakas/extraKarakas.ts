@@ -72,7 +72,7 @@ const GRAHA_CLASSICAL: Record<string, GrahaClassicalSeed> = {
   },
   "graha-mars": {
     time: [
-      "Weekday: Tuesday (செவ்வாய்)",
+      "Weekday: Tuesday (செவ்)",
       "Time unit ruled: Vara (a day)",
       "Season: Grishma (summer) • Vimshottari Dasa: 7 years",
       "Age of maturity: 28 • Life stage: middle age",
@@ -99,7 +99,7 @@ const GRAHA_CLASSICAL: Record<string, GrahaClassicalSeed> = {
   },
   "graha-mercury": {
     time: [
-      "Weekday: Wednesday (புதன்)",
+      "Weekday: Wednesday (புத)",
       "Time unit ruled: Ritu (season of two months)",
       "Season: Sharad (autumn) • Vimshottari Dasa: 17 years",
       "Age of maturity: 32 • Life stage: childhood",

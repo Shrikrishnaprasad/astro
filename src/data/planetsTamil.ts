@@ -1,25 +1,19 @@
 import type { Planet } from "../engine/types";
 
-export const PLANET_TAMIL_NAME: Record<Planet, string> = {
-  Sun: "சூரியன்",
-  Moon: "சந்திரன்",
-  Mars: "செவ்வாய்",
-  Mercury: "புதன்",
+/** Short Tamil graha labels used everywhere in the UI. */
+export const PLANET_TAMIL_ABBR: Record<Planet, string> = {
+  Sun: "சூரி",
+  Moon: "சந்",
+  Mars: "செவ்",
+  Mercury: "புத",
   Jupiter: "குரு",
-  Venus: "சுக்கிரன்",
+  Venus: "சுக்",
   Saturn: "சனி",
   Rahu: "ராகு",
   Ketu: "கேது",
 };
 
-export const PLANET_TAMIL_ABBR: Record<Planet, string> = {
-  Sun: "சூ",
-  Moon: "சந்",
-  Mars: "செ",
-  Mercury: "பு",
-  Jupiter: "கு",
-  Venus: "சுக்",
-  Saturn: "சனி",
-  Rahu: "ரா",
-  Ketu: "கே",
-};
+export const PLANET_TAMIL_NAME = PLANET_TAMIL_ABBR;
+
+export const LAGNA_TAMIL = "ல";
+export const MANDHI_TAMIL = "மாந்";

@@ -4,7 +4,7 @@ import { calculateKavippu } from "./kavippu";
 describe("calculateKavippu", () => {
   it("matches reference example 1: Udhayam Tula, Aarudam Kanni, Surya Veedhi Vrishabha -> Mithuna", () => {
     // https://hindupanchangam.in/tools/jamakol-prasannam/, 2026-10-20 ~sunset:
-    // "கன்னி → ரிஷபம் = 9, உதயத்திலிருந்து → மிதுனம்"
+    // "கன் → ரி = 9, உதயத்திலிருந்து → மி"
     const result = calculateKavippu({
       udhayamRasiIndex: 6, // Tula
       udhayamDegreeInRasi: 21 + 20 / 60,
@@ -17,7 +17,7 @@ describe("calculateKavippu", () => {
   });
 
   it("matches reference example 2: Udhayam Dhanu, Aarudam Kataka, Surya Veedhi Vrishabha -> Tula", () => {
-    // 2026-10-20 20:15: "கடகம் → ரிஷபம் = 11, உதயத்திலிருந்து → துலாம் 30°00'"
+    // 2026-10-20 20:15: "கட → ரி = 11, உதயத்திலிருந்து → து 30°00'"
     const result = calculateKavippu({
       udhayamRasiIndex: 8, // Dhanu
       udhayamDegreeInRasi: 14 + 47 / 60,
@@ -30,7 +30,7 @@ describe("calculateKavippu", () => {
   });
 
   it("matches reference example 3: Udhayam Kumbha, Aarudam Dhanu, Surya Veedhi Vrishabha -> Kataka", () => {
-    // 2026-10-20 22:40: "தனுசு → ரிஷபம் = 6, உதயத்திலிருந்து → கடகம் 30°00'"
+    // 2026-10-20 22:40: "தனு → ரி = 6, உதயத்திலிருந்து → கட 30°00'"
     const result = calculateKavippu({
       udhayamRasiIndex: 10, // Kumbha
       udhayamDegreeInRasi: 26 + 5 / 60,

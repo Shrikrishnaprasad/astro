@@ -4,7 +4,7 @@ import {
   KAKSHYA_LORDS,
   type AshtakavargaContributor,
 } from "../data/ashtakavargaTables";
-import { PLANET_TAMIL_ABBR } from "../data/planetsTamil";
+import { LAGNA_TAMIL, PLANET_TAMIL_ABBR } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import {
   computeAshtakavarga,
@@ -187,7 +187,7 @@ export default function AshtakavargaPanel({
                     <span>
                       {rasi.nameEnglish} (H{house})
                     </span>
-                    {isLagna && <strong style={{ color: "#f0b429" }}>லக்</strong>}
+                    {isLagna && <strong style={{ color: "#f0b429" }}>{LAGNA_TAMIL}</strong>}
                   </div>
                   <div
                     className={isStrong ? "pass" : isWeak ? "fail" : ""}

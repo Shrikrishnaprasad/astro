@@ -29,7 +29,7 @@ function normalizeRasiIndex(rasiIndex: number): number {
  * https://hindupanchangam.in/tools/jamakol-prasannam/ (different Udhayam,
  * Aarudam and counts each time, all matching exactly):
  *   1. Count signs from Aarudam to Surya Veedhi, forward, inclusive of both
- *      ends (the page states this count explicitly, e.g. "கடகம் → ரிஷபம் = 11").
+ *      ends (the page states this count explicitly, e.g. "கட → ரி = 11").
  *   2. Starting from Udhayam, advance by (count - 1) signs forward - i.e. the
  *      same forward/inclusive convention applied a second time.
  *   This reduces to: kavippu = (udhayam + (suryaVeedhi - aarudam)) mod 12.

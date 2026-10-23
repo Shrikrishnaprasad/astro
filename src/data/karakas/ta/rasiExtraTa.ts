@@ -25,7 +25,7 @@ function buildRasiClassicalTa(): Record<string, string[][]> {
     const ascension = i >= 9 || i <= 2 ? "குறுகிய உதயம்" : "நீண்ட உதயம்";
     out[`rasi-${i + 1}`] = [
       [
-        `தமிழ் சூரிய மாதம்: ${MONTHS_TA[i]} (சூரியன் சஞ்சாரம்)`,
+        `தமிழ் சூரிய மாதம்: ${MONTHS_TA[i]} (சூரி சஞ்சாரம்)`,
         `நிறம்: ${COLOURS_TA[i]}`,
         `வளம்: ${FERTILITY_TA[i]}`,
         `பலம்: ${DAY_STRONG.has(i) ? "பகல் பலம் (திவா பலி)" : "இரவு பலம் (ராத்ரி பலி)"}`,
