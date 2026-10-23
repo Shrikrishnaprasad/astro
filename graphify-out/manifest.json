@@ -12,10 +12,10 @@
     "semantic_hash": "9cf4399dc90aedf88b93fb8a3c37cf2c"
   },
   "src/App.tsx": {
-    "mtime": 1792585222.2728283,
-    "seen": 1792648462.9069815,
-    "ast_hash": "116857bf15212270b86294ba266c42b7",
-    "semantic_hash": "116857bf15212270b86294ba266c42b7"
+    "mtime": 1792656020.2115424,
+    "seen": 1792739927.5927954,
+    "ast_hash": "3a4b53d4665c6b18fd1987aed86ca69f",
+    "semantic_hash": "3a4b53d4665c6b18fd1987aed86ca69f"
   },
   "src/components/DateTimePlaceForm.tsx": {
     "mtime": 1792569062.83848,
@@ -24,10 +24,10 @@
     "semantic_hash": "be7801f71b5d3c5dfc462edfc1413529"
   },
   "src/components/NavMenu.tsx": {
-    "mtime": 1792566294.9511049,
-    "seen": 1792574204.956359,
-    "ast_hash": "193e7a2cd9f06faec87b039b9a8087f4",
-    "semantic_hash": "193e7a2cd9f06faec87b039b9a8087f4"
+    "mtime": 1792656022.2495365,
+    "seen": 1792739927.5928373,
+    "ast_hash": "6dcbe9c69a2c61b6df94e4a1d3cd5ce5",
+    "semantic_hash": "6dcbe9c69a2c61b6df94e4a1d3cd5ce5"
   },
   "src/components/PlaceSelector.tsx": {
     "mtime": 1792567747.5847836,
@@ -36,10 +36,10 @@
     "semantic_hash": "54d614b8e63e890248a63c4269a246d0"
   },
   "src/components/PlanetTable.tsx": {
-    "mtime": 1792579817.1666856,
-    "seen": 1792648462.90702,
-    "ast_hash": "c8e5d5c9cab5504f6bb6510aa4fec5cc",
-    "semantic_hash": "c8e5d5c9cab5504f6bb6510aa4fec5cc"
+    "mtime": 1792649056.3484533,
+    "seen": 1792739927.5928445,
+    "ast_hash": "103a6a4dc50d489f8d81567237bc2dbb",
+    "semantic_hash": "103a6a4dc50d489f8d81567237bc2dbb"
   },
   "src/components/SouthIndianChart.tsx": {
     "mtime": 1792566315.2148476,
@@ -222,10 +222,10 @@
     "semantic_hash": "56429f681d126bbf930b05ebb137b863"
   },
   "src/engine/panchanga.ts": {
-    "mtime": 1792491964.1444218,
-    "seen": 1792565465.760985,
-    "ast_hash": "5bf14194edcc9251ced41caaad2c9dd3",
-    "semantic_hash": "5bf14194edcc9251ced41caaad2c9dd3"
+    "mtime": 1792650649.8428466,
+    "seen": 1792739927.592977,
+    "ast_hash": "ebf4fc162bd912bc4f76075261be6d20",
+    "semantic_hash": "ebf4fc162bd912bc4f76075261be6d20"
   },
   "src/engine/planetaryPositions.ts": {
     "mtime": 1792585211.3758276,
@@ -270,10 +270,10 @@
     "semantic_hash": "6082203d97e0075eed5e08a7e27efd46"
   },
   "src/engine/retrograde.ts": {
-    "mtime": 1792499971.2153254,
-    "seen": 1792565465.7610238,
-    "ast_hash": "f96e41d590f316f09a3d2abf94fdbce5",
-    "semantic_hash": "f96e41d590f316f09a3d2abf94fdbce5"
+    "mtime": 1792649045.1186738,
+    "seen": 1792739927.5930393,
+    "ast_hash": "8271316a116b999c2bbf7646459c746a",
+    "semantic_hash": "8271316a116b999c2bbf7646459c746a"
   },
   "src/engine/samvatsara.test.ts": {
     "mtime": 1792491948.1361537,
@@ -300,10 +300,10 @@
     "semantic_hash": "e9ad1b64cddbe4ade4ac7cf4fa6a8698"
   },
   "src/engine/specialPoints.ts": {
-    "mtime": 1792501820.7545652,
-    "seen": 1792565465.7610471,
-    "ast_hash": "5cde9708147227b51e1430a49c77e36b",
-    "semantic_hash": "5cde9708147227b51e1430a49c77e36b"
+    "mtime": 1792649072.8969753,
+    "seen": 1792739927.593067,
+    "ast_hash": "98a57ecbb6339a33d9c9c34d124534a4",
+    "semantic_hash": "98a57ecbb6339a33d9c9c34d124534a4"
   },
   "src/engine/sunTimes.ts": {
     "mtime": 1792489317.6830356,
@@ -342,16 +342,16 @@
     "semantic_hash": "72a18cba7c1664f93b25dab74f0852fa"
   },
   "src/pages/ArudhaLagnaPage.tsx": {
-    "mtime": 1792582969.2578561,
-    "seen": 1792648462.9074297,
-    "ast_hash": "8779e1980ca51e1b8f4e9d8bfccd2eb3",
-    "semantic_hash": "8779e1980ca51e1b8f4e9d8bfccd2eb3"
+    "mtime": 1792649079.097451,
+    "seen": 1792739927.5931191,
+    "ast_hash": "dbb29bf1f2adfe6931487c13d310996e",
+    "semantic_hash": "dbb29bf1f2adfe6931487c13d310996e"
   },
   "src/pages/BirthChartPage.tsx": {
-    "mtime": 1792585238.1636357,
-    "seen": 1792648462.907434,
-    "ast_hash": "eb4f75b2bb203a3222a906def4ccf468",
-    "semantic_hash": "eb4f75b2bb203a3222a906def4ccf468"
+    "mtime": 1792652832.9943285,
+    "seen": 1792739927.593128,
+    "ast_hash": "0e2c9763e2cf57f372d40ca2d5bddbfc",
+    "semantic_hash": "0e2c9763e2cf57f372d40ca2d5bddbfc"
   },
   "src/pages/DasaPage.tsx": {
     "mtime": 1792582965.6755593,
@@ -360,16 +360,16 @@
     "semantic_hash": "a3887a8c17a2ae20cb63dd9b9df10e83"
   },
   "src/pages/LiveTransitPage.tsx": {
-    "mtime": 1792582964.9962237,
-    "seen": 1792648462.9074519,
-    "ast_hash": "1ad7800b4e962a6fe3d90644b5f7b937",
-    "semantic_hash": "1ad7800b4e962a6fe3d90644b5f7b937"
+    "mtime": 1792649077.050201,
+    "seen": 1792739927.5931597,
+    "ast_hash": "55928f0bbccb6ee02fcf6202c503088a",
+    "semantic_hash": "55928f0bbccb6ee02fcf6202c503088a"
   },
   "src/pages/PanchangamPage.tsx": {
-    "mtime": 1792582971.6502347,
-    "seen": 1792648462.9074564,
-    "ast_hash": "8533c92b05f85ca7a96f5a2fdad24ce8",
-    "semantic_hash": "8533c92b05f85ca7a96f5a2fdad24ce8"
+    "mtime": 1792651664.8161025,
+    "seen": 1792739927.593167,
+    "ast_hash": "b21ac32a0cff829f4789c2d846277339",
+    "semantic_hash": "b21ac32a0cff829f4789c2d846277339"
   },
   "src/pages/PoruthamPage.tsx": {
     "mtime": 1792585242.021248,
@@ -378,16 +378,16 @@
     "semantic_hash": "aa1f914e78056e2cc2ac24db4cc54151"
   },
   "src/routes.tsx": {
-    "mtime": 1792584867.35307,
-    "seen": 1792648462.9074695,
-    "ast_hash": "c8ec5a48fcadb098918098173e41f457",
-    "semantic_hash": "c8ec5a48fcadb098918098173e41f457"
+    "mtime": 1792653670.9141853,
+    "seen": 1792739927.5931814,
+    "ast_hash": "7b780db47b59e83c1d6d187c7c683c0f",
+    "semantic_hash": "7b780db47b59e83c1d6d187c7c683c0f"
   },
   "src/utils/format.ts": {
-    "mtime": 1792489908.4975996,
-    "seen": 1792565465.7610939,
-    "ast_hash": "20c35383791b23ea66e2ec54ef2cac0b",
-    "semantic_hash": "20c35383791b23ea66e2ec54ef2cac0b"
+    "mtime": 1792649043.4396763,
+    "seen": 1792739927.5931854,
+    "ast_hash": "085b59f2082c880eae704dd2d9b4cc49",
+    "semantic_hash": "085b59f2082c880eae704dd2d9b4cc49"
   },
   "tsconfig.json": {
     "mtime": 1792486897.1749704,
@@ -546,10 +546,10 @@
     "semantic_hash": "b8a911d24203b26ad35a6b796646124c"
   },
   "src/data/ashtakavargaTables.ts": {
-    "mtime": 1792584827.2571352,
-    "seen": 1792648462.9070516,
-    "ast_hash": "ed52bfd64ab780fbc0650c5e59cf1665",
-    "semantic_hash": "ed52bfd64ab780fbc0650c5e59cf1665"
+    "mtime": 1792652407.5637753,
+    "seen": 1792739927.5928571,
+    "ast_hash": "6d2858d11b475cd178f9345c485d22ca",
+    "semantic_hash": "6d2858d11b475cd178f9345c485d22ca"
   },
   "src/data/ephemerisAccuracy.ts": {
     "mtime": 1792582954.9450493,
@@ -558,10 +558,10 @@
     "semantic_hash": "b70a7fbdfd168520d9652e49039c61e0"
   },
   "src/data/jyotishScope.ts": {
-    "mtime": 1792585245.1529257,
-    "seen": 1792648462.907072,
-    "ast_hash": "94e38eee9d42459ac6997708d1c7572a",
-    "semantic_hash": "94e38eee9d42459ac6997708d1c7572a"
+    "mtime": 1792653675.1495123,
+    "seen": 1792739927.5928655,
+    "ast_hash": "22ae8965dbe0ba9b93274660340d4fe3",
+    "semantic_hash": "22ae8965dbe0ba9b93274660340d4fe3"
   },
   "src/data/tithiShunyaNakshatras.ts": {
     "mtime": 1792584822.6756642,
@@ -570,16 +570,16 @@
     "semantic_hash": "1a982ce49676871ce7923d170e3474d5"
   },
   "src/engine/advancedJyotish.test.ts": {
-    "mtime": 1792584856.5539293,
-    "seen": 1792648462.9071589,
-    "ast_hash": "f1fd7cc38b6ed4353b4d4375279152fa",
-    "semantic_hash": "f1fd7cc38b6ed4353b4d4375279152fa"
+    "mtime": 1792653682.2464676,
+    "seen": 1792739927.592917,
+    "ast_hash": "9b40db6d5ca196e61ca608c2b902b9c1",
+    "semantic_hash": "9b40db6d5ca196e61ca608c2b902b9c1"
   },
   "src/engine/ashtakavarga.ts": {
-    "mtime": 1792584850.319208,
-    "seen": 1792648462.9071846,
-    "ast_hash": "17bfad3aa0256312adcfec231a41cfb4",
-    "semantic_hash": "17bfad3aa0256312adcfec231a41cfb4"
+    "mtime": 1792652445.3264933,
+    "seen": 1792739927.5929255,
+    "ast_hash": "a4f76fa596b5924c6d273414ce6ac24f",
+    "semantic_hash": "a4f76fa596b5924c6d273414ce6ac24f"
   },
   "src/engine/ephemerisSettings.test.ts": {
     "mtime": 1792585248.0013149,
@@ -594,10 +594,10 @@
     "semantic_hash": "d5d150b108bf7e5c21ff263006f0e89c"
   },
   "src/engine/kp.ts": {
-    "mtime": 1792584849.1872728,
-    "seen": 1792648462.9072478,
-    "ast_hash": "af9ee4578c3534d785d0a0f4714a377c",
-    "semantic_hash": "af9ee4578c3534d785d0a0f4714a377c"
+    "mtime": 1792653548.3871572,
+    "seen": 1792739927.5929506,
+    "ast_hash": "2563d841271fc5a412fd3f2f79d88a72",
+    "semantic_hash": "2563d841271fc5a412fd3f2f79d88a72"
   },
   "src/engine/nutation.ts": {
     "mtime": 1792585204.9356492,
@@ -618,10 +618,10 @@
     "semantic_hash": "6f258359c7738597e8395a9af9718830"
   },
   "src/engine/prasna.ts": {
-    "mtime": 1792584843.400414,
-    "seen": 1792648462.9073198,
-    "ast_hash": "03f5e9fcf138eb43a83cff233c62f2ad",
-    "semantic_hash": "03f5e9fcf138eb43a83cff233c62f2ad"
+    "mtime": 1792649088.7917652,
+    "seen": 1792739927.5930142,
+    "ast_hash": "1cac3be2b001995be62e61c6ed04590a",
+    "semantic_hash": "1cac3be2b001995be62e61c6ed04590a"
   },
   "src/engine/shadbala.ts": {
     "mtime": 1792584838.015051,
@@ -642,10 +642,10 @@
     "semantic_hash": "dd567b3ea063010381c61e77cb246840"
   },
   "src/pages/AdvancedJyotishPage.tsx": {
-    "mtime": 1792584942.9414465,
-    "seen": 1792648462.907425,
-    "ast_hash": "afe3dc7371ca1ed4d7cfa458b6d9584e",
-    "semantic_hash": "afe3dc7371ca1ed4d7cfa458b6d9584e"
+    "mtime": 1792652886.6894553,
+    "seen": 1792739927.5931149,
+    "ast_hash": "6ab2f7ae9a913a0f132bda19b812fb9b",
+    "semantic_hash": "6ab2f7ae9a913a0f132bda19b812fb9b"
   },
   "src/pages/EphemerisAccuracyPage.tsx": {
     "mtime": 1792585242.3762507,
@@ -660,9 +660,219 @@
     "semantic_hash": "2270af043473ff7e6a91b077cdc228e9"
   },
   "src/pages/PrasnaPage.tsx": {
-    "mtime": 1792584867.0616848,
-    "seen": 1792648462.907465,
-    "ast_hash": "03f1176c0a63d1d78b78aefadcff71a9",
-    "semantic_hash": "03f1176c0a63d1d78b78aefadcff71a9"
+    "mtime": 1792653659.329149,
+    "seen": 1792739927.593177,
+    "ast_hash": "9b358bbf6e40ffedf515e889e045b24f",
+    "semantic_hash": "9b358bbf6e40ffedf515e889e045b24f"
+  },
+  "src/components/AshtakavargaPanel.tsx": {
+    "mtime": 1792652737.118756,
+    "seen": 1792739927.592801,
+    "ast_hash": "6fafa2fc13ce802a0e883f0de37e74bc",
+    "semantic_hash": "6fafa2fc13ce802a0e883f0de37e74bc"
+  },
+  "src/components/KarakamPopup.tsx": {
+    "mtime": 1792738166.7112718,
+    "seen": 1792739927.5928288,
+    "ast_hash": "91692eef39349a3654ad44e5c65e6e85",
+    "semantic_hash": "91692eef39349a3654ad44e5c65e6e85"
+  },
+  "src/components/KpSystemPanel.tsx": {
+    "mtime": 1792653609.753402,
+    "seen": 1792739927.5928311,
+    "ast_hash": "b69881d39ced1d83bf6024e4e07c6390",
+    "semantic_hash": "b69881d39ced1d83bf6024e4e07c6390"
+  },
+  "src/components/ShodashavargaPanel.tsx": {
+    "mtime": 1792652775.8355675,
+    "seen": 1792739927.5928516,
+    "ast_hash": "cedfcd486a0052eff4dad00d52be1df5",
+    "semantic_hash": "cedfcd486a0052eff4dad00d52be1df5"
+  },
+  "src/data/classicalMuhurtaRules.ts": {
+    "mtime": 1792651405.709241,
+    "seen": 1792739927.5928586,
+    "ast_hash": "7526836f30d2d758c42fc114c5c012c5",
+    "semantic_hash": "7526836f30d2d758c42fc114c5c012c5"
+  },
+  "src/data/karakas/bhavaKarakas.ts": {
+    "mtime": 1792656063.396949,
+    "seen": 1792739927.5928674,
+    "ast_hash": "23e8e4eb9920dcff73bae74da35e38c1",
+    "semantic_hash": "23e8e4eb9920dcff73bae74da35e38c1"
+  },
+  "src/data/karakas/extraKarakas.ts": {
+    "mtime": 1792735826.9645026,
+    "seen": 1792739927.5928688,
+    "ast_hash": "3d0cfcdbca2921e218d1c5cf31d1ab82",
+    "semantic_hash": "3d0cfcdbca2921e218d1c5cf31d1ab82"
+  },
+  "src/data/karakas/grahaKarakas.ts": {
+    "mtime": 1792656049.172719,
+    "seen": 1792739927.5928705,
+    "ast_hash": "717d37fa8ece4a4ecd4c24eb4ab64693",
+    "semantic_hash": "717d37fa8ece4a4ecd4c24eb4ab64693"
+  },
+  "src/data/karakas/index.ts": {
+    "mtime": 1792739142.5372157,
+    "seen": 1792739927.5928717,
+    "ast_hash": "e5780053a87c4f105ffe823b340084b8",
+    "semantic_hash": "e5780053a87c4f105ffe823b340084b8"
+  },
+  "src/data/karakas/language.ts": {
+    "mtime": 1792738039.3628843,
+    "seen": 1792739927.5928729,
+    "ast_hash": "2102bf733831428f9b17b89bc2eb9414",
+    "semantic_hash": "2102bf733831428f9b17b89bc2eb9414"
+  },
+  "src/data/karakas/modernKarakas.ts": {
+    "mtime": 1792665350.568609,
+    "seen": 1792739927.5928743,
+    "ast_hash": "31f6a7dc7e62d0f0d8cc77224dda546d",
+    "semantic_hash": "31f6a7dc7e62d0f0d8cc77224dda546d"
+  },
+  "src/data/karakas/nakshatraKarakas.ts": {
+    "mtime": 1792738081.1559093,
+    "seen": 1792739927.5928755,
+    "ast_hash": "ed40d679fcacb611c4f949127a34ac74",
+    "semantic_hash": "ed40d679fcacb611c4f949127a34ac74"
+  },
+  "src/data/karakas/rasiKarakas.ts": {
+    "mtime": 1792735873.3067997,
+    "seen": 1792739927.5928774,
+    "ast_hash": "8e7b077cccb9712a3e35531205aeb361",
+    "semantic_hash": "8e7b077cccb9712a3e35531205aeb361"
+  },
+  "src/data/karakas/specialExtraKarakas.ts": {
+    "mtime": 1792739130.8552423,
+    "seen": 1792739927.5928786,
+    "ast_hash": "32a73e5d1d75227bb4d4cf018f23fd0d",
+    "semantic_hash": "32a73e5d1d75227bb4d4cf018f23fd0d"
+  },
+  "src/data/karakas/specialKarakas.ts": {
+    "mtime": 1792735910.9850328,
+    "seen": 1792739927.5928798,
+    "ast_hash": "f8fcebc75c8d1eeeb25a584204399fd7",
+    "semantic_hash": "f8fcebc75c8d1eeeb25a584204399fd7"
+  },
+  "src/data/karakas/ta/bhavaExtraTa.ts": {
+    "mtime": 1792737703.1036136,
+    "seen": 1792739927.5928814,
+    "ast_hash": "49e38efd2eb909e691e958035b7832b7",
+    "semantic_hash": "49e38efd2eb909e691e958035b7832b7"
+  },
+  "src/data/karakas/ta/bhavaTa.ts": {
+    "mtime": 1792736886.8656924,
+    "seen": 1792739927.5928824,
+    "ast_hash": "15d56d91e44e15009b693380f14d182e",
+    "semantic_hash": "15d56d91e44e15009b693380f14d182e"
+  },
+  "src/data/karakas/ta/grahaExtraTa.ts": {
+    "mtime": 1792737623.0279753,
+    "seen": 1792739927.5928838,
+    "ast_hash": "b7bd7c2a780dae2477f0e706e40f4afc",
+    "semantic_hash": "b7bd7c2a780dae2477f0e706e40f4afc"
+  },
+  "src/data/karakas/ta/grahaTa.ts": {
+    "mtime": 1792736682.68612,
+    "seen": 1792739927.5928853,
+    "ast_hash": "243bda3ae29c17b08863c8e5ec04522f",
+    "semantic_hash": "243bda3ae29c17b08863c8e5ec04522f"
+  },
+  "src/data/karakas/ta/nakshatraExtraTa.ts": {
+    "mtime": 1792738032.5733714,
+    "seen": 1792739927.5928867,
+    "ast_hash": "a6bef9470ba1a8abfcc8c23f4b5b7100",
+    "semantic_hash": "a6bef9470ba1a8abfcc8c23f4b5b7100"
+  },
+  "src/data/karakas/ta/rasiExtraTa.ts": {
+    "mtime": 1792737748.907183,
+    "seen": 1792739927.592888,
+    "ast_hash": "aa3c6671d4e630f68221bdef7817fe70",
+    "semantic_hash": "aa3c6671d4e630f68221bdef7817fe70"
+  },
+  "src/data/karakas/ta/rasiTa.ts": {
+    "mtime": 1792737270.5424976,
+    "seen": 1792739927.592889,
+    "ast_hash": "bb361443e473d2ac96234bfe3cf6db01",
+    "semantic_hash": "bb361443e473d2ac96234bfe3cf6db01"
+  },
+  "src/data/karakas/ta/specialTa.ts": {
+    "mtime": 1792737414.2198548,
+    "seen": 1792739927.5928907,
+    "ast_hash": "91cd5f33ba8c78708cbdedf1b5fa562c",
+    "semantic_hash": "91cd5f33ba8c78708cbdedf1b5fa562c"
+  },
+  "src/data/karakas/types.ts": {
+    "mtime": 1792738038.3131416,
+    "seen": 1792739927.592892,
+    "ast_hash": "d93db0d66a15c8be655e7368c96277b0",
+    "semantic_hash": "d93db0d66a15c8be655e7368c96277b0"
+  },
+  "src/data/muhurtaActivities.ts": {
+    "mtime": 1792650722.464401,
+    "seen": 1792739927.5928936,
+    "ast_hash": "863ba7aaf19b6a999b672d5aa05791fa",
+    "semantic_hash": "863ba7aaf19b6a999b672d5aa05791fa"
+  },
+  "src/engine/classicalMuhurta.ts": {
+    "mtime": 1792651464.0897033,
+    "seen": 1792739927.5929303,
+    "ast_hash": "3685d2abc0ba8016f19537162199886d",
+    "semantic_hash": "3685d2abc0ba8016f19537162199886d"
+  },
+  "src/engine/ephemerisSnapshot.ts": {
+    "mtime": 1792649042.3272634,
+    "seen": 1792739927.5929406,
+    "ast_hash": "7e435b1513750e14c7d3a75941a03c2f",
+    "semantic_hash": "7e435b1513750e14c7d3a75941a03c2f"
+  },
+  "src/engine/muhurtaPicker.test.ts": {
+    "mtime": 1792651687.5739093,
+    "seen": 1792739927.5929537,
+    "ast_hash": "aa57065016e22c8e0ca837208dc4b8d7",
+    "semantic_hash": "aa57065016e22c8e0ca837208dc4b8d7"
+  },
+  "src/engine/muhurtaPicker.ts": {
+    "mtime": 1792652318.7508526,
+    "seen": 1792739927.5929549,
+    "ast_hash": "f8ec7bd99a5c319e39589676a8c30534",
+    "semantic_hash": "f8ec7bd99a5c319e39589676a8c30534"
+  },
+  "src/engine/vargas.ts": {
+    "mtime": 1792652661.651359,
+    "seen": 1792739927.5930836,
+    "ast_hash": "7649e86bfa41bf3b0d22b13a832984d2",
+    "semantic_hash": "7649e86bfa41bf3b0d22b13a832984d2"
+  },
+  "src/pages/AshtakavargaPage.tsx": {
+    "mtime": 1792652797.1933224,
+    "seen": 1792739927.593123,
+    "ast_hash": "2c33e8cf9bd8f92cd7d7e7b2f4eada72",
+    "semantic_hash": "2c33e8cf9bd8f92cd7d7e7b2f4eada72"
+  },
+  "src/pages/DivisionalChartsPage.tsx": {
+    "mtime": 1792652796.3326833,
+    "seen": 1792739927.5931368,
+    "ast_hash": "9c0be713aaf06bca23e83e31bf7f6aec",
+    "semantic_hash": "9c0be713aaf06bca23e83e31bf7f6aec"
+  },
+  "src/pages/EphemerisPage.tsx": {
+    "mtime": 1792649073.6009748,
+    "seen": 1792739927.593146,
+    "ast_hash": "f94f1cc7d410d5bdb3b37687d305e274",
+    "semantic_hash": "f94f1cc7d410d5bdb3b37687d305e274"
+  },
+  "src/pages/KpAstrologyPage.tsx": {
+    "mtime": 1792653640.6948948,
+    "seen": 1792739927.5931559,
+    "ast_hash": "868531ab07ef44c1e5cc6f31311c27ad",
+    "semantic_hash": "868531ab07ef44c1e5cc6f31311c27ad"
+  },
+  "src/pages/MuhurtaPage.tsx": {
+    "mtime": 1792652349.9690669,
+    "seen": 1792739927.5931625,
+    "ast_hash": "9a973e7c071247e5e2dfc9a111db4c80",
+    "semantic_hash": "9a973e7c071247e5e2dfc9a111db4c80"
   }
 }
