@@ -1,5 +1,17 @@
 import { NAKSHATRAS, NAKSHATRA_SPAN_DEGREES } from "../nakshatras";
 import { RASIS } from "../rasis";
+import { tamilFromParen } from "./language";
+import {
+  GANA_TA,
+  NADI_TA,
+  NAKSHATRA_SEEDS_TA,
+  NAME_SYLLABLES_TA,
+  NATURE_TA,
+  PLANET_TA,
+  PURUSHARTHA_TA,
+  RISHI_TA,
+  VARNA_TA,
+} from "./ta/nakshatraExtraTa";
 import type { KarakaCategoryGroup, KarakaEntry } from "./types";
 
 type NakshatraNature = "Dhruva" | "Chara" | "Ugra" | "Mishra" | "Kshipra" | "Mridu" | "Tikshna";
@@ -327,6 +339,47 @@ const SEEDS: NakshatraKarakaSeed[] = [
   },
 ];
 
+const BIRDS = [
+  "Rajali / hawk (ராஜாளி)", "Crow (காக்கை)", "Peacock (மயில்)", "Owl (ஆந்தை)", "Hen (கோழி)",
+  "Andril bird (அன்றில்)", "Swan (அன்னம்)", "Cormorant (நீர்க்காகம்)", "Kingfisher (கிச்சிலி)",
+  "Eagle (கழுகு)", "Female eagle (பெண் கழுகு)", "Kiluvai bird (கிளுவை)", "Kite (பருந்து)",
+  "Woodpecker (மரங்கொத்தி)", "Bee (தேனீ)", "Red partridge (செஞ்சிவல்)", "Skylark (வானம்பாடி)",
+  "Chakravaka / ruddy shelduck (சக்கரவாகம்)", "Crow-pheasant (செம்போத்து)", "Partridge (கௌதாரி)",
+  "Valiyan bird (வலியன்)", "Drongo (கரிக்குருவி)", "Golden beetle (பொன்வண்டு)", "Jungle crow (அண்டங்காக்கை)",
+  "Sandpiper (உள்ளான்)", "Owl (கோட்டான்)", "Falcon (வல்லூறு)",
+];
+
+const VARNAS: Record<number, string> = {};
+const VARNA_GROUPS: Array<[string, number[]]> = [
+  ["Brahmana", [2, 10, 19, 24]],
+  ["Kshatriya", [7, 11, 20, 25]],
+  ["Vaishya", [0, 6, 12]],
+  ["Shudra", [3, 9, 16, 26]],
+  ["Servant / farmer (Dasa)", [4, 13, 17, 22]],
+  ["Butcher (Kasai)", [5, 14, 18, 23]],
+  ["Outcaste (Mleccha)", [1, 8, 15, 21]],
+];
+for (const [varna, indices] of VARNA_GROUPS) {
+  for (const i of indices) VARNAS[i] = varna;
+}
+
+const GOTRA_RISHIS = ["Marichi", "Vasishtha", "Angiras", "Atri", "Pulastya", "Pulaha", "Kratu"];
+
+const NAME_SYLLABLES = [
+  "Chu, Che, Cho, La", "Li, Lu, Le, Lo", "A, I, U, E", "O, Va, Vi, Vu", "Ve, Vo, Ka, Ki",
+  "Ku, Gha, Ng, Chha", "Ke, Ko, Ha, Hi", "Hu, He, Ho, Da", "Di, Du, De, Do", "Ma, Mi, Mu, Me",
+  "Mo, Ta, Ti, Tu", "Te, To, Pa, Pi", "Pu, Sha, Na, Tha", "Pe, Po, Ra, Ri", "Ru, Re, Ro, Ta",
+  "Ti, Tu, Te, To", "Na, Ni, Nu, Ne", "No, Ya, Yi, Yu", "Ye, Yo, Bha, Bhi", "Bhu, Dha, Pha, Dha",
+  "Be, Bo, Ja, Ji", "Ju/Khi, Je/Khu, Jo/Khe, Gha/Kho", "Ga, Gi, Gu, Ge", "Go, Sa, Si, Su",
+  "Se, So, Da, Di", "Du, Tha, Jha, Na", "De, Do, Cha, Chi",
+];
+
+function gotra(index: number): string {
+  // Gotra cycle runs over 28 nakshatras; Abhijit sits between Uttara Ashadha and Shravana.
+  const position = index < 21 ? index : index + 1;
+  return GOTRA_RISHIS[position % 7];
+}
+
 function formatDms(degrees: number): string {
   const totalMinutes = Math.round(degrees * 60);
   const d = Math.floor(totalMinutes / 60);
@@ -334,46 +387,99 @@ function formatDms(degrees: number): string {
   return `${d}°${String(m).padStart(2, "0")}′`;
 }
 
-function spanLabel(index: number): string {
+function spanLabel(index: number, tamil = false): string {
   const start = index * NAKSHATRA_SPAN_DEGREES;
   const end = start + NAKSHATRA_SPAN_DEGREES;
   const startRasi = Math.floor(start / 30);
   const endRasi = Math.floor((end - 1e-9) / 30);
-  const startText = `${RASIS[startRasi].nameEnglish} ${formatDms(start - startRasi * 30)}`;
-  const endText = `${RASIS[endRasi].nameEnglish} ${formatDms(end - endRasi * 30)}`;
+  const name = (r: number) => (tamil ? RASIS[r].nameTamil : RASIS[r].nameEnglish);
+  const startText = `${name(startRasi)} ${formatDms(start - startRasi * 30)}`;
+  const endText = `${name(endRasi)} ${formatDms(end - endRasi * 30)}`;
   return `${startText} – ${endText}`;
 }
 
-function padaNavamsas(index: number): string {
+function padaNavamsas(index: number, tamil = false): string {
   return [0, 1, 2, 3]
     .map((pada) => {
       const navamsa = (index * 4 + pada) % 12;
-      return `P${pada + 1}: ${RASIS[navamsa].nameEnglish}`;
+      return tamil ? `பாதம் ${pada + 1}: ${RASIS[navamsa].nameTamil}` : `P${pada + 1}: ${RASIS[navamsa].nameEnglish}`;
     })
     .join(" • ");
 }
 
-function rasiLords(index: number): string {
+function rasiLords(index: number, tamil = false): string {
   const start = index * NAKSHATRA_SPAN_DEGREES;
   const end = start + NAKSHATRA_SPAN_DEGREES;
   const startRasi = Math.floor(start / 30);
   const endRasi = Math.floor((end - 1e-9) / 30);
   const rasis = startRasi === endRasi ? [startRasi] : [startRasi, endRasi];
-  return rasis.map((r) => `${RASIS[r].nameEnglish} (${RASIS[r].lord})`).join(", ");
+  return rasis
+    .map((r) => (tamil ? `${RASIS[r].nameTamil} (${PLANET_TA[RASIS[r].lord]})` : `${RASIS[r].nameEnglish} (${RASIS[r].lord})`))
+    .join(", ");
+}
+
+function paren(text: string): string {
+  return tamilFromParen(text) ?? text;
 }
 
 export const NAKSHATRA_KARAKAS: KarakaEntry[] = NAKSHATRAS.map((nakshatra, index) => {
   const seed = SEEDS[index];
+  const seedTa = NAKSHATRA_SEEDS_TA[index];
   const nature = NATURE_INFO[seed.nature];
+  const natureTa = NATURE_TA[seed.nature];
+  const lordTa = PLANET_TA[nakshatra.lord] ?? nakshatra.lord;
+  const deityTa = paren(seed.deity);
+  const vrikshaTa = paren(seed.vriksha);
   const categories: KarakaCategoryGroup[] = [
-    { category: "Nature & Temperament (குணநலன்கள்)", categoryTamil: "குணநலன்", items: seed.traits },
-    { category: "Professions & Career (தொழில்)", categoryTamil: "தொழில்", items: seed.professions },
+    { category: "Nature & Temperament (குணநலன்கள்)", categoryTamil: "குணநலன்", items: seed.traits, itemsTa: seedTa.traits },
+    { category: "Professions & Career (தொழில்)", categoryTamil: "தொழில்", items: seed.professions, itemsTa: seedTa.professions },
     {
       category: "Body Part & Medical (உடல் & நோய்)",
       categoryTamil: "உடல் & நோய்",
       items: [`Nakshatra Purusha: ${seed.bodyPart}`, ...seed.health],
+      itemsTa: [`நட்சத்திர புருஷ அங்கம்: ${paren(seed.bodyPart)}`, ...seedTa.health],
     },
-    { category: `Suitable Activities — ${nature.label}`, categoryTamil: "முகூர்த்தம்", items: nature.activities },
+    {
+      category: `Suitable Activities — ${nature.label}`,
+      categoryTamil: "முகூர்த்தம்",
+      categoryTa: `ஏற்ற செயல்கள் — ${natureTa.label}`,
+      items: nature.activities,
+      itemsTa: natureTa.activities,
+    },
+    {
+      category: "Bird, Varna, Gotra & Name Syllables (பட்சி, வர்ணம், கோத்திரம் & நாமாக்ஷரம்)",
+      categoryTamil: "பட்சி & நாமாக்ஷரம்",
+      items: [
+        `Bird (பட்சி): ${BIRDS[index]}`,
+        `Varna: ${VARNAS[index]}`,
+        `Gotra (Rishi): ${gotra(index)}`,
+        `Name syllables by pada (1–4): ${NAME_SYLLABLES[index]}`,
+      ],
+      itemsTa: [
+        `பட்சி: ${paren(BIRDS[index])}`,
+        `வர்ணம்: ${VARNA_TA[VARNAS[index]]}`,
+        `கோத்திரம் (ரிஷி): ${RISHI_TA[gotra(index)]}`,
+        `பாத வாரியான நாமாக்ஷரங்கள் (1–4): ${NAME_SYLLABLES_TA[index]}`,
+      ],
+    },
+    {
+      category: "Remedies & Worship (பரிகாரம் & வழிபாடு)",
+      categoryTamil: "பரிகாரம்",
+      items: [
+        `Worship the presiding deity: ${seed.deity.split(" — ")[0]}`,
+        `Worship the star lord ${nakshatra.lord} on its weekday, with its grain and gem`,
+        `Plant, water or protect the nakshatra tree: ${seed.vriksha}`,
+        `Feed or protect the yoni animal and the nakshatra bird`,
+        "Tara Bala: counted from this janma star, favour the 2nd, 4th, 6th, 8th and 9th stars; avoid the 3rd, 5th and 7th (Vipat, Pratyak, Naidhana)",
+      ],
+      itemsTa: [
+        `அதிதேவதை வழிபாடு: ${deityTa}`,
+        `நட்சத்திர அதிபதியான ${lordTa} கிரகத்தை அவருக்குரிய கிழமையில், உரிய தானியம் & ரத்தினத்துடன் வழிபடவும்`,
+        `நட்சத்திர மரத்தை நடுதல், நீர் ஊற்றுதல் அல்லது பாதுகாத்தல்: ${vrikshaTa}`,
+        "யோனி விலங்கு & நட்சத்திரப் பட்சிக்கு உணவளித்தல் அல்லது பாதுகாத்தல்",
+        "தாரா பலம்: இந்த ஜன்ம நட்சத்திரத்திலிருந்து எண்ணி 2, 4, 6, 8, 9-வது நட்சத்திரங்கள் நன்மை; 3, 5, 7-வது (விபத், பிரத்யக், நைதனம்) தவிர்க்கவும்",
+      ],
+    },
   ];
 
   return {
@@ -383,20 +489,22 @@ export const NAKSHATRA_KARAKAS: KarakaEntry[] = NAKSHATRAS.map((nakshatra, index
     titleEnglish: `${index + 1}. ${nakshatra.nameEnglish}`,
     titleTamil: nakshatra.nameTamil,
     subtitle: `Lord: ${nakshatra.lord} • ${seed.gana} Gana • ${seed.nature}`,
+    subtitleTa: `அதிபதி: ${lordTa} • ${GANA_TA[seed.gana]} • ${natureTa.label.split(" / ")[0]}`,
     badge: spanLabel(index),
+    badgeTa: spanLabel(index, true),
     attributes: [
-      { label: "Star Lord (நட்சத்திர அதிபதி)", value: nakshatra.lord },
-      { label: "Rasi & Rasi Lord", value: rasiLords(index) },
-      { label: "Span", value: spanLabel(index) },
-      { label: "Pada Navamsas", value: padaNavamsas(index) },
-      { label: "Deity (அதிதேவதை)", value: seed.deity },
-      { label: "Symbol (சின்னம்)", value: seed.symbol },
-      { label: "Gana (கணம்)", value: seed.gana },
-      { label: "Yoni (யோனி)", value: seed.yoni },
-      { label: "Nadi (நாடி)", value: seed.nadi },
-      { label: "Purushartha", value: PURUSHARTHA_CYCLE[index % 8] },
-      { label: "Nature (தன்மை)", value: nature.label },
-      { label: "Vriksha (விருட்சம்)", value: seed.vriksha },
+      { label: "Star Lord (நட்சத்திர அதிபதி)", value: nakshatra.lord, valueTa: lordTa },
+      { label: "Rasi & Rasi Lord", value: rasiLords(index), valueTa: rasiLords(index, true) },
+      { label: "Span", value: spanLabel(index), valueTa: spanLabel(index, true) },
+      { label: "Pada Navamsas", value: padaNavamsas(index), valueTa: padaNavamsas(index, true) },
+      { label: "Deity (அதிதேவதை)", value: seed.deity, valueTa: deityTa },
+      { label: "Symbol (சின்னம்)", value: seed.symbol, valueTa: paren(seed.symbol) },
+      { label: "Gana (கணம்)", value: seed.gana, valueTa: GANA_TA[seed.gana] },
+      { label: "Yoni (யோனி)", value: seed.yoni, valueTa: paren(seed.yoni) },
+      { label: "Nadi (நாடி)", value: seed.nadi, valueTa: NADI_TA[seed.nadi] },
+      { label: "Purushartha", value: PURUSHARTHA_CYCLE[index % 8], valueTa: PURUSHARTHA_TA[PURUSHARTHA_CYCLE[index % 8]] },
+      { label: "Nature (தன்மை)", value: nature.label, valueTa: natureTa.label },
+      { label: "Vriksha (விருட்சம்)", value: seed.vriksha, valueTa: vrikshaTa },
     ],
     categories,
   };

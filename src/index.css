@@ -671,6 +671,42 @@ body.karakam-open {
   border-bottom: 1px solid #2a2f45;
 }
 
+.karakam-lang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.karakam-lang__label {
+  color: #b8bdd6;
+  margin-right: 2px;
+}
+
+.karakam-lang__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #2a2f45;
+  border-radius: 999px;
+  background: #1b1f30;
+  cursor: pointer;
+  user-select: none;
+}
+
+.karakam-lang__option input {
+  margin: 0;
+  accent-color: #6b7fd0;
+}
+
+.karakam-lang__option--active {
+  background: #2d3a6e;
+  border-color: #6b7fd0;
+}
+
 .karakam-search {
   width: 100%;
   box-sizing: border-box;
