@@ -194,7 +194,7 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     name: "Muhurta picker (activity search)",
     status: "implemented",
     summary:
-      "365-day search across 31 activities; Varjyam & Amrita, day+night Durmuhurtam, Vishti windows, Choghadiya + Gowri, Siddha/Anandadi/special yogas, 21 Mahadoshas (Maudhya, Sankranti, eclipse, Graha Yuddha, Gandanta, Mrityu Bhaga, Latta, Vedha), Lagna Shuddhi (8th, Kartari, Bhrigu, Moon dusthana, Mandi, kendra malefics), Pushkara & Navamsa Lagna, activity Hora/Gowri. Optional natal: Dasa–Bhukti, SAV, Sade Sati, Jupiter gochara, natal Lagna ashtama, couple Porutham.",
+      "365-day sunrise-based search across 31 activities. 21 Mahadoshas include Maudhya, Sankranti, local solar/lunar eclipse, Kranti Samya, Ekargala, Gandanta, Latta and Vedha. Slots add D9 shuddhi. Natal charts add Dasa–Bhukti–Antara, Kakshya, gochara of the other grahas, and the full Porutham report. Lahiri uses nutation and the true node via astronomy-engine.",
     pages: ["muhurta", "panchangam"],
   },
 ];

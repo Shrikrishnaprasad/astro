@@ -7,8 +7,11 @@ import {
   computeMahadoshas,
   computeSpecialDayYogas,
   computeVarjyamAndAmrita,
+  collectEclipsePeaks,
   evaluateMuhurtaKundali,
+  evaluateNavamsaShuddhi,
   evaluatePointShuddhi,
+  isKrantiSamya,
   lattaNakshatra,
 } from "./classicalMuhurta";
 import { getSiderealAscendant } from "./ascendant";
@@ -151,7 +154,36 @@ describe("searchMuhurtaDays & classicalMuhurta", () => {
     });
     expect(rows.length).toBeGreaterThan(0);
     expect(rows.some((r) => r.natalDasaLabel !== null)).toBe(true);
+    expect(rows.some((r) => (r.natalDasaLabel?.split("/").length ?? 0) >= 3)).toBe(true);
     expect(rows[0].slots[0].navamsaLagnaName.length).toBeGreaterThan(0);
+    expect(typeof rows[0].slots[0].d9AshtamaShuddhi).toBe("boolean");
+  });
+
+  it("scores D9 shuddhi, Kranti Samya, and local eclipse peaks", () => {
+    const clean = evaluateNavamsaShuddhi(10, {
+      Sun: 40,
+      Moon: 70,
+      Mars: 100,
+      Mercury: 130,
+      Jupiter: 160,
+      Venus: 190,
+      Saturn: 250,
+      Rahu: 280,
+      Ketu: 100,
+    });
+    expect(clean.d9LagnaRasi).toBeGreaterThanOrEqual(0);
+    expect(typeof clean.vargottamaLagna).toBe("boolean");
+
+    const sameDeclination = isKrantiSamya(new Date("2026-06-01T12:00:00Z"));
+    expect(typeof sameDeclination).toBe("boolean");
+
+    const peaks = collectEclipsePeaks(
+      new Date("2026-01-01T00:00:00Z"),
+      new Date("2026-12-31T00:00:00Z"),
+      CHENNAI.lat,
+      CHENNAI.lon,
+    );
+    expect(Array.isArray(peaks)).toBe(true);
   });
 
   it("slices out Rahu/Yama/Gulika overlaps cleanly in subtractTimeWindows", () => {

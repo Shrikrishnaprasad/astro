@@ -1,11 +1,11 @@
 import type { GowriName } from "../data/classicalMuhurtaRules";
 import type { MuhurtaActivityId } from "../data/muhurtaActivities";
-import { computeAshtakavarga } from "./ashtakavarga";
+import { computeAshtakavarga, evaluateKakshyaPlacements } from "./ashtakavarga";
 import { computeLattaVedha } from "./classicalMuhurta";
-import { findActiveMahadasaAndBhukti, computeVimshottariDasa, type DasaPeriod } from "./dasa";
+import { isWithinDasaPeriod, computeVimshottariDasa, type DasaPeriod } from "./dasa";
 import { computePorutham } from "./porutham";
 import { computePoruthamMatchReport } from "./poruthamMatch";
-import type { ChartResult, Planet } from "./types";
+import type { ChartResult, LongitudeMap, Planet } from "./types";
 import { PLANETS } from "./types";
 
 function planetRasiIndexMap(chart: ChartResult): Record<Planet, number> {
@@ -22,6 +22,16 @@ const GOOD_GURU_HOUSES = new Set([2, 5, 7, 9, 11]);
 const BAD_GURU_HOUSES = new Set([6, 8, 12]);
 const SADE_SATI_HOUSES = new Set([12, 1, 2]);
 
+/** Favorable gochara houses counted from the natal Moon (Parashara). */
+const GOCHARA_GOOD: Partial<Record<Planet, number[]>> = {
+  Sun: [3, 6, 10, 11],
+  Mars: [3, 6, 11],
+  Mercury: [2, 4, 6, 8, 10, 11],
+  Venus: [1, 2, 3, 4, 5, 8, 9, 11, 12],
+  Rahu: [3, 6, 10, 11],
+  Ketu: [3, 6, 10, 11],
+};
+
 export interface NatalBalaResult {
   deltaScore: number;
   flags: string[];
@@ -37,6 +47,7 @@ export interface CoupleMatchResult {
   deltaScore: number;
   flags: string[];
   label: string;
+  summary: string;
 }
 
 function houseFrom(fromRasi: number, toRasi: number): number {
@@ -44,7 +55,17 @@ function houseFrom(fromRasi: number, toRasi: number): number {
 }
 
 export function prepareNatalDasa(chart: ChartResult, birthDate: Date): DasaPeriod[] {
-  return computeVimshottariDasa(chart.planetLongitudes.Moon, birthDate, 1, 1);
+  return computeVimshottariDasa(chart.planetLongitudes.Moon, birthDate, 1, 2);
+}
+
+function activeDasaStack(
+  mahadasas: DasaPeriod[],
+  instant: Date,
+): { mahadasa: DasaPeriod | null; bhukti: DasaPeriod | null; antara: DasaPeriod | null } {
+  const mahadasa = mahadasas.find((period) => isWithinDasaPeriod(period, instant)) ?? null;
+  const bhukti = mahadasa?.bhuktis.find((period) => isWithinDasaPeriod(period, instant)) ?? null;
+  const antara = bhukti?.bhuktis.find((period) => isWithinDasaPeriod(period, instant)) ?? null;
+  return { mahadasa, bhukti, antara };
 }
 
 export function scoreNatalBala(
@@ -55,8 +76,7 @@ export function scoreNatalBala(
   instant: Date,
   transitMoonRasi: number,
   transitMoonNak: number,
-  transitSaturnRasi: number,
-  transitJupiterRasi: number,
+  transitLongitudes: LongitudeMap,
   muhurtaLagnaRasi: number | undefined,
 ): NatalBalaResult {
   let deltaScore = 0;
@@ -72,9 +92,9 @@ export function scoreNatalBala(
   const natalMoonNak = chart.planetRasi.Moon.nakshatraIndex;
 
   if (dasaTimeline && birthDate) {
-    const { mahadasa, bhukti } = findActiveMahadasaAndBhukti(dasaTimeline, instant);
+    const { mahadasa, bhukti, antara } = activeDasaStack(dasaTimeline, instant);
     if (mahadasa) {
-      dasaLabel = bhukti ? `${mahadasa.lord}/${bhukti.lord}` : mahadasa.lord;
+      dasaLabel = [mahadasa.lord, bhukti?.lord, antara?.lord].filter(Boolean).join("/");
       if (BENEFIC_DASA.has(mahadasa.lord)) {
         deltaScore += 8;
         flags.push(`${prefix}Benefic Dasa ${dasaLabel}`);
@@ -82,14 +102,15 @@ export function scoreNatalBala(
         deltaScore -= 6;
         flags.push(`${prefix}Malefic Dasa ${dasaLabel}`);
       }
-      if (bhukti && MALEFIC_DASA.has(bhukti.lord)) {
-        deltaScore -= 3;
-      } else if (bhukti && BENEFIC_DASA.has(bhukti.lord)) {
-        deltaScore += 2;
-      }
+      if (bhukti && MALEFIC_DASA.has(bhukti.lord)) deltaScore -= 3;
+      else if (bhukti && BENEFIC_DASA.has(bhukti.lord)) deltaScore += 2;
+      if (antara && MALEFIC_DASA.has(antara.lord)) deltaScore -= 2;
+      else if (antara && BENEFIC_DASA.has(antara.lord)) deltaScore += 2;
     }
   }
 
+  const transitSaturnRasi = Math.floor(transitLongitudes.Saturn / 30) % 12;
+  const transitJupiterRasi = Math.floor(transitLongitudes.Jupiter / 30) % 12;
   const satHouse = houseFrom(natalMoonRasi, transitSaturnRasi);
   if (SADE_SATI_HOUSES.has(satHouse)) {
     sadeSati = true;
@@ -120,6 +141,21 @@ export function scoreNatalBala(
     deltaScore -= 4;
   }
 
+  const weakGochara: string[] = [];
+  let goodGochara = 0;
+  for (const planet of Object.keys(GOCHARA_GOOD) as Planet[]) {
+    const house = houseFrom(natalMoonRasi, Math.floor(transitLongitudes[planet] / 30) % 12);
+    if (GOCHARA_GOOD[planet]?.includes(house)) goodGochara += 1;
+    else weakGochara.push(planet);
+  }
+  deltaScore += goodGochara * 2;
+  if (weakGochara.length) {
+    deltaScore -= weakGochara.length;
+    flags.push(`${prefix}Weak gochara: ${weakGochara.join(", ")}`);
+  } else {
+    flags.push(`${prefix}Gochara favorable for Sun, Mars, Mercury, Venus, Rahu, Ketu`);
+  }
+
   const av = computeAshtakavarga(planetRasiIndexMap(chart), chart.lagnaRasiIndex);
   savMoon = av.sarvaByRasi[transitMoonRasi] ?? null;
   if (savMoon !== null) {
@@ -131,6 +167,18 @@ export function scoreNatalBala(
       flags.push(`${prefix}Weak SAV Moon rasi (${savMoon})`);
     }
   }
+  const kakshya = evaluateKakshyaPlacements(transitLongitudes, av);
+  const withBindu = kakshya.filter((row) => row.hasBindu);
+  const moonKakshya = kakshya.find((row) => row.planet === "Moon");
+  if (moonKakshya?.hasBindu) {
+    deltaScore += 6;
+    flags.push(`${prefix}Moon Kakshya has a bindu (${moonKakshya.kakshyaLord})`);
+  } else if (moonKakshya) {
+    deltaScore -= 6;
+    flags.push(`${prefix}Moon Kakshya is empty (${moonKakshya.kakshyaLord})`);
+  }
+  if (withBindu.length >= 5) deltaScore += 4;
+  else if (withBindu.length <= 2) deltaScore -= 4;
   if (muhurtaLagnaRasi !== undefined) {
     savLagna = av.sarvaByRasi[muhurtaLagnaRasi] ?? null;
     if (savLagna !== null) {
@@ -183,6 +231,7 @@ export function scoreCoupleMatch(
     deltaScore,
     flags: [`Couple Porutham: ${report.dasakoota.score}/${report.dasakoota.total} (${report.recommendation})`],
     label: `${report.dasakoota.score}/${report.dasakoota.total} · ${report.recommendation}`,
+    summary: report.summary,
   };
 }
 
@@ -198,6 +247,7 @@ export function scoreCoupleFromStars(
     deltaScore,
     flags: [`Couple Dasakoota ${porutham.score}/${porutham.total}`],
     label: `${porutham.score}/${porutham.total}`,
+    summary: porutham.checks.map((check) => `${check.name}: ${check.pass ? "pass" : "fail"}`).join("; "),
   };
 }
 

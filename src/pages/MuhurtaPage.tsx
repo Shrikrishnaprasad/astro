@@ -290,12 +290,14 @@ export default function MuhurtaPage() {
         <strong>Varjyam (Vishaghati) &amp; Amrita Kalam</strong>, <strong>Durmuhurtam</strong>,{" "}
         <strong>Tamil Siddha / Amrita / Marana &amp; 28-Anandadi Yogas</strong>,{" "}
         <strong>Sarvartha Siddhi / Amrita Siddhi / Tripushkara / Dagdha / Visha Yogas</strong>,{" "}
-        <strong>21-Mahadoshas</strong> (Maudhya, Sankranti, Eclipse, Graha Yuddha, Gandanta,
-        Mrityu Bhaga, Latta, Vedha), <strong>Vishti windows</strong>,{" "}
-        <strong>Pushkara &amp; Navamsa Lagna</strong>,{" "}
-        <strong>Panchaka Rahita</strong>, <strong>full Lagna Kundali Shuddhi</strong>,{" "}
-        <strong>activity Hora &amp; Gowri</strong>. With a birth chart:{" "}
-        <strong>Dasa–Bhukti, Ashtakavarga, Sade Sati, Jupiter Gochara, natal Lagna &amp; Porutham</strong>.
+        <strong>21 Mahadoshas</strong> (five Maudhyas, Sankranti, Masa Shunya, local eclipse,
+        Graha Yuddha, Vyatipata, Vaidhriti, Gandanta, Mrityu Bhaga, Kranti Samya, Ekargala,
+        Bhadra, Dagdha, Visha, Latta, Vedha). Each day is judged at <strong>sunrise</strong>.{" "}
+        <strong>Vishti windows</strong>, <strong>Pushkara</strong>, <strong>D9 shuddhi</strong>,{" "}
+        <strong>Panchaka</strong>, and <strong>activity Hora &amp; Gowri</strong>. With a birth chart:{" "}
+        <strong>Dasa–Bhukti–Antara, Kakshya, full Gochara, Sade Sati, and the Porutham report</strong>.
+        Lahiri charts use nutation and the true node. This app calculates eclipses with astronomy-engine,
+        not Swiss Ephemeris files.
       </p>
 
       <div className="card">
@@ -789,6 +791,9 @@ export default function MuhurtaPage() {
                         {row.secondNatalDasaLabel && <div>P2 Dasa: {row.secondNatalDasaLabel}</div>}
                         {row.sadeSati && <div className="fail">Sade Sati / Ashtama Sani</div>}
                         {row.couplePoruthamLabel && <div>Porutham: {row.couplePoruthamLabel}</div>}
+                        {row.couplePoruthamSummary && (
+                          <div style={{ marginTop: 4, color: "#b8bdd6" }}>{row.couplePoruthamSummary}</div>
+                        )}
                       </td>
                     )}
                     <td style={{ fontSize: 12 }}>
@@ -834,7 +839,10 @@ export default function MuhurtaPage() {
                               {s.lagnaGandanta && <span className="fail"> · Lagna Gandanta</span>}
                               {s.lagnaMrityuBhaga && <span className="fail"> · Lagna Mrityu</span>}
                               {" · "}
-                              D9 {s.navamsaLagnaName} · Pada {s.nakshatraPada}
+                              D9 {s.navamsaLagnaName}
+                              {s.vargottamaLagna ? " Vargottama" : ""}
+                              {s.maleficInD9Lagna ? " · malefic in D9" : s.d9AshtamaShuddhi ? " · D9 8th clean" : " · D9 8th occupied"}
+                              {" · "}Pada {s.nakshatraPada}
                               {" · "}
                               <span className={s.isPreferredHora ? "pass" : s.isBeneficHora ? "pass" : ""}>
                                 Hora: {s.horaPlanet}

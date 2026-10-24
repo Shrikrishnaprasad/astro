@@ -106,8 +106,13 @@ export default function PanchangamPage() {
 
   const mahadoshas = useMemo(
     () =>
-      date && panchangam ? computeMahadoshas(date, panchangam.tithiIndex, resolved) : null,
-    [date, panchangam, resolved],
+      date && panchangam
+        ? computeMahadoshas(date, panchangam.tithiIndex, resolved, {
+            latitude: city.lat,
+            longitude: city.lon,
+          })
+        : null,
+    [date, panchangam, resolved, city],
   );
 
   const dishaShool = date ? getDishaShool(date) : null;

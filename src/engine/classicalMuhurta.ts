@@ -36,10 +36,12 @@ import {
   type EphemerisSettings,
 } from "./ephemerisSettings";
 import { dividedWindow, type TimeWindow } from "./panchanga";
+import { longitudeToNavamsa } from "./navamsa";
 import { getSiderealLongitudes } from "./planetaryPositions";
 import { getRetrogradeStatus } from "./retrograde";
 import { getSunriseSunset } from "./sunTimes";
 import { PLANETS, type LongitudeMap, type Planet } from "./types";
+import * as Astronomy from "astronomy-engine";
 
 export interface GowriSlot extends TimeWindow {
   name: GowriName;
@@ -59,10 +61,15 @@ export interface DayYogaAnalysis {
   specialYogas: SpecialDayYoga[];
 }
 
+/** Twenty-one day-level muhurta dosha categories scored by this engine. */
+export const MAHADOSHA_CATEGORY_COUNT = 21;
+
 export interface MahadoshaAnalysis {
   guruMaudhya: boolean;
   shukraMaudhya: boolean;
   budhaMaudhya: boolean;
+  mangalMaudhya: boolean;
+  shaniMaudhya: boolean;
   sankrantiDosha: boolean;
   masaShunyaTithi: boolean;
   eclipseProximity: boolean;
@@ -72,9 +79,22 @@ export interface MahadoshaAnalysis {
   moonGandanta: boolean;
   tithiGandanta: boolean;
   mrityuBhagaMoon: boolean;
+  krantiSamya: boolean;
+  ekargala: boolean;
+  bhadra: boolean;
+  dagdha: boolean;
+  visha: boolean;
   lattaHits: string[];
   vedhaHits: string[];
   activeDoshas: string[];
+}
+
+export interface NavamsaShuddhiResult {
+  d9LagnaRasi: number;
+  vargottamaLagna: boolean;
+  d9AshtamaShuddhi: boolean;
+  maleficInD9Lagna: boolean;
+  beneficsInD9Kendra: number;
 }
 
 export interface KundaliShuddhiResult {
@@ -438,6 +458,122 @@ export function computeVishtiWindows(
   return windows;
 }
 
+function equatorialDeclination(body: Astronomy.Body, date: Date): number {
+  const ecl = Astronomy.Ecliptic(Astronomy.GeoVector(body, date, true));
+  const obl = (Astronomy.e_tilt(Astronomy.MakeTime(date)).tobl * Math.PI) / 180;
+  const lon = (ecl.elon * Math.PI) / 180;
+  const lat = (ecl.elat * Math.PI) / 180;
+  const dec = Math.asin(
+    Math.sin(lat) * Math.cos(obl) + Math.cos(lat) * Math.sin(obl) * Math.sin(lon),
+  );
+  return (dec * 180) / Math.PI;
+}
+
+/** Kranti Samya: Sun and Moon share the same declination within `orb` degrees. */
+export function isKrantiSamya(date: Date, orb = 0.6): boolean {
+  const sun = equatorialDeclination(Astronomy.Body.Sun, date);
+  const moon = equatorialDeclination(Astronomy.Body.Moon, date);
+  return Math.abs(sun - moon) <= orb;
+}
+
+/**
+ * Peaks of solar eclipses visible at this place, and partial/total lunar eclipses,
+ * between `rangeStart` and `rangeEnd`. Uses astronomy-engine eclipse geometry.
+ */
+export function collectEclipsePeaks(
+  rangeStart: Date,
+  rangeEnd: Date,
+  latitude: number,
+  longitude: number,
+): Date[] {
+  const peaks: Date[] = [];
+  const observer = new Astronomy.Observer(latitude, longitude, 0);
+  const searchFrom = new Date(rangeStart.getTime() - 36 * 3600_000);
+  const limit = rangeEnd.getTime() + 36 * 3600_000;
+  try {
+    let solar = Astronomy.SearchLocalSolarEclipse(searchFrom, observer);
+    for (let i = 0; i < 6; i++) {
+      const peak = solar.peak.time.date;
+      if (peak.getTime() > limit) break;
+      if (solar.peak.altitude > 0 && peak.getTime() >= rangeStart.getTime() - 18 * 3600_000) {
+        peaks.push(peak);
+      }
+      solar = Astronomy.NextLocalSolarEclipse(solar.peak.time, observer);
+    }
+  } catch {
+    /* no further solar eclipse in range */
+  }
+  try {
+    let lunar = Astronomy.SearchLunarEclipse(searchFrom);
+    for (let i = 0; i < 8; i++) {
+      const peak = lunar.peak.date;
+      if (peak.getTime() > limit) break;
+      if (lunar.kind !== Astronomy.EclipseKind.Penumbral && peak.getTime() >= rangeStart.getTime()) {
+        peaks.push(peak);
+      }
+      lunar = Astronomy.NextLunarEclipse(lunar.peak);
+    }
+  } catch {
+    /* no further lunar eclipse in range */
+  }
+  return peaks;
+}
+
+export function eclipseInWindow(peaks: Date[], start: Date, end: Date): boolean {
+  const a = start.getTime();
+  const b = end.getTime();
+  return peaks.some((peak) => {
+    const t = peak.getTime();
+    return t >= a && t < b;
+  });
+}
+
+function karanaIsVishti(moonLon: number, sunLon: number): boolean {
+  const karanaNumber = Math.floor(normalizeDegrees(moonLon - sunLon) / 6);
+  if (karanaNumber === 0 || karanaNumber >= 57) return false;
+  return (karanaNumber - 1) % 7 === 6;
+}
+
+/**
+ * D9 shuddhi of the muhurta chart: empty 8th from Navamsa lagna,
+ * no malefic in D9 lagna, benefics in D9 kendras, Vargottama lagna.
+ */
+export function evaluateNavamsaShuddhi(
+  lagnaLongitude: number,
+  planetLongitudes: LongitudeMap,
+): NavamsaShuddhiResult {
+  const d9Lagna = longitudeToNavamsa(lagnaLongitude).rasiIndex;
+  const d1Lagna = Math.floor(normalizeDegrees(lagnaLongitude) / 30) % 12;
+  const houseOf = (rasi: number) => (((rasi - d9Lagna) % 12 + 12) % 12) + 1;
+  const MALEFICS = new Set<Planet>(["Sun", "Mars", "Saturn", "Rahu", "Ketu"]);
+  const BENEFICS = new Set<Planet>(["Jupiter", "Venus", "Mercury", "Moon"]);
+  const KENDRA = new Set([1, 4, 7, 10]);
+  let planetsIn8 = 0;
+  let maleficInD9Lagna = false;
+  let beneficsInD9Kendra = 0;
+  for (const planet of PLANETS) {
+    const d9 = longitudeToNavamsa(planetLongitudes[planet]).rasiIndex;
+    const house = houseOf(d9);
+    if (house === 8) planetsIn8 += 1;
+    if (house === 1 && MALEFICS.has(planet)) maleficInD9Lagna = true;
+    if (BENEFICS.has(planet) && KENDRA.has(house)) beneficsInD9Kendra += 1;
+  }
+  return {
+    d9LagnaRasi: d9Lagna,
+    vargottamaLagna: d1Lagna === d9Lagna,
+    d9AshtamaShuddhi: planetsIn8 === 0,
+    maleficInD9Lagna,
+    beneficsInD9Kendra,
+  };
+}
+
+export interface MahadoshaOptions {
+  /** When set, use this instead of searching eclipses inside the call. */
+  eclipseOnDay?: boolean;
+  latitude?: number;
+  longitude?: number;
+}
+
 /**
  * Evaluate classical Mahadoshas at the day's reference instant.
  */
@@ -445,6 +581,7 @@ export function computeMahadoshas(
   date: Date,
   tithiIndex0To14: number,
   settings: EphemerisSettings = DEFAULT_EPHEMERIS_SETTINGS,
+  options?: MahadoshaOptions,
 ): MahadoshaAnalysis {
   const resolved = resolveEphemerisSettings(settings);
   const lons = getSiderealLongitudes(date, resolved);
@@ -455,13 +592,12 @@ export function computeMahadoshas(
   const jupLon = normalizeDegrees(lons.Jupiter);
   const venLon = normalizeDegrees(lons.Venus);
   const merLon = normalizeDegrees(lons.Mercury);
-  const rahuLon = normalizeDegrees(lons.Rahu);
-  const ketuLon = normalizeDegrees(lons.Ketu);
-
   const guruMaudhya = angularDistance(sunLon, jupLon) < 11;
   const shukraLimit = retro.Venus ? 8 : 10;
   const shukraMaudhya = angularDistance(sunLon, venLon) < shukraLimit;
   const budhaMaudhya = angularDistance(sunLon, merLon) < 14;
+  const mangalMaudhya = angularDistance(sunLon, normalizeDegrees(lons.Mars)) < 17;
+  const shaniMaudhya = angularDistance(sunLon, normalizeDegrees(lons.Saturn)) < 15;
 
   const sunRasiIndex = Math.floor(sunLon / 30) % 12;
   const sunDegInRasi = sunLon - sunRasiIndex * 30;
@@ -470,9 +606,28 @@ export function computeMahadoshas(
   const masaShunyaTithi =
     MASA_SHUNYA_TITHIS_BY_SUN_RASI[sunRasiIndex]?.includes(tithiIndex0To14) ?? false;
 
-  const eclipseProximity =
-    tithiIndex0To14 === 14 &&
-    (angularDistance(sunLon, rahuLon) < 13.5 || angularDistance(sunLon, ketuLon) < 13.5);
+  const moonRasiIndex = Math.floor(moonLon / 30) % 12;
+  const ekargala = moonRasiIndex === (sunRasiIndex + 3) % 12;
+  const krantiSamya = isKrantiSamya(date);
+  const bhadra = karanaIsVishti(moonLon, sunLon);
+  const weekday = date.getUTCDay();
+  const dagdha = DAGDHA_TITHI_BY_VARA[weekday] === tithiIndex0To14;
+  const visha = VISHA_TITHI_BY_VARA[weekday] === tithiIndex0To14;
+
+  let eclipseProximity = options?.eclipseOnDay ?? false;
+  if (options?.eclipseOnDay === undefined && options?.latitude !== undefined && options.longitude !== undefined) {
+    const peaks = collectEclipsePeaks(
+      new Date(date.getTime() - 18 * 3600_000),
+      new Date(date.getTime() + 30 * 3600_000),
+      options.latitude,
+      options.longitude,
+    );
+    eclipseProximity = eclipseInWindow(
+      peaks,
+      new Date(date.getTime() - 6 * 3600_000),
+      new Date(date.getTime() + 24 * 3600_000),
+    );
+  }
 
   const grahaYuddha = hasGrahaYuddha(lons);
   const yogaIndex = Math.floor(normalizeDegrees(sunLon + moonLon) / NAKSHATRA_SPAN_DEGREES) % 27;
@@ -494,15 +649,22 @@ export function computeMahadoshas(
   if (guruMaudhya) activeDoshas.push("Guru Maudhya (Jupiter Combust)");
   if (shukraMaudhya) activeDoshas.push("Shukra Maudhya (Venus Combust)");
   if (budhaMaudhya) activeDoshas.push("Budha Maudhya (Mercury Combust)");
+  if (mangalMaudhya) activeDoshas.push("Mangal Maudhya (Mars Combust)");
+  if (shaniMaudhya) activeDoshas.push("Shani Maudhya (Saturn Combust)");
   if (sankrantiDosha) activeDoshas.push("Sankranti (Solar Ingress)");
   if (masaShunyaTithi) activeDoshas.push("Masa Shunya Tithi");
-  if (eclipseProximity) activeDoshas.push("Grahan / Eclipse Proximity");
+  if (eclipseProximity) activeDoshas.push("Grahan (eclipse at this place)");
   if (grahaYuddha) activeDoshas.push("Graha Yuddha");
   if (vyatipataYoga) activeDoshas.push("Vyatipata Yoga");
   if (vaidhritiYoga) activeDoshas.push("Vaidhriti Yoga");
   if (moonGandanta) activeDoshas.push("Moon Gandanta");
   if (tithiGandanta) activeDoshas.push("Tithi Gandanta");
   if (mrityuBhagaMoon) activeDoshas.push("Moon Mrityu Bhaga");
+  if (krantiSamya) activeDoshas.push("Kranti Samya");
+  if (ekargala) activeDoshas.push("Ekargala (Moon in 4th from Sun)");
+  if (bhadra) activeDoshas.push("Bhadra (Vishti Karana)");
+  if (dagdha) activeDoshas.push("Dagdha Yoga");
+  if (visha) activeDoshas.push("Visha Yoga");
   if (lattaHits.length) activeDoshas.push(...lattaHits);
   if (vedhaHits.length) activeDoshas.push(...vedhaHits);
 
@@ -510,6 +672,8 @@ export function computeMahadoshas(
     guruMaudhya,
     shukraMaudhya,
     budhaMaudhya,
+    mangalMaudhya,
+    shaniMaudhya,
     sankrantiDosha,
     masaShunyaTithi,
     eclipseProximity,
@@ -519,6 +683,11 @@ export function computeMahadoshas(
     moonGandanta,
     tithiGandanta,
     mrityuBhagaMoon,
+    krantiSamya,
+    ekargala,
+    bhadra,
+    dagdha,
+    visha,
     lattaHits,
     vedhaHits,
     activeDoshas,
