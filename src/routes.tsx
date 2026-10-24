@@ -18,6 +18,6 @@ export const MENU_ROUTES: MenuRoute[] = [
   { path: "/accuracy", label: "Ephemeris accuracy" },
   { path: "/advanced-jyotish", label: "Advanced Jyotish" },
   { path: "/kp", label: "KP Astrology" },
-  { path: "/degree-system", label: "Degree System (பாகை முறை)" },
+  { path: "/degree-system", label: "Degree System" },
   { path: "/prasna", label: "Prasna" },
 ];

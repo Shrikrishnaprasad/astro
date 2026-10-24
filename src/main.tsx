@@ -1,6 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import "@fontsource/outfit/400.css";
+import "@fontsource/outfit/500.css";
+import "@fontsource/outfit/600.css";
+import "@fontsource/fraunces/500.css";
+import "@fontsource/fraunces/600.css";
 import "@fontsource/noto-sans-tamil/400.css";
 import "@fontsource/noto-sans-tamil/600.css";
 import "@fontsource/noto-sans-tamil/700.css";

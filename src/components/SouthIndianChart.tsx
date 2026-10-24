@@ -47,35 +47,28 @@ interface ChartCellMetrics {
 
 const DESKTOP_METRICS: ChartCellMetrics = { w: 130, h: 110, gap: 2 };
 
-function readChartCellMetrics(): ChartCellMetrics {
-  if (typeof document === "undefined") return DESKTOP_METRICS;
-  const style = getComputedStyle(document.documentElement);
-  const w = parseFloat(style.getPropertyValue("--chart-cell-w"));
-  const h = parseFloat(style.getPropertyValue("--chart-cell-h"));
-  const gap = parseFloat(style.getPropertyValue("--chart-gap"));
-  return {
-    w: Number.isFinite(w) && w > 0 ? w : DESKTOP_METRICS.w,
-    h: Number.isFinite(h) && h > 0 ? h : DESKTOP_METRICS.h,
-    gap: Number.isFinite(gap) && gap >= 0 ? gap : DESKTOP_METRICS.gap,
-  };
-}
-
-function useChartCellMetrics(): ChartCellMetrics {
+function useChartCellMetrics(chart: HTMLElement | null): ChartCellMetrics {
   const [metrics, setMetrics] = useState(DESKTOP_METRICS);
   useEffect(() => {
-    const update = () => setMetrics(readChartCellMetrics());
-    update();
-    window.addEventListener("resize", update);
-    const mq768 = window.matchMedia("(max-width: 768px)");
-    const mq400 = window.matchMedia("(max-width: 400px)");
-    mq768.addEventListener("change", update);
-    mq400.addEventListener("change", update);
-    return () => {
-      window.removeEventListener("resize", update);
-      mq768.removeEventListener("change", update);
-      mq400.removeEventListener("change", update);
+    if (!chart) return;
+    const update = () => {
+      const cell = chart.querySelector(".chart-cell");
+      if (!cell) return;
+      const rect = cell.getBoundingClientRect();
+      const gap = parseFloat(getComputedStyle(chart).columnGap || "2");
+      if (rect.width > 0 && rect.height > 0) {
+        setMetrics({
+          w: rect.width,
+          h: rect.height,
+          gap: Number.isFinite(gap) ? gap : 2,
+        });
+      }
     };
-  }, []);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(chart);
+    return () => observer.disconnect();
+  }, [chart]);
   return metrics;
 }
 
@@ -156,12 +149,13 @@ export default function SouthIndianChart({
   cellContents: Record<number, ChartMarker[]>;
   outerMarkers?: Record<number, ChartMarker[]>;
 }) {
-  const cellMetrics = useChartCellMetrics();
+  const [chartEl, setChartEl] = useState<HTMLDivElement | null>(null);
+  const cellMetrics = useChartCellMetrics(chartEl);
 
   return (
     <div className="chart-scroll" aria-label="Rasi chart">
     <div className="south-indian-chart-wrap">
-      <div className="south-indian-chart">
+      <div className="south-indian-chart" ref={setChartEl}>
         {GRID.flatMap((row, rowIndex) =>
           row.map((rasiIndex, colIndex) => {
             const key = `${rowIndex}-${colIndex}`;

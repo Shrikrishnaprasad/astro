@@ -14,8 +14,8 @@ export default defineConfig({
         short_name: "Astro",
         description:
           "Client-side Vedic and Tamil astrology: charts, panchangam, dasa, porutham, and live transits.",
-        theme_color: "#161925",
-        background_color: "#0f1117",
+        theme_color: "#0b0d14",
+        background_color: "#0b0d14",
         display: "standalone",
         orientation: "portrait-primary",
         scope: "/",

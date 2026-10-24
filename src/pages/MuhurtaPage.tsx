@@ -352,7 +352,7 @@ export default function MuhurtaPage() {
           </label>
         </div>
 
-        <div className="field-row" style={{ marginTop: 6 }}>
+        <div className="chip-row" style={{ marginTop: 6 }}>
           <span style={{ fontSize: 12, color: "#9aa0c0" }}>Quick range:</span>
           {[
             { label: "14 Days", days: 14 },
@@ -624,7 +624,7 @@ export default function MuhurtaPage() {
         )}
 
         <div className="field-row" style={{ marginTop: 14 }}>
-          <button type="button" onClick={() => setSubmitted(true)}>
+          <button type="button" className="btn-primary" onClick={() => setSubmitted(true)}>
             Find muhurtas ({startDateStr} to {endDateStr})
           </button>
           {results && results.length > 0 && (
@@ -791,7 +791,7 @@ export default function MuhurtaPage() {
                         {row.couplePoruthamLabel && <div>Porutham: {row.couplePoruthamLabel}</div>}
                       </td>
                     )}
-                    <td style={{ fontSize: 12, minWidth: 360 }}>
+                    <td style={{ fontSize: 12 }}>
                       <ul style={{ margin: 0, paddingLeft: 18 }}>
                         {row.slots.map((s) => (
                           <li

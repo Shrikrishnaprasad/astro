@@ -92,39 +92,13 @@ export default function AshtakavargaPanel({
         </div>
 
         {/* South Indian Bindu Grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(110px, 1fr))",
-            gap: 4,
-            maxWidth: 560,
-            margin: "0 auto 18px",
-            border: "2px solid #3a416f",
-            padding: 4,
-            borderRadius: 6,
-            background: "#13172b",
-          }}
-        >
+        <div className="bindu-grid">
           {SOUTH_GRID.flatMap((row, rIdx) =>
             row.map((rasiIndex, cIdx) => {
               if (rasiIndex === null) {
                 if (rIdx === 1 && cIdx === 1) {
                   return (
-                    <div
-                      key="center"
-                      style={{
-                        gridColumn: "2 / span 2",
-                        gridRow: "2 / span 2",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: 12,
-                        textAlign: "center",
-                        background: "#181d36",
-                        borderRadius: 4,
-                      }}
-                    >
+                    <div key="center" className="bindu-grid__center">
                       <strong style={{ fontSize: 15 }}>
                         {selectedView === "SAV"
                           ? "Sarvashtakavarga (SAV)"
@@ -165,15 +139,9 @@ export default function AshtakavargaPanel({
               return (
                 <div
                   key={rasiIndex}
+                  className="bindu-grid__cell"
                   style={{
-                    minHeight: 92,
-                    padding: 8,
                     border: isLagna ? "2px solid #f0b429" : "1px solid #2b3158",
-                    borderRadius: 4,
-                    background: "#1b203d",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
                   }}
                 >
                   <div
