@@ -824,6 +824,158 @@ button:hover {
   margin-bottom: 16px;
 }
 
+/* ══ Eight Jama Grahas Perimeter Layout ══════════════════════════════════════ */
+
+/*
+ * Layout:
+ *                     [TOP_CENTER]
+ *   [UPPER_LEFT]                    [UPPER_RIGHT]
+ *   [MIDDLE_LEFT]   [RASI CHART]   [MIDDLE_RIGHT]
+ *   [LOWER_LEFT]                    [LOWER_RIGHT]
+ *                    [BOTTOM_CENTER]
+ */
+
+/* ── Jama Graha Perimeter ────────────────────────────────────────────────────── */
+/*
+ * CSS Grid layout (3 cols × 3 rows):
+ *
+ *   [empty]  [TOP  strip — chart width]  [empty]
+ *   [LEFT strip]  [CHART]  [RIGHT strip]
+ *   [empty]  [BOT  strip — chart width]  [empty]
+ *
+ * Strips span ONLY the chart column/row so that badge positions
+ * (absolute within strip) align exactly with chart cells.
+ */
+
+/* Badge dimensions — change these two vars to resize everything */
+:root {
+  --jama-badge-h: 40px;
+  --jama-badge-w: 80px;
+}
+
+.jama-rasi-perimeter {
+  display: grid;
+  grid-template-areas:
+    ". top ."
+    "left chart right"
+    ". bottom .";
+  grid-template-columns: var(--jama-badge-w) auto var(--jama-badge-w);
+  grid-template-rows: var(--jama-badge-h) auto var(--jama-badge-h);
+  gap: var(--chart-gap);
+  width: fit-content;
+  margin: 12px auto 6px;
+}
+
+/* Assign grid areas */
+.jama-strip--top    { grid-area: top;   }
+.jama-strip--bottom { grid-area: bottom;}
+.jama-strip--left   { grid-area: left;  }
+.jama-strip--right  { grid-area: right; }
+.jama-rasi-chart    { grid-area: chart; }
+
+/* Zero out SouthIndianChart's built-in margins inside the perimeter
+   so the chart grid starts exactly at the content edge. */
+.jama-rasi-chart .chart-scroll         { margin: 0; }
+.jama-rasi-chart .south-indian-chart-wrap { margin: 0; }
+
+/* ── Strip containers ────────────────────────────────────────────────────────── */
+
+.jama-strip {
+  position: relative;
+  overflow: visible;
+}
+
+/* Top/bottom: strip width = chart width (center column auto) */
+.jama-strip--top,
+.jama-strip--bottom {
+  /* height comes from grid-template-rows: --jama-badge-h */
+}
+
+/* Left/right: strip width = --jama-badge-w (outer columns) */
+.jama-strip--left,
+.jama-strip--right {
+  /* height stretches to chart height (middle row) */
+}
+
+/* ── Badge (jama-graha-box) ─────────────────────────────────────────────────── */
+
+.jama-graha-box {
+  /* sizing */
+  width: var(--jama-badge-w);
+  box-sizing: border-box;
+  padding: 3px 5px 2px;
+  /* look */
+  background: #cdf5e4;
+  border: 1px solid #5ec495;
+  border-radius: 4px;
+  cursor: default;
+  transition: box-shadow 0.12s;
+  /* layout inside */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 3px;
+  row-gap: 0;
+  white-space: nowrap;
+}
+
+.jama-graha-box--empty-slot {
+  display: none;   /* truly remove; absolute positioning means no gap */
+}
+
+.jama-graha-box--active {
+  background: #a4edcb;
+  border-color: #27a96a;
+  box-shadow: 0 0 0 2px #27a96a55;
+}
+
+/* Row 1 col 1: graha name */
+.jgb-name {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0d2f1c;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Row 1 col 2: degree */
+.jgb-deg {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: #0d2f1c;
+  line-height: 1.4;
+  text-align: right;
+}
+
+/* Row 2 col 1-2: rasi label */
+.jgb-rasi {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  font-size: 9px;
+  color: #2e7d52;
+  font-weight: 500;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+/* ── Responsive — 768px ─────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --jama-badge-h: 36px;
+    --jama-badge-w: 68px;
+  }
+
+  .jgb-name { font-size: 10px; }
+  .jgb-deg  { font-size: 9px; }
+  .jgb-rasi { font-size: 8px; }
+}
+
 /* —— Karakam reference popup —— */
 .nav-karakam {
   display: block;

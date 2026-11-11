@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { BirthFormValue } from "../components/DateTimePlaceForm";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
+import JamaGrahaPerimeter, { PLANET_TO_RING_ID } from "../components/JamaGrahaPerimeter";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
-import { JAMAGRAHAM_SEQUENCE } from "../data/jamagraham";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
 import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
@@ -140,9 +140,15 @@ export default function ArudhaLagnaPage() {
         });
       }
       push(chart.lagnaRasiIndex, {
-        label: LAGNA_TAMIL,
+        label: LAGNA_TAMIL,  // "ல" Lagnam
         kind: "lagna",
-        title: "உதயம் (Udhayam / Lagna)",
+        title: "லக்னம் (Lagnam)",
+        degree: chart.lagnaDegreeInRasi,
+      });
+      push(chart.lagnaRasiIndex, {
+        label: "உத",  // "உத" Udhayam (Jamakkol-specific)
+        kind: "lagna",
+        title: "உதயம் (Udhayam / Jamakkol Lagna)",
         degree: chart.lagnaDegreeInRasi,
       });
     }
@@ -171,29 +177,11 @@ export default function ArudhaLagnaPage() {
     return cells;
   }, [chart, displayedArudhaLagnaRasi, displayedArudhaLagnaDegree, mandhi, kavippu, retrograde]);
 
-  // Show all 8 Jamagraham-sequence grahas on the outer ring at once, each at
-  // its own real chart position, with the currently-active one highlighted.
-  const outerMarkers = useMemo(() => {
-    if (!chart) return {};
-    const outer: Record<number, ChartMarker[]> = {};
-    const push = (rasiIndex: number, marker: ChartMarker) => {
-      (outer[rasiIndex] ??= []).push(marker);
-    };
-    for (const graha of JAMAGRAHAM_SEQUENCE) {
-      const rasiIndex = chart.planetRasi[graha].rasiIndex;
-      const isActive = jamagraham?.graha === graha;
-      const isRetrograde = shouldShowRetrograde(graha, retrograde);
-      push(rasiIndex, {
-        label: PLANET_TAMIL_ABBR[graha],
-        kind: isActive ? "jamagraham" : "jamagraham-inactive",
-        title: `ஜாமகிரஹம் (Jamagraham): ${graha} / ${PLANET_TAMIL_NAME[graha]}${
-          isActive ? " — active now" : ""
-        }${isRetrograde ? " - Vakram (retrograde)" : ""}`,
-        retrograde: isRetrograde,
-      });
-    }
-    return outer;
-  }, [chart, jamagraham, retrograde]);
+  // Map the active sunrise-cycle Jamagraham planet to the ring ID used by
+  // JamaGrahaPerimeter so the correct perimeter box gets highlighted.
+  const activeRingGrahaId = jamagraham
+    ? (PLANET_TO_RING_ID[jamagraham.graha] ?? null)
+    : null;
 
   return (
     <div>
@@ -232,7 +220,17 @@ export default function ArudhaLagnaPage() {
 
       {chart && (
         <>
-          <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />
+          {/* ── Eight Jama Grahas perimeter + inner Rasi chart ── */}
+          {jamaGrahaRing ? (
+            <JamaGrahaPerimeter
+              grahas={jamaGrahaRing.jamaGrahas}
+              activeGrahaId={activeRingGrahaId}
+            >
+              <SouthIndianChart cellContents={cellContents} />
+            </JamaGrahaPerimeter>
+          ) : (
+            <SouthIndianChart cellContents={cellContents} />
+          )}
 
           {/* ── Udhayam details card ── */}
           {udhayam && (
@@ -539,11 +537,14 @@ export default function ArudhaLagnaPage() {
             )}
           </div>
 
-          {/* ── Eight Jama Grahas ring ── */}
+          {/* ── Eight Jama Grahas ring — collapsed detail view ── */}
           {jamaGrahaRing && (
-            <div className="card">
-              <strong className="tamil">எட்டு ஜாமக்கிரகங்கள் (Eight Jama Grahas):</strong>
-              <div style={{ fontSize: 12, color: "#9aa0c0", marginTop: 2, marginBottom: 8 }}>
+            <details className="card" style={{ marginTop: 14 }}>
+              <summary style={{ cursor: "pointer", fontWeight: 600, fontSize: 15 }}>
+                <span className="tamil">எட்டு ஜாமக்கிரகங்கள் (Eight Jama Grahas)</span>
+                {" "}— calculation details
+              </summary>
+              <div style={{ fontSize: 12, color: "#9aa0c0", marginTop: 8, marginBottom: 8 }}>
                 Vaidyanathan 45° ring — NOT actual planetary positions.
                 Starting longitude θ:{" "}
                 <strong>
@@ -669,7 +670,7 @@ export default function ArudhaLagnaPage() {
                   </tbody>
                 </table>
               </details>
-            </div>
+            </details>
           )}
 
           {arudhaPadas && (
