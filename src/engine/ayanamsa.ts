@@ -57,6 +57,24 @@ export function getKrishnamurtiAyanamsa(date: Date): number {
   return getKpAyanamsa(date);
 }
 
+/**
+ * Yukteswar ayanamsa — anchored at the epoch cited in Sri Yukteswar's
+ * "The Holy Science" (1894): the tropical and sidereal Aries points coincided
+ * near 499 CE (Julian Day ≈ 1903682.5, approximated below as years from that
+ * epoch with IAU general precession).
+ *
+ * PRECISION NOTE: This is a mean-precession linear approximation only.
+ * Published Yukteswar implementations differ by several arcminutes depending on
+ * the exact epoch and precession constant chosen. Do not use for arcsecond work
+ * without calibrating against a primary Yukteswar ephemeris source.
+ */
+const YUKTESWAR_EPOCH_JD = 1903682.5; // approx. 499 CE March 21
+export function getYukteswarAyanamsa(date: Date): number {
+  const jd = toJulianDate(date);
+  const yearsSinceEpoch = (jd - YUKTESWAR_EPOCH_JD) / 365.25;
+  return (yearsSinceEpoch * PRECESSION_RATE_ARCSEC_PER_YEAR) / 3600;
+}
+
 export function getAyanamsa(date: Date, mode: AyanamsaMode): number {
   switch (mode) {
     case "lahiri-mean":
@@ -68,6 +86,8 @@ export function getAyanamsa(date: Date, mode: AyanamsaMode): number {
     case "kp":
     case "krishnamurti":
       return getKpAyanamsa(date);
+    case "yukteswar":
+      return getYukteswarAyanamsa(date);
     default:
       return getLahiriAyanamsa(date);
   }

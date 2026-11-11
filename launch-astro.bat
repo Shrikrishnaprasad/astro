@@ -13,7 +13,4 @@ if not exist "node_modules\" (
   exit /b 0
 )
 
-start "Astro Dev Server" /min cmd /k "cd /d \"%CD%\" && npm run dev"
-
-timeout /t 3 /nobreak >nul
-start "" "http://localhost:5173"
+npm run app

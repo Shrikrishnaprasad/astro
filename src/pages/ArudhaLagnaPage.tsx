@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { BirthFormValue } from "../components/DateTimePlaceForm";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
@@ -8,9 +9,10 @@ import { JAMAGRAHAM_SEQUENCE } from "../data/jamagraham";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
 import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
-import { suryaVeedhiRasiIndex } from "../data/suryaVeedhi";
 import { computeAllArudhaPadas } from "../engine/arudha";
 import { calculateKavippu } from "../engine/kavippu";
+import { calculateUdhayamFromDate } from "../engine/udhayam";
+import { calculateEightJamaGrahasFromUTC } from "../engine/jamaGrahaRing";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
 import { computeJamagraham, computeMandhi } from "../engine/specialPoints";
 import type { BirthInput } from "../engine/types";
@@ -30,6 +32,18 @@ export default function ArudhaLagnaPage() {
   const [live, setLive] = useState(true);
   const [place, setPlace] = useState<ResolvedPlace>(defaultPlace());
   const [formInput, setFormInput] = useState<BirthInput | null>(null);
+  // Timezone offset (hours) for the manual-mode input — captured from the
+  // raw form value so the Jama Graha ring can identify the 06:00 AM reference.
+  const [formTzOffset, setFormTzOffset] = useState(defaultPlace().tzOffsetHours);
+
+  const handleFormChange = useCallback(
+    (input: BirthInput | null, raw: BirthFormValue) => {
+      setFormInput(input);
+      const tz = raw.useManual ? Number(raw.manualTz) : raw.place.tzOffsetHours;
+      setFormTzOffset(isNaN(tz) ? 0 : tz);
+    },
+    [],
+  );
   // Frozen at the moment the page opens (or Live is switched on); only
   // changes via the "Refresh now" button, never on its own.
   const { now, refresh } = useRefreshableNow(false);
@@ -84,13 +98,28 @@ export default function ArudhaLagnaPage() {
   const kavippu = useMemo(() => {
     if (!chart) return null;
     return calculateKavippu({
+      sunRasiIndex: chart.planetRasi.Sun.rasiIndex,
       udhayamRasiIndex: chart.lagnaRasiIndex,
       udhayamDegreeInRasi: chart.lagnaDegreeInRasi,
       aarudamRasiIndex: displayedArudhaLagnaRasi,
       aarudamDegreeInRasi: displayedArudhaLagnaDegree,
-      suryaVeedhiRasiIndex: suryaVeedhiRasiIndex(chart.planetRasi.Sun.rasiIndex),
     });
   }, [chart, displayedArudhaLagnaRasi, displayedArudhaLagnaDegree]);
+
+  // Full Udhayam details (tropical, sidereal, nakshatra, ayanamsa, GMST/GAST/LST)
+  const udhayam = useMemo(() => {
+    if (!input || !chart) return null;
+    return calculateUdhayamFromDate(input.date, input.latitude, input.longitude, resolved);
+  }, [input, chart, resolved]);
+
+  // Effective timezone offset: place-based for live mode, captured from form in manual mode
+  const effectiveTzOffset = live ? place.tzOffsetHours : formTzOffset;
+
+  // Eight Jama Grahas ring (45-degree Vaidyanathan method)
+  const jamaGrahaRing = useMemo(() => {
+    if (!input) return null;
+    return calculateEightJamaGrahasFromUTC(input.date, effectiveTzOffset);
+  }, [input, effectiveTzOffset]);
 
   const cellContents = useMemo(() => {
     const cells: Record<number, ChartMarker[]> = {};
@@ -192,7 +221,7 @@ export default function ArudhaLagnaPage() {
         <DateTimePlaceForm
           submitToCalculate
           submitLabel="Calculate Jamakkol Arudam"
-          onChange={setFormInput}
+          onChange={handleFormChange}
         />
       )}
       {!live && !chart && (
@@ -204,6 +233,171 @@ export default function ArudhaLagnaPage() {
       {chart && (
         <>
           <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />
+
+          {/* ── Udhayam details card ── */}
+          {udhayam && (
+            <div className="card">
+              <strong className="tamil">உதயம் (Udhayam / Lagna):</strong>
+              <div style={{ marginTop: 6 }}>
+                <table style={{ borderCollapse: "collapse", fontSize: 14 }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Rasi</td>
+                      <td>
+                        {udhayam.siderealAscendant.rasi}{" "}
+                        <span className="tamil">
+                          ({RASIS[udhayam.siderealAscendant.rasiIndex].nameTamil})
+                        </span>
+                        <span style={{ fontSize: 12, color: "#9aa0c0", marginLeft: 6 }}>
+                          lord: {udhayam.rasiLord}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Degree</td>
+                      <td>
+                        {udhayam.siderealAscendant.degree}°
+                        {String(udhayam.siderealAscendant.minute).padStart(2, "0")}′
+                        {String(udhayam.siderealAscendant.second).padStart(2, "0")}″
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Nakshatra</td>
+                      <td>
+                        {udhayam.nakshatra.name}{" "}
+                        <span className="tamil">({udhayam.nakshatra.nameTamil})</span>
+                        <span style={{ fontSize: 12, color: "#9aa0c0", marginLeft: 6 }}>
+                          lord: {udhayam.nakshatra.lord}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Pada</td>
+                      <td>{udhayam.nakshatra.pada}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Ayanamsa</td>
+                      <td>
+                        {udhayam.ayanamsa.name} — {udhayam.ayanamsa.value.toFixed(4)}°
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Tropical Asc.</td>
+                      <td>
+                        {udhayam.tropicalAscendant.rasi}{" "}
+                        {udhayam.tropicalAscendant.degree}°
+                        {String(udhayam.tropicalAscendant.minute).padStart(2, "0")}′
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Sidereal Asc.</td>
+                      <td>
+                        {udhayam.siderealAscendant.rasi}{" "}
+                        {formatDegreeInRasi(udhayam.siderealAscendant.degreeInRasi)}
+                        <span style={{ fontSize: 12, color: "#9aa0c0", marginLeft: 6 }}>
+                          λ = {udhayam.siderealAscendant.longitude.toFixed(4)}°
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 8 }}>
+                <summary style={{ cursor: "pointer" }}>
+                  Calculation details (astronomical pipeline)
+                </summary>
+                <table
+                  style={{
+                    borderCollapse: "collapse",
+                    marginTop: 6,
+                    fontSize: 12,
+                    width: "100%",
+                  }}
+                >
+                  <tbody>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        1. UTC instant
+                      </td>
+                      <td>{udhayam.utcDate.toISOString()}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        2. Latitude / Longitude
+                      </td>
+                      <td>
+                        {input?.latitude.toFixed(4)}° N,{" "}
+                        {input?.longitude.toFixed(4)}° E
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        3. Julian Day
+                      </td>
+                      <td>{udhayam.astronomicalData.julianDay.toFixed(6)}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        4. GMST
+                      </td>
+                      <td>{udhayam.astronomicalData.gmst.toFixed(6)}°</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        5. GAST
+                      </td>
+                      <td>{udhayam.astronomicalData.gast.toFixed(6)}°</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        6. Local Sidereal Time
+                      </td>
+                      <td>{udhayam.astronomicalData.localSiderealTime.toFixed(6)}°</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        7. Mean obliquity
+                      </td>
+                      <td>{udhayam.astronomicalData.obliquity.toFixed(6)}°</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        8. Tropical Ascendant
+                      </td>
+                      <td>
+                        {udhayam.tropicalAscendant.rasi}{" "}
+                        {formatDegreeInRasi(udhayam.tropicalAscendant.degreeInRasi)}
+                        {" "}(λ = {udhayam.tropicalAscendant.longitude.toFixed(4)}°)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        9. Ayanamsa correction
+                      </td>
+                      <td>
+                        {udhayam.ayanamsa.name} = −{udhayam.ayanamsa.value.toFixed(4)}°
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        10. Sidereal Udhayam
+                      </td>
+                      <td>
+                        <strong>
+                          {udhayam.siderealAscendant.rasi}{" "}
+                          {udhayam.siderealAscendant.degree}°
+                          {String(udhayam.siderealAscendant.minute).padStart(2, "0")}′
+                          {String(udhayam.siderealAscendant.second).padStart(2, "0")}″
+                          {" "}| {udhayam.nakshatra.name} pada {udhayam.nakshatra.pada}
+                        </strong>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            </div>
+          )}
 
           <div className="card">
             <strong className="tamil">ஜாமகிரஹம் (Jamagraham) window:</strong>{" "}
@@ -227,22 +421,256 @@ export default function ArudhaLagnaPage() {
             <strong className="tamil">கவிப்பு (Kavippu):</strong>{" "}
             {kavippu ? (
               <>
-                {RASIS[kavippu.rasiIndex].nameEnglish}{" "}
-                <span className="tamil">({RASIS[kavippu.rasiIndex].nameTamil})</span>{" "}
-                {kavippu.degreeInRasi !== undefined && formatDegreeInRasi(kavippu.degreeInRasi)}
-                <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 4 }}>
-                  <summary>Calculation trace (verified against 3 reference charts)</summary>
-                  <ul style={{ margin: "4px 0 0 0", paddingLeft: 18 }}>
-                    {kavippu.calculationTrace.map((line, i) => (
-                      <li key={i}>{line}</li>
-                    ))}
-                  </ul>
+                {/* ── Primary result ── */}
+                <div style={{ marginTop: 6 }}>
+                  <table style={{ borderCollapse: "collapse", fontSize: 14 }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Rasi</td>
+                        <td>
+                          {kavippu.rasiName}{" "}
+                          <span className="tamil">({kavippu.rasiNameTamil})</span>
+                          <span style={{ fontSize: 12, color: "#9aa0c0", marginLeft: 6 }}>
+                            lord: {kavippu.rasiLord}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Degree</td>
+                        <td>{formatDegreeInRasi(kavippu.degreeInRasi)}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Nakshatra</td>
+                        <td>
+                          {kavippu.nakshatraName}{" "}
+                          <span className="tamil">({kavippu.nakshatraNameTamil})</span>
+                          <span style={{ fontSize: 12, color: "#9aa0c0", marginLeft: 6 }}>
+                            lord: {kavippu.nakshatraLord}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Pada</td>
+                        <td>{kavippu.pada}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0" }}>Longitude</td>
+                        <td>{kavippu.longitude.toFixed(4)}°</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* ── Calculation details ── */}
+                <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 8 }}>
+                  <summary style={{ cursor: "pointer" }}>
+                    Calculation details (Vaidyanathan method)
+                  </summary>
+                  <table
+                    style={{
+                      borderCollapse: "collapse",
+                      marginTop: 6,
+                      fontSize: 12,
+                      width: "100%",
+                    }}
+                  >
+                    <tbody>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          1. Sun's Rasi
+                        </td>
+                        <td>
+                          {chart &&
+                            `${RASIS[chart.planetRasi.Sun.rasiIndex].nameEnglish} (index ${chart.planetRasi.Sun.rasiIndex})`}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          2. Surya Veedhi
+                        </td>
+                        <td>
+                          {kavippu.suryaVeedhiRasiName} (8th from Sun, inclusive)
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          3. Arudam → Surya Veedhi count
+                        </td>
+                        <td>{kavippu.count} (forward, inclusive)</td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          4. Udhayam → Kavippu count
+                        </td>
+                        <td>{kavippu.count} (same count applied from Udhayam)</td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          5. Arudam degree
+                        </td>
+                        <td>{formatDegreeInRasi(displayedArudhaLagnaDegree)}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          6. Kavippu degree
+                        </td>
+                        <td>
+                          30° − {formatDegreeInRasi(displayedArudhaLagnaDegree)} ={" "}
+                          {formatDegreeInRasi(kavippu.degreeInRasi)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                          7. Final result
+                        </td>
+                        <td>
+                          <strong>
+                            {kavippu.rasiName} {formatDegreeInRasi(kavippu.degreeInRasi)} |{" "}
+                            {kavippu.nakshatraName} pada {kavippu.pada}
+                          </strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </details>
               </>
             ) : (
               "unavailable"
             )}
           </div>
+
+          {/* ── Eight Jama Grahas ring ── */}
+          {jamaGrahaRing && (
+            <div className="card">
+              <strong className="tamil">எட்டு ஜாமக்கிரகங்கள் (Eight Jama Grahas):</strong>
+              <div style={{ fontSize: 12, color: "#9aa0c0", marginTop: 2, marginBottom: 8 }}>
+                Vaidyanathan 45° ring — NOT actual planetary positions.
+                Starting longitude θ:{" "}
+                <strong>
+                  {jamaGrahaRing.startingLongitude.degree}°
+                  {String(jamaGrahaRing.startingLongitude.minute).padStart(2, "0")}′
+                  {String(jamaGrahaRing.startingLongitude.second).padStart(2, "0")}″
+                </strong>{" "}
+                ({jamaGrahaRing.reference.direction.toLowerCase()}, {jamaGrahaRing.reference.movementRate}°/min)
+              </div>
+
+              {/* Graha table */}
+              <table style={{ borderCollapse: "collapse", fontSize: 13, width: "100%" }}>
+                <thead>
+                  <tr style={{ color: "#9aa0c0", fontSize: 12 }}>
+                    <th style={{ textAlign: "left", paddingRight: 10, paddingBottom: 4 }}>Graha</th>
+                    <th style={{ textAlign: "left", paddingRight: 10 }}>Rasi</th>
+                    <th style={{ textAlign: "left", paddingRight: 10 }}>Degree</th>
+                    <th style={{ textAlign: "left", paddingRight: 10 }}>Nakshatra</th>
+                    <th style={{ textAlign: "left", paddingRight: 10 }}>Pada</th>
+                    <th style={{ textAlign: "right", fontSize: 11, color: "#666" }}>Offset</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {jamaGrahaRing.jamaGrahas.map((g) => (
+                    <tr key={g.id}>
+                      <td style={{ paddingRight: 10, paddingBottom: 2 }}>
+                        {g.name}{" "}
+                        <span className="tamil" style={{ fontSize: 11 }}>({g.tamil})</span>
+                      </td>
+                      <td style={{ paddingRight: 10 }}>
+                        {g.rasi}{" "}
+                        <span style={{ fontSize: 11, color: "#9aa0c0" }}>
+                          lord: {g.rasiLord}
+                        </span>
+                      </td>
+                      <td style={{ paddingRight: 10, fontVariantNumeric: "tabular-nums" }}>
+                        {g.degree}°{String(g.minute).padStart(2, "0")}′
+                        {String(g.second).padStart(2, "0")}″
+                      </td>
+                      <td style={{ paddingRight: 10 }}>
+                        {g.nakshatra}{" "}
+                        <span className="tamil" style={{ fontSize: 11 }}>({g.nakshatraTamil})</span>
+                      </td>
+                      <td style={{ paddingRight: 10 }}>{g.pada}</td>
+                      <td style={{ textAlign: "right", color: "#9aa0c0", fontSize: 11 }}>
+                        +{g.offset}°
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Expandable calculation details */}
+              <details style={{ fontSize: 12, color: "#9aa0c0", marginTop: 8 }}>
+                <summary style={{ cursor: "pointer" }}>Calculation details</summary>
+                <table style={{ borderCollapse: "collapse", marginTop: 6, fontSize: 12, width: "100%" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        1. Reference time
+                      </td>
+                      <td>{jamaGrahaRing.reference.time} local</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        2. Reference UTC
+                      </td>
+                      <td>{jamaGrahaRing.reference.referenceUtc.toISOString()}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        3. Query UTC
+                      </td>
+                      <td>{input?.date.toISOString()}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        4. Elapsed time
+                      </td>
+                      <td>
+                        {jamaGrahaRing.reference.elapsedMinutes} min{" "}
+                        ({jamaGrahaRing.reference.elapsedSeconds} s total)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        5. Starting θ
+                      </td>
+                      <td>
+                        {jamaGrahaRing.startingLongitude.degree}°
+                        {String(jamaGrahaRing.startingLongitude.minute).padStart(2, "0")}′
+                        {String(jamaGrahaRing.startingLongitude.second).padStart(2, "0")}″{" "}
+                        ({jamaGrahaRing.startingLongitude.totalLongitude.toFixed(4)}°)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        6. Movement rate
+                      </td>
+                      <td>
+                        {jamaGrahaRing.reference.movementRate}°/min = 30″/s{" "}
+                        {jamaGrahaRing.reference.direction}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        7. Angular offsets
+                      </td>
+                      <td>
+                        {jamaGrahaRing.jamaGrahas.map((g) => `${g.name} +${g.offset}°`).join(" · ")}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ paddingRight: 12, color: "#9aa0c0", whiteSpace: "nowrap" }}>
+                        8. Final longitudes
+                      </td>
+                      <td>
+                        {jamaGrahaRing.jamaGrahas
+                          .map((g) => `${g.name} ${g.longitude.toFixed(2)}°`)
+                          .join(" · ")}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            </div>
+          )}
 
           {arudhaPadas && (
             <table>

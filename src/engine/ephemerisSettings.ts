@@ -1,5 +1,11 @@
 /** User-selectable sidereal frame options (persisted in UI). */
-export type AyanamsaMode = "lahiri-mean" | "lahiri-true" | "raman" | "kp" | "krishnamurti";
+export type AyanamsaMode =
+  | "lahiri-mean"
+  | "lahiri-true"
+  | "raman"
+  | "kp"
+  | "krishnamurti"
+  | "yukteswar";
 
 export type LunarNodeMode = "mean" | "true";
 
@@ -36,6 +42,7 @@ export function ephemerisSettingsLabel(settings: EphemerisSettings): string {
     raman: "Raman",
     kp: "KP (Krishnamurti)",
     krishnamurti: "KP (Krishnamurti)",
+    yukteswar: "Yukteswar",
   };
   return `${ayanamsaLabels[settings.ayanamsa]} · ${settings.nodeMode === "true" ? "true" : "mean"} node`;
 }

@@ -1,0 +1,3 @@
+Target: D:\Astro\launch-astro.bat
+Args:   
+Dir:    D:\Astro
