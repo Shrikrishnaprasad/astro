@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
+import KpPredictionsPanel from "../components/KpPredictionsPanel";
 import KpSystemPanel from "../components/KpSystemPanel";
 import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import type { EphemerisSettings } from "../engine/ephemerisSettings";
@@ -179,6 +180,15 @@ export default function KpAstrologyPage() {
             kp={kpResult}
             onRefreshRulingPlanets={() => setRpMoment(new Date())}
           />
+          {input && (
+            <KpPredictionsPanel
+              kp={kpResult}
+              birthDate={input.date}
+              mode={mode}
+              question={question}
+              settings={effectiveSettings}
+            />
+          )}
         </>
       )}
 

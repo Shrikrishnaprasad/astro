@@ -53,7 +53,30 @@ function toneForNatal(natal: GkNatalAnalysis, planet: Planet): QaTone {
   return "mixed";
 }
 
+function mergeDuplicateQuestions(rows: PredictionQa[]): PredictionQa[] {
+  const byQuestion = new Map<string, PredictionQa>();
+  for (const row of rows) {
+    const key = row.question.trim().toLowerCase();
+    const existing = byQuestion.get(key);
+    if (!existing) {
+      byQuestion.set(key, { ...row });
+    } else if (!existing.source.split(" · ").includes(row.source)) {
+      existing.source = `${existing.source} · ${row.source}`;
+    }
+  }
+  return [...byQuestion.values()];
+}
+
 export function buildDegreeSystemPredictions(
+  natal: GkNatalAnalysis,
+  combinations: GkDegreePair[],
+  transitHits: GkTransitHit[],
+  dasaLords: string[] = [],
+): PredictionQa[] {
+  return mergeDuplicateQuestions(buildDegreeSystemRows(natal, combinations, transitHits, dasaLords));
+}
+
+function buildDegreeSystemRows(
   natal: GkNatalAnalysis,
   combinations: GkDegreePair[],
   transitHits: GkTransitHit[],
@@ -158,6 +181,10 @@ export function buildDegreeSystemPredictions(
 }
 
 export function buildChandraNadiPredictions(nadi: ChandraNadiResult): PredictionQa[] {
+  return mergeDuplicateQuestions(buildChandraNadiRows(nadi));
+}
+
+function buildChandraNadiRows(nadi: ChandraNadiResult): PredictionQa[] {
   const rows: PredictionQa[] = [];
   const unfavourable = new Set(nadi.unfavourable.map((u) => u.planet));
 

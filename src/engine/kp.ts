@@ -137,6 +137,16 @@ export interface KpEventPromise {
   matchedNegating: number[];
   verdict: "Promised (Strong)" | "Promised with Delay / Mixed" | "Denied / Unfavorable";
   explanation: string;
+  /** Houses signified by the sub-lord's Star Lord (the primary KP test). */
+  starLordHouses: number[];
+  starLordFavorable: number[];
+  starLordNegating: number[];
+  /** Score of the primary cusp alone (star-lord first). */
+  primaryScore: number;
+  /** Primary score plus weighted supporting cusps. Verdict is derived from this. */
+  combinedScore: number;
+  /** Per-cusp contribution to the combined score. */
+  contributions: { cusp: number; subLord: Planet; score: number; weight: number }[];
 }
 
 export interface KpSystemResult {
@@ -579,11 +589,14 @@ const EVENT_RULES: {
   primaryCusp: number;
   favorableHouses: number[];
   negatingHouses: number[];
+  /** Supporting cusps counted at half weight in the combined verdict. */
+  supportCusps?: number[];
 }[] = [
   {
     id: "marriage",
     topic: "Marriage & Partnership (7th Cusp)",
     primaryCusp: 7,
+    supportCusps: [2, 11],
     favorableHouses: [2, 7, 11],
     negatingHouses: [1, 6, 10],
   },
@@ -591,6 +604,7 @@ const EVENT_RULES: {
     id: "career",
     topic: "Career, Promotion & Profession (10th Cusp)",
     primaryCusp: 10,
+    supportCusps: [2, 6],
     favorableHouses: [2, 6, 10, 11],
     negatingHouses: [1, 5, 8, 9, 12],
   },
@@ -598,6 +612,7 @@ const EVENT_RULES: {
     id: "finance",
     topic: "Wealth, Gain & Financial Prosperity (2nd / 11th Cusp)",
     primaryCusp: 11,
+    supportCusps: [2, 6],
     favorableHouses: [2, 6, 10, 11],
     negatingHouses: [5, 8, 12],
   },
@@ -605,6 +620,7 @@ const EVENT_RULES: {
     id: "childbirth",
     topic: "Childbirth & Progeny (5th Cusp)",
     primaryCusp: 5,
+    supportCusps: [2, 11],
     favorableHouses: [2, 5, 11],
     negatingHouses: [1, 4, 10],
   },
@@ -612,6 +628,7 @@ const EVENT_RULES: {
     id: "property",
     topic: "Property, Home & Vehicle Purchase (4th Cusp)",
     primaryCusp: 4,
+    supportCusps: [11],
     favorableHouses: [4, 11, 12],
     negatingHouses: [3, 6, 8],
   },
@@ -619,6 +636,7 @@ const EVENT_RULES: {
     id: "education",
     topic: "Education & Academic Success (4th / 9th Cusp)",
     primaryCusp: 4,
+    supportCusps: [9, 11],
     favorableHouses: [4, 9, 11],
     negatingHouses: [3, 8, 12],
   },
@@ -626,6 +644,7 @@ const EVENT_RULES: {
     id: "foreign",
     topic: "Foreign Travel & Settlement (12th Cusp)",
     primaryCusp: 12,
+    supportCusps: [3, 9],
     favorableHouses: [3, 9, 12],
     negatingHouses: [2, 4, 11],
   },
@@ -633,6 +652,7 @@ const EVENT_RULES: {
     id: "litigation",
     topic: "Competition, Litigation & Loan Recovery (6th Cusp)",
     primaryCusp: 6,
+    supportCusps: [10, 11],
     favorableHouses: [1, 6, 10, 11],
     negatingHouses: [5, 7, 12],
   },
@@ -640,6 +660,7 @@ const EVENT_RULES: {
     id: "health",
     topic: "Health, Vitality & Recovery (1st / 11th Cusp)",
     primaryCusp: 1,
+    supportCusps: [5, 11],
     favorableHouses: [1, 5, 9, 11],
     negatingHouses: [6, 8, 12],
   },
@@ -810,38 +831,67 @@ export function computeFullKpSystem(
     planetSignificators.map((row) => [row.planet, row]),
   ) as Record<Planet, KpPlanetSignificatorRow>;
 
-  // Evaluate Cuspal Sub-Lord Event Promises
+  // Evaluate Cuspal Sub-Lord Event Promises (star-lord first, then sub-lord's own houses,
+  // then supporting cusps at half weight).
+  const scoreCusp = (cuspNumber: number, fav: number[], neg: number[]) => {
+    const sub = cusps[cuspNumber - 1].subLord as Planet;
+    const row = sigByPlanet[sub];
+    const starHouses = new Set(row.starLordHouses);
+    const ownHouses = new Set(row.allHouses);
+    const starFav = fav.filter((h) => starHouses.has(h));
+    const starNeg = neg.filter((h) => starHouses.has(h));
+    const ownFav = fav.filter((h) => ownHouses.has(h));
+    const ownNeg = neg.filter((h) => ownHouses.has(h));
+    const score = 2 * starFav.length - 2 * starNeg.length + ownFav.length - ownNeg.length;
+    return { sub, row, starFav, starNeg, ownFav, ownNeg, score };
+  };
+
   const eventPromises: KpEventPromise[] = EVENT_RULES.map((rule) => {
-    const cusp = cusps[rule.primaryCusp - 1];
-    const subLord = cusp.subLord as Planet;
-    const subRow = sigByPlanet[subLord];
-    // In KP, a Cusp Sub-Lord's results come primarily through its Star Lord + its own signified houses
-    const combinedSet = new Set<number>([
-      ...subRow.allHouses,
-      ...subRow.starLordHouses,
-    ]);
+    const primary = scoreCusp(rule.primaryCusp, rule.favorableHouses, rule.negatingHouses);
+    const subLord = primary.sub;
+    const subRow = primary.row;
+    const combinedSet = new Set<number>([...subRow.allHouses, ...subRow.starLordHouses]);
     const subLordSignifiedHouses = Array.from(combinedSet).sort((a, b) => a - b);
 
     const matchedFavorable = rule.favorableHouses.filter((h) => combinedSet.has(h));
     const matchedNegating = rule.negatingHouses.filter((h) => combinedSet.has(h));
 
+    const contributions: KpEventPromise["contributions"] = [
+      { cusp: rule.primaryCusp, subLord, score: primary.score, weight: 1 },
+    ];
+    let combinedScore = primary.score;
+    for (const sc of rule.supportCusps ?? []) {
+      if (sc === rule.primaryCusp) continue;
+      const s = scoreCusp(sc, rule.favorableHouses, rule.negatingHouses);
+      contributions.push({ cusp: sc, subLord: s.sub, score: s.score, weight: 0.5 });
+      combinedScore += 0.5 * s.score;
+    }
+
+    // Heuristic thresholds: strong needs the star lord to link to a favorable house with no
+    // negating star-lord house and a clearly positive combined score.
     let verdict: KpEventPromise["verdict"];
-    if (matchedFavorable.length >= 2 && matchedNegating.length === 0) {
+    if (combinedScore >= 4 && primary.starFav.length >= 1 && primary.starNeg.length === 0) {
       verdict = "Promised (Strong)";
-    } else if (matchedFavorable.length >= 1 && matchedFavorable.length >= matchedNegating.length) {
+    } else if (combinedScore >= 1 && (primary.starFav.length >= 1 || primary.ownFav.length >= 1)) {
       verdict = "Promised with Delay / Mixed";
     } else {
       verdict = "Denied / Unfavorable";
     }
 
     const explanation =
-      `Cusp ${rule.primaryCusp} Sub-Lord is ${subLord} (in Star of ${subRow.starLord}), signifying houses [${subLordSignifiedHouses.join(", ")}]. ` +
-      (matchedFavorable.length > 0
-        ? `Connects to favorable houses (${matchedFavorable.join(", ")})`
-        : `Lacks strong connection to primary houses (${rule.favorableHouses.join(", ")})`) +
-      (matchedNegating.length > 0
-        ? `, with negating/challenging influence from (${matchedNegating.join(", ")}).`
-        : `, with zero negating house affliction.`);
+      `Cusp ${rule.primaryCusp} Sub-Lord is ${subLord} (in Star of ${subRow.starLord}). ` +
+      `Star Lord ${subRow.starLord} signifies [${subRow.starLordHouses.join(", ")}] — ` +
+      (primary.starFav.length > 0
+        ? `favorable (${primary.starFav.join(", ")})`
+        : `no favorable house`) +
+      (primary.starNeg.length > 0 ? `, negating (${primary.starNeg.join(", ")})` : ``) +
+      `. ${subLord} itself signifies [${subRow.allHouses.join(", ")}]` +
+      (primary.ownNeg.length > 0 ? ` (negating: ${primary.ownNeg.join(", ")})` : ``) +
+      `. Score ${primary.score}; with supporting cusps ` +
+      `${contributions
+        .slice(1)
+        .map((c) => `${c.cusp}(${c.score})`)
+        .join(", ") || "none"} combined ${combinedScore.toFixed(1)}.`;
 
     return {
       id: rule.id,
@@ -856,6 +906,12 @@ export function computeFullKpSystem(
       matchedNegating,
       verdict,
       explanation,
+      starLordHouses: subRow.starLordHouses,
+      starLordFavorable: primary.starFav,
+      starLordNegating: primary.starNeg,
+      primaryScore: primary.score,
+      combinedScore,
+      contributions,
     };
   });
 
