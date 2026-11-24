@@ -19,5 +19,6 @@ export const MENU_ROUTES: MenuRoute[] = [
   { path: "/advanced-jyotish", label: "Advanced Jyotish" },
   { path: "/kp", label: "KP Astrology" },
   { path: "/degree-system", label: "Degree System" },
+  { path: "/dna-astrology", label: "DNA Astrology" },
   { path: "/prasna", label: "Prasna" },
 ];

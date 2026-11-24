@@ -10,7 +10,10 @@ const NAV_GROUPS: { label: string; paths: string[] }[] = [
     paths: ["/birth-chart", "/divisional-charts", "/ashtakavarga", "/jamakkol-arudam"],
   },
   { label: "Timing & match", paths: ["/dasa", "/porutham"] },
-  { label: "Methods", paths: ["/kp", "/degree-system", "/prasna", "/advanced-jyotish"] },
+  {
+    label: "Methods",
+    paths: ["/kp", "/degree-system", "/dna-astrology", "/prasna", "/advanced-jyotish"],
+  },
   { label: "Reference", paths: ["/ephemeris", "/accuracy", "/jyotish-scope"] },
 ];
 

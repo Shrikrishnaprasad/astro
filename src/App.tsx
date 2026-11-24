@@ -16,6 +16,7 @@ import EphemerisAccuracyPage from "./pages/EphemerisAccuracyPage";
 import EphemerisPage from "./pages/EphemerisPage";
 import KpAstrologyPage from "./pages/KpAstrologyPage";
 import GkDegreePage from "./pages/GkDegreePage";
+import DnaAstrologyPage from "./pages/DnaAstrologyPage";
 import PrasnaPage from "./pages/PrasnaPage";
 import JyotishDepthPage from "./pages/JyotishDepthPage";
 import PoruthamPage from "./pages/PoruthamPage";
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/kp" element={<KpAstrologyPage />} />
           <Route path="/degree-system" element={<GkDegreePage />} />
           <Route path="/gk-degree" element={<Navigate to="/degree-system" replace />} />
+          <Route path="/dna-astrology" element={<DnaAstrologyPage />} />
           <Route path="/prasna" element={<PrasnaPage />} />
         </Routes>
       </main>

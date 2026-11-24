@@ -12,6 +12,7 @@ export type JyotishPageId =
   | "advanced-jyotish"
   | "kp"
   | "degree-system"
+  | "dna-astrology"
   | "prasna"
   | "ephemeris"
   | "global";
@@ -181,6 +182,30 @@ export const JYOTISH_FEATURES: JyotishFeature[] = [
     summary:
       "12 Placidus House Cusps (Sign/Star/Sub/Sub-Sub/Prana), Bhava Chalit, 4-Fold Significators (A/B/C/D + Rahu/Ketu rules), 1–249 Horary Number Chart, Ruling Planets (RP), and 9 Cuspal Sub-Lord Event Promise analyzers.",
     pages: ["kp", "prasna", "advanced-jyotish"],
+  },
+  {
+    id: "dna-astrology-core",
+    name: "DNA Astrology — karmic registries & core report",
+    status: "implemented",
+    summary:
+      "Nakshatra→karma map (Sun–Rahu), weighted Lagna / Lagna-lord / Moon pillars (100/100/50), planet birth-star carriers, sign & house DNA registries, EN/TA guidance.",
+    pages: ["dna-astrology"],
+  },
+  {
+    id: "dna-astrology-topics-match",
+    name: "DNA Astrology — life topics & second-chart match",
+    status: "implemented",
+    summary:
+      "Spouse/mother/father/child/career expected patterns from opposition & 10th links; transparent checklist score vs a second birth chart.",
+    pages: ["dna-astrology"],
+  },
+  {
+    id: "dna-astrology-timing-remedies",
+    name: "DNA Astrology — dasa/transit highlights & remedies",
+    status: "partial",
+    summary:
+      "Heuristic Vimshottari MD/AD and transit activation notes for active DNA karmas. Proprietary Karumbu remedies and course-only dasa formulas are not implemented.",
+    pages: ["dna-astrology"],
   },
   {
     id: "muhurta-panchangam",
