@@ -10,7 +10,13 @@ import PushkaraAtBirthTable from "../components/PushkaraAtBirthTable";
 import AshtakavargaPanel from "../components/AshtakavargaPanel";
 import ShodashavargaPanel from "../components/ShodashavargaPanel";
 import { NAKSHATRAS } from "../data/nakshatras";
-import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import {
+  GULIKA_TAMIL,
+  LAGNA_TAMIL,
+  MANDHI_TAMIL,
+  PLANET_TAMIL_ABBR,
+  PLANET_TAMIL_NAME,
+} from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { getSiderealAscendant } from "../engine/ascendant";
 import { houseRasiIndex } from "../engine/houses";
@@ -30,7 +36,7 @@ import { computeTithiShunya } from "../engine/tithiShunya";
 import { computePanchangam } from "../engine/panchanga";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
 import { computeSamvatsara } from "../engine/samvatsara";
-import { computeMandhi } from "../engine/specialPoints";
+import { computeGulikaMandhi } from "../engine/specialPoints";
 import type { Planet } from "../engine/types";
 import { PLANETS } from "../engine/types";
 import type { BirthInput } from "../engine/types";
@@ -53,9 +59,9 @@ export default function BirthChartPage() {
     autoRefresh ? 60000 : 0,
   );
 
-  const mandhi = useMemo(
+  const gulikaMandhi = useMemo(
     () =>
-      input ? computeMandhi(input.date, input.latitude, input.longitude, resolved) : null,
+      input ? computeGulikaMandhi(input.date, input.latitude, input.longitude, resolved) : null,
     [input, resolved],
   );
 
@@ -68,16 +74,16 @@ export default function BirthChartPage() {
     [transitNow, resolved],
   );
 
-  // Live (current-moment) lagna and mandhi, at the same place as the birth
+  // Live (current-moment) lagna and Gulika/Mandhi, at the same place as the birth
   // input, for the outer transit ring.
   const transitLagna = useMemo(
     () =>
       input ? getSiderealAscendant(transitNow, input.latitude, input.longitude, resolved) : null,
     [transitNow, input, resolved],
   );
-  const transitMandhi = useMemo(
+  const transitGulikaMandhi = useMemo(
     () =>
-      input ? computeMandhi(transitNow, input.latitude, input.longitude, resolved) : null,
+      input ? computeGulikaMandhi(transitNow, input.latitude, input.longitude, resolved) : null,
     [transitNow, input, resolved],
   );
 
@@ -106,7 +112,7 @@ export default function BirthChartPage() {
     return computeTithiShunya(birthPanchangam.tithiIndex, chart.planetRasi.Moon.nakshatraIndex);
   }, [chart, birthPanchangam]);
 
-  // Inside each box: this person's own birth-chart placements (planets + lagna + mandhi).
+  // Inside each box: this person's own birth-chart placements (planets + lagna + Gulika/Mandhi).
   const cellContents = useMemo(() => {
     const cells: Record<number, ChartMarker[]> = {};
     const push = (rasiIndex: number, marker: ChartMarker) => {
@@ -132,16 +138,22 @@ export default function BirthChartPage() {
         degree: chart.lagnaDegreeInRasi,
       });
     }
-    if (mandhi) {
-      push(mandhi.rasiIndex, {
+    if (gulikaMandhi) {
+      push(gulikaMandhi.gulika.rasiIndex, {
+        label: GULIKA_TAMIL,
+        kind: "gulika",
+        title: "குளி (Gulika — start of Saturn's portion)",
+        degree: gulikaMandhi.gulika.longitude - gulikaMandhi.gulika.rasiIndex * 30,
+      });
+      push(gulikaMandhi.mandhi.rasiIndex, {
         label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "மாந் (Mandhi / Gulika)",
-        degree: mandhi.longitude - mandhi.rasiIndex * 30,
+        title: "மாந் (Mandhi — mid of Saturn's portion)",
+        degree: gulikaMandhi.mandhi.longitude - gulikaMandhi.mandhi.rasiIndex * 30,
       });
     }
     return cells;
-  }, [chart, mandhi, birthRetrograde]);
+  }, [chart, gulikaMandhi, birthRetrograde]);
 
   const companionVargaDef = useMemo(
     () => SHODASHAVARGA_DEFS.find((d) => d.id === companionVarga) ?? SHODASHAVARGA_DEFS[5],
@@ -197,7 +209,7 @@ export default function BirthChartPage() {
     return cells;
   }, [chart, birthRetrograde, companionVarga, companionVargaDef]);
 
-  // Outer ring: where each planet (+ lagna, + mandhi) is transiting right
+  // Outer ring: where each planet (+ lagna, + Gulika/Mandhi) is transiting right
   // now, with its current degree.
   const outerMarkers = useMemo(() => {
     const outer: Record<number, ChartMarker[]> = {};
@@ -226,16 +238,24 @@ export default function BirthChartPage() {
         degree: transitLagna - rasiIndex * 30,
       });
     }
-    if (transitMandhi) {
-      push(transitMandhi.rasiIndex, {
+    if (transitGulikaMandhi) {
+      push(transitGulikaMandhi.gulika.rasiIndex, {
+        label: GULIKA_TAMIL,
+        kind: "gulika",
+        title: "நடப்பு குளி (Transit Gulika)",
+        degree:
+          transitGulikaMandhi.gulika.longitude - transitGulikaMandhi.gulika.rasiIndex * 30,
+      });
+      push(transitGulikaMandhi.mandhi.rasiIndex, {
         label: MANDHI_TAMIL,
         kind: "mandhi",
         title: "நடப்பு மாந் (Transit Mandhi)",
-        degree: transitMandhi.longitude - transitMandhi.rasiIndex * 30,
+        degree:
+          transitGulikaMandhi.mandhi.longitude - transitGulikaMandhi.mandhi.rasiIndex * 30,
       });
     }
     return outer;
-  }, [transitLongitudes, transitLagna, transitMandhi, transitRetrograde]);
+  }, [transitLongitudes, transitLagna, transitGulikaMandhi, transitRetrograde]);
 
   return (
     <div>

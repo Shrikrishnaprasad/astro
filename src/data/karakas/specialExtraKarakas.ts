@@ -149,7 +149,7 @@ export const SPECIAL_EXTRA_KARAKAS: KarakaEntry[] = [
       ]),
       group("Time-based Upagrahas (கால உபகிரகங்கள்)", "கால உபகிரகம்", [
         ["Gulika: son of Saturn, rising point of Saturn's portion of the day or night — the most malefic; poison, chronic illness, delays, grief", "குளிகன்: சனியின் மகன், பகல் / இரவில் சனியின் பகுதியின் உதயப் புள்ளி — மிகக் கொடிய உபகிரகம்; விஷம், நாள்பட்ட நோய், தாமதம், துக்கம்"],
-        ["Mandi: also Saturn's son; used almost interchangeably with Gulika in Tamil and Kerala texts", "மாந்: இதுவும் சனியின் மகன்; தமிழ் & கேரள நூல்களில் குளிகனுடன் கிட்டத்தட்ட ஒன்றாகவே பயன்படுத்தப்படுகிறது"],
+        ["Mandi: also Saturn's son; this app places it at the middle of Saturn's portion (Gulika is the start)", "மாந்: இதுவும் சனியின் மகன்; இங்கு சனியின் பகுதியின் நடுவில் (குளிகன் தொடக்கத்தில்)"],
         ["Kala (Sun's portion), Mrityu (Mars), Ardhaprahara (Mercury) — malefic; Yamakantaka (Jupiter) — benefic", "காலன் (சூரி பகுதி), மிருத்யு (செவ்), அர்த்தப்பிரகரன் (புத) — பாபர்; எமகண்டன் (குரு) — சுபர்"],
       ]),
       group("Mandi / Gulika in Houses (மாந் பாவ பலன்)", "மாந் பாவ பலன்", [

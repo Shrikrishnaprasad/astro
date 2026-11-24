@@ -6,7 +6,13 @@ import PredictionQaPanel from "../components/PredictionQaPanel";
 import type { ChartMarker } from "../components/SouthIndianChart";
 import SouthIndianChart from "../components/SouthIndianChart";
 import { CHANDRA_NADI_NOTES, GK_POINT_THEMES, GK_RULE_NOTES } from "../data/gkDegreeNotes";
-import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import {
+  GULIKA_TAMIL,
+  LAGNA_TAMIL,
+  MANDHI_TAMIL,
+  PLANET_TAMIL_ABBR,
+  PLANET_TAMIL_NAME,
+} from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { getSiderealAscendant } from "../engine/ascendant";
 import {
@@ -28,7 +34,7 @@ import {
   type GkPointId,
 } from "../engine/gkDegree";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
-import { computeMandhi } from "../engine/specialPoints";
+import { computeGulikaMandhi } from "../engine/specialPoints";
 import type { BirthInput, Planet } from "../engine/types";
 import { PLANETS } from "../engine/types";
 import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
@@ -64,13 +70,14 @@ export default function GkDegreePage() {
     return getSiderealAscendant(now, input.latitude, input.longitude, resolved);
   }, [input, now, resolved]);
 
-  const transitMandhi = useMemo(
-    () => (input ? computeMandhi(now, input.latitude, input.longitude, resolved) : null),
+  const transitGulikaMandhi = useMemo(
+    () => (input ? computeGulikaMandhi(now, input.latitude, input.longitude, resolved) : null),
     [input, now, resolved],
   );
 
-  const natalMandhi = useMemo(
-    () => (input ? computeMandhi(input.date, input.latitude, input.longitude, resolved) : null),
+  const natalGulikaMandhi = useMemo(
+    () =>
+      input ? computeGulikaMandhi(input.date, input.latitude, input.longitude, resolved) : null,
     [input, resolved],
   );
 
@@ -107,16 +114,22 @@ export default function GkDegreePage() {
       title: "ல (Lagna)",
       degree: chart.lagnaDegreeInRasi,
     });
-    if (natalMandhi) {
-      push(natalMandhi.rasiIndex, {
+    if (natalGulikaMandhi) {
+      push(natalGulikaMandhi.gulika.rasiIndex, {
+        label: GULIKA_TAMIL,
+        kind: "gulika",
+        title: "குளி (Gulika — start of Saturn's portion)",
+        degree: natalGulikaMandhi.gulika.longitude - natalGulikaMandhi.gulika.rasiIndex * 30,
+      });
+      push(natalGulikaMandhi.mandhi.rasiIndex, {
         label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "மாந் (Mandhi / Gulika)",
-        degree: natalMandhi.longitude - natalMandhi.rasiIndex * 30,
+        title: "மாந் (Mandhi — mid of Saturn's portion)",
+        degree: natalGulikaMandhi.mandhi.longitude - natalGulikaMandhi.mandhi.rasiIndex * 30,
       });
     }
     return cells;
-  }, [chart, natalMandhi, birthRetrograde]);
+  }, [chart, natalGulikaMandhi, birthRetrograde]);
 
   const outerMarkers = useMemo(() => {
     const outer: Record<number, ChartMarker[]> = {};
@@ -144,16 +157,24 @@ export default function GkDegreePage() {
         degree: transitLagna - rasiIndex * 30,
       });
     }
-    if (transitMandhi) {
-      push(transitMandhi.rasiIndex, {
+    if (transitGulikaMandhi) {
+      push(transitGulikaMandhi.gulika.rasiIndex, {
+        label: GULIKA_TAMIL,
+        kind: "gulika",
+        title: "நடப்பு குளி (Transit Gulika)",
+        degree:
+          transitGulikaMandhi.gulika.longitude - transitGulikaMandhi.gulika.rasiIndex * 30,
+      });
+      push(transitGulikaMandhi.mandhi.rasiIndex, {
         label: MANDHI_TAMIL,
         kind: "mandhi",
         title: "நடப்பு மாந் (Transit Mandhi)",
-        degree: transitMandhi.longitude - transitMandhi.rasiIndex * 30,
+        degree:
+          transitGulikaMandhi.mandhi.longitude - transitGulikaMandhi.mandhi.rasiIndex * 30,
       });
     }
     return outer;
-  }, [longitudes, transitLagna, transitMandhi, retrograde]);
+  }, [longitudes, transitLagna, transitGulikaMandhi, retrograde]);
 
   const transitHits = useMemo(() => {
     if (!natal || transitLagna == null) return [];
@@ -248,7 +269,7 @@ export default function GkDegreePage() {
               <h3 className="chart-pair__title">Rasi (D1)</h3>
               <SouthIndianChart cellContents={cellContents} outerMarkers={outerMarkers} />
               <p className="chart-pair__hint">
-                Inside: natal grahas, Lagna, Mandhi. Outer ring: live Gochara grahas, Lagna, Mandhi
+                Inside: natal grahas, Lagna, Gulika, Mandhi. Outer ring: live Gochara grahas, Lagna, Gulika, Mandhi
                 at the birth place.
               </p>
             </div>

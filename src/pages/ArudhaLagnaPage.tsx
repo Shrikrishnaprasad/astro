@@ -7,14 +7,20 @@ import DateTimePlaceForm from "../components/DateTimePlaceForm";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
 import PlaceSelector from "../components/PlaceSelector";
 import { defaultPlace, type ResolvedPlace } from "../data/places";
-import { LAGNA_TAMIL, MANDHI_TAMIL, PLANET_TAMIL_ABBR, PLANET_TAMIL_NAME } from "../data/planetsTamil";
+import {
+  GULIKA_TAMIL,
+  LAGNA_TAMIL,
+  MANDHI_TAMIL,
+  PLANET_TAMIL_ABBR,
+  PLANET_TAMIL_NAME,
+} from "../data/planetsTamil";
 import { RASIS } from "../data/rasis";
 import { computeAllArudhaPadas } from "../engine/arudha";
 import { calculateKavippu } from "../engine/kavippu";
 import { calculateUdhayamFromDate } from "../engine/udhayam";
 import { calculateEightJamaGrahasFromUTC } from "../engine/jamaGrahaRing";
 import { getRetrogradeStatus, shouldShowRetrograde } from "../engine/retrograde";
-import { computeJamagraham, computeMandhi } from "../engine/specialPoints";
+import { computeGulikaMandhi, computeJamagraham } from "../engine/specialPoints";
 import type { BirthInput } from "../engine/types";
 import { PLANETS } from "../engine/types";
 import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
@@ -64,9 +70,9 @@ export default function ArudhaLagnaPage() {
     [chart],
   );
 
-  const mandhi = useMemo(
+  const gulikaMandhi = useMemo(
     () =>
-      input ? computeMandhi(input.date, input.latitude, input.longitude, resolved) : null,
+      input ? computeGulikaMandhi(input.date, input.latitude, input.longitude, resolved) : null,
     [input, resolved],
   );
 
@@ -158,12 +164,18 @@ export default function ArudhaLagnaPage() {
       title: "ஆரூடம் (Aaru) - cycles 1 rasi every 5 min, Mesha at :00, full loop every hour",
       degree: displayedArudhaLagnaDegree,
     });
-    if (mandhi) {
-      push(mandhi.rasiIndex, {
+    if (gulikaMandhi) {
+      push(gulikaMandhi.gulika.rasiIndex, {
+        label: GULIKA_TAMIL,
+        kind: "gulika",
+        title: "குளி (Gulika — start of Saturn's portion)",
+        degree: gulikaMandhi.gulika.longitude - gulikaMandhi.gulika.rasiIndex * 30,
+      });
+      push(gulikaMandhi.mandhi.rasiIndex, {
         label: MANDHI_TAMIL,
         kind: "mandhi",
-        title: "மாந் (Mandhi / Gulika)",
-        degree: mandhi.longitude - mandhi.rasiIndex * 30,
+        title: "மாந் (Mandhi — mid of Saturn's portion)",
+        degree: gulikaMandhi.mandhi.longitude - gulikaMandhi.mandhi.rasiIndex * 30,
       });
     }
     if (kavippu) {
@@ -175,7 +187,7 @@ export default function ArudhaLagnaPage() {
       });
     }
     return cells;
-  }, [chart, displayedArudhaLagnaRasi, displayedArudhaLagnaDegree, mandhi, kavippu, retrograde]);
+  }, [chart, displayedArudhaLagnaRasi, displayedArudhaLagnaDegree, gulikaMandhi, kavippu, retrograde]);
 
   // Map the active sunrise-cycle Jamagraham planet to the ring ID used by
   // JamaGrahaPerimeter so the correct perimeter box gets highlighted.

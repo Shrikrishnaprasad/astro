@@ -6,6 +6,7 @@ export type ChartMarkerKind =
   | "lagna"
   | "arudha"
   | "mandhi"
+  | "gulika"
   | "kavippu"
   | "jamagraham"
   | "jamagraham-inactive"
@@ -85,6 +86,7 @@ const KIND_CLASS: Record<ChartMarkerKind, string> = {
   lagna: "chart-marker-lagna",
   arudha: "chart-marker-arudha",
   mandhi: "chart-marker-mandhi",
+  gulika: "chart-marker-gulika",
   kavippu: "chart-marker-kavippu",
   jamagraham: "chart-marker-jamagraham",
   "jamagraham-inactive": "chart-marker-jamagraham-inactive",

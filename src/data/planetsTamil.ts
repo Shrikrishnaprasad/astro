@@ -16,4 +16,7 @@ export const PLANET_TAMIL_ABBR: Record<Planet, string> = {
 export const PLANET_TAMIL_NAME = PLANET_TAMIL_ABBR;
 
 export const LAGNA_TAMIL = "ல";
+/** Mandhi / Maandi — lagna at mid of Saturn's eighth. */
 export const MANDHI_TAMIL = "மாந்";
+/** Gulika — lagna at start of Saturn's eighth (Gulika Kalam start). */
+export const GULIKA_TAMIL = "குளி";
