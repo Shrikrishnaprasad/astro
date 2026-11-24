@@ -583,7 +583,7 @@ export function computeKpRulingPlanets(
   };
 }
 
-const EVENT_RULES: {
+export interface KpEventTopicRule {
   id: string;
   topic: string;
   primaryCusp: number;
@@ -591,7 +591,10 @@ const EVENT_RULES: {
   negatingHouses: number[];
   /** Supporting cusps counted at half weight in the combined verdict. */
   supportCusps?: number[];
-}[] = [
+}
+
+/** Public topic list for UI (rectification, filters) — same rules used by the promise analyzer. */
+export const KP_EVENT_TOPICS: KpEventTopicRule[] = [
   {
     id: "marriage",
     topic: "Marriage & Partnership (7th Cusp)",
@@ -665,6 +668,8 @@ const EVENT_RULES: {
     negatingHouses: [6, 8, 12],
   },
 ];
+
+const EVENT_RULES = KP_EVENT_TOPICS;
 
 /**
  * Full Krishnamurti Paddhati (KP) System computation:

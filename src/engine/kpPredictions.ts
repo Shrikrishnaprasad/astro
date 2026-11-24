@@ -4,6 +4,7 @@ import type { KpEventPromise, KpPlanetSignificatorRow, KpSystemResult } from "./
 import type { Planet } from "./types";
 import type { EphemerisSettings } from "./ephemerisSettings";
 import { DEFAULT_EPHEMERIS_SETTINGS } from "./ephemerisSettings";
+import { matchKpTopicDetailed } from "./kpHorary";
 import { findKpTransitTriggers, type KpTransitTrigger, type TransitLongitudeCache } from "./kpTransit";
 
 export type KpMode = "natal" | "horary249";
@@ -90,27 +91,8 @@ const VERDICT_TA: Record<KpEventPromise["verdict"], string> = {
   "Denied / Unfavorable": "மறுப்பு / சாதகமில்லை",
 };
 
-const QUESTION_KEYWORDS: Record<string, string[]> = {
-  marriage: ["marriage", "marry", "wedding", "spouse", "husband", "wife", "partner", "divorce", "love", "திருமண"],
-  career: ["job", "career", "promotion", "profession", "work", "business", "employ", "transfer", "வேலை", "தொழில்"],
-  finance: ["money", "wealth", "income", "profit", "gain", "finance", "salary", "lottery", "பணம்", "வருமான"],
-  childbirth: ["child", "baby", "pregnan", "progeny", "son", "daughter", "conceive", "குழந்தை"],
-  property: ["house", "home", "property", "land", "flat", "vehicle", "car", "plot", "வீடு", "நிலம்"],
-  education: ["exam", "study", "education", "degree", "college", "admission", "result", "course", "படிப்பு", "தேர்வு"],
-  foreign: ["abroad", "foreign", "visa", "immigr", "overseas", "settle", "travel", "வெளிநாடு"],
-  litigation: ["court", "case", "litigation", "lawsuit", "loan", "dispute", "compet", "வழக்கு", "கடன்"],
-  health: ["health", "disease", "illness", "recover", "surgery", "operation", "sick", "medical", "ஆரோக்கிய", "நோய்"],
-};
-
 export function matchKpTopicFromQuestion(question: string): string | null {
-  const q = question.trim().toLowerCase();
-  if (!q) return null;
-  let best: { id: string; score: number } | null = null;
-  for (const [id, words] of Object.entries(QUESTION_KEYWORDS)) {
-    const score = words.filter((w) => q.includes(w)).length;
-    if (score > 0 && (!best || score > best.score)) best = { id, score };
-  }
-  return best?.id ?? null;
+  return matchKpTopicDetailed(question).topicId;
 }
 
 /** Planets that carry a topic: connect to favorable houses and outweigh negating ones. */

@@ -1,14 +1,23 @@
 import { useMemo, useState } from "react";
 import DateTimePlaceForm from "../components/DateTimePlaceForm";
 import { EphemerisAccuracyNotice } from "../components/EphemerisAccuracyPanel";
+import KpExtrasPanel from "../components/KpExtrasPanel";
+import KpHoraryExtrasPanel from "../components/KpHoraryExtrasPanel";
+import KpMatchPanel from "../components/KpMatchPanel";
+import KpMuhurtaPanel from "../components/KpMuhurtaPanel";
 import KpPredictionsPanel from "../components/KpPredictionsPanel";
+import KpRectificationPanel from "../components/KpRectificationPanel";
 import KpSystemPanel from "../components/KpSystemPanel";
 import { useEphemerisSettings } from "../context/EphemerisSettingsContext";
 import type { EphemerisSettings } from "../engine/ephemerisSettings";
+import { computeFullKpSystem, getKp249Table } from "../engine/kp";
 import {
-  computeFullKpSystem,
-  getKp249Table,
-} from "../engine/kp";
+  pickKpHoraryFromLagna,
+  pickKpHoraryFromMoon,
+  pickKpHoraryRandom,
+  pickKpHoraryTyped,
+  type KpHoraryNumberPick,
+} from "../engine/kpHorary";
 import type { BirthInput } from "../engine/types";
 import { formatSiderealLongitude } from "../utils/format";
 
@@ -19,7 +28,11 @@ export default function KpAstrologyPage() {
   const [mode, setMode] = useState<KpMode>("natal");
   const [useKpAyanamsa, setUseKpAyanamsa] = useState(true);
   const [horaryNumber, setHoraryNumber] = useState<number>(1);
+  const [horaryLocked, setHoraryLocked] = useState(false);
+  const [horaryPickNote, setHoraryPickNote] = useState<KpHoraryNumberPick | null>(null);
+  const [typedDigits, setTypedDigits] = useState("");
   const [question, setQuestion] = useState("");
+  const [topicOverride, setTopicOverride] = useState("");
   const [input, setInput] = useState<BirthInput | null>(null);
   const [rpMoment, setRpMoment] = useState<Date>(() => new Date());
   const [tableFilter, setTableFilter] = useState("");
@@ -65,17 +78,20 @@ export default function KpAstrologyPage() {
     );
   }, [kp249Table, tableFilter]);
 
+  const applyHoraryPick = (pick: KpHoraryNumberPick) => {
+    if (horaryLocked) return;
+    setHoraryNumber(pick.number);
+    setHoraryPickNote(pick);
+  };
+
   return (
     <div>
       <h2>KP Astrology System (Krishnamurti Paddhati)</h2>
       <EphemerisAccuracyNotice />
       <p style={{ fontSize: 14, color: "#9aa0c0", maxWidth: 820 }}>
-        Complete <strong>Krishnamurti Paddhati (KP)</strong> suite:{" "}
-        <strong>12 Placidus House Cusps</strong> (Sign · Star · Sub · Sub-Sub · Prana Lords),{" "}
-        <strong>Placidus Bhava Chalit</strong>, <strong>4-Fold KP Significators (A/B/C/D)</strong>{" "}
-        with Rahu/Ketu agent &amp; Untenanted planet rules,{" "}
-        <strong>1–249 Horary Number Chart</strong>, <strong>Ruling Planets (RP)</strong>, and{" "}
-        <strong>Cuspal Sub-Lord Event Promise Analyzer</strong>.
+        Complete <strong>Krishnamurti Paddhati (KP)</strong> suite: Placidus cusps, significators,
+        horary 1–249, predictions &amp; remedies, interlinks, Fortuna/nodes, matching, muhurta and
+        rectification.
       </p>
 
       <div className="card">
@@ -108,28 +124,101 @@ export default function KpAstrologyPage() {
                   min={1}
                   max={249}
                   value={horaryNumber}
-                  onChange={(e) =>
-                    setHoraryNumber(Math.min(249, Math.max(1, Number(e.target.value) || 1)))
-                  }
+                  disabled={horaryLocked}
+                  onChange={(e) => {
+                    setHoraryNumber(Math.min(249, Math.max(1, Number(e.target.value) || 1)));
+                    setHoraryPickNote(null);
+                  }}
+                />
+              </label>
+              <label style={{ marginTop: 18 }}>
+                <input
+                  type="checkbox"
+                  checked={horaryLocked}
+                  onChange={(e) => setHoraryLocked(e.target.checked)}
+                />
+                Lock number (prevent re-roll)
+              </label>
+            </div>
+
+            <div className="field-row" style={{ marginTop: 8, flexWrap: "wrap", gap: 8 }}>
+              <button
+                type="button"
+                disabled={horaryLocked}
+                onClick={() => applyHoraryPick(pickKpHoraryRandom())}
+              >
+                Random 1–249
+              </button>
+              <button
+                type="button"
+                disabled={horaryLocked}
+                onClick={() => {
+                  applyHoraryPick(pickKpHoraryFromMoon(new Date(), effectiveSettings));
+                  setRpMoment(new Date());
+                }}
+              >
+                From Moon Sub (now)
+              </button>
+              <button
+                type="button"
+                disabled={horaryLocked || !input}
+                onClick={() => {
+                  if (!input) return;
+                  applyHoraryPick(
+                    pickKpHoraryFromLagna(
+                      new Date(),
+                      input.latitude,
+                      input.longitude,
+                      effectiveSettings,
+                    ),
+                  );
+                  setRpMoment(new Date());
+                }}
+              >
+                From Lagna Sub (now)
+              </button>
+            </div>
+
+            <div className="field-row" style={{ marginTop: 8, alignItems: "flex-end" }}>
+              <label style={{ flex: 1 }}>
+                Typed number / phone digits → KP #
+                <input
+                  type="text"
+                  placeholder="e.g. 9876543210 or 108"
+                  value={typedDigits}
+                  disabled={horaryLocked}
+                  onChange={(e) => setTypedDigits(e.target.value)}
                 />
               </label>
               <button
                 type="button"
-                onClick={() => setHoraryNumber(Math.floor(Math.random() * 249) + 1)}
+                disabled={horaryLocked}
+                onClick={() => {
+                  const pick = pickKpHoraryTyped(typedDigits);
+                  if (pick) applyHoraryPick(pick);
+                }}
               >
-                Pick Random KP Number (1–249)
+                Apply typed → 1–249
               </button>
             </div>
+
             {selected249Entry && (
               <p style={{ fontSize: 13, color: "#8fd19e", marginTop: 6 }}>
                 <strong>Horary #{selected249Entry.number}:</strong> {selected249Entry.rasiName}{" "}
-                (Sign Lord: {selected249Entry.rasiLord}) · Star:{" "}
-                {selected249Entry.nakshatraName} ({selected249Entry.starLord}) ·{" "}
-                <strong>Sub-Lord: {selected249Entry.subLord}</strong> ·{" "}
-                {formatSiderealLongitude(selected249Entry.startLongitude)}–
+                (Sign Lord: {selected249Entry.rasiLord}) · Star: {selected249Entry.nakshatraName} (
+                {selected249Entry.starLord}) · <strong>Sub-Lord: {selected249Entry.subLord}</strong>{" "}
+                · {formatSiderealLongitude(selected249Entry.startLongitude)}–
                 {formatSiderealLongitude(selected249Entry.endLongitude)}
+                {horaryLocked ? " · LOCKED" : ""}
               </p>
             )}
+            {horaryPickNote && (
+              <p style={{ fontSize: 12, color: "#9aa0c0" }}>
+                {horaryPickNote.noteEn}{" "}
+                <span className="tamil">({horaryPickNote.noteTa})</span>
+              </p>
+            )}
+
             <label style={{ display: "block", marginTop: 8 }}>
               Horary Question (optional)
               <input
@@ -176,10 +265,27 @@ export default function KpAstrologyPage() {
               <strong>Question:</strong> {question.trim()}
             </div>
           )}
+          {mode === "horary249" && (
+            <KpHoraryExtrasPanel
+              kp={kpResult}
+              question={question}
+              topicOverride={topicOverride}
+              onTopicChange={setTopicOverride}
+            />
+          )}
           <KpSystemPanel
             kp={kpResult}
             onRefreshRulingPlanets={() => setRpMoment(new Date())}
           />
+          {input && (
+            <KpExtrasPanel
+              kp={kpResult}
+              date={input.date}
+              latitude={input.latitude}
+              longitude={input.longitude}
+              settings={effectiveSettings}
+            />
+          )}
           {input && (
             <KpPredictionsPanel
               kp={kpResult}
@@ -187,8 +293,30 @@ export default function KpAstrologyPage() {
               mode={mode}
               question={question}
               settings={effectiveSettings}
+              topicOverride={mode === "horary249" ? topicOverride : undefined}
             />
           )}
+          {input && mode === "natal" && (
+            <KpMuhurtaPanel
+              kp={kpResult}
+              latitude={input.latitude}
+              longitude={input.longitude}
+              settings={effectiveSettings}
+            />
+          )}
+          {input && mode === "natal" && (
+            <KpRectificationPanel
+              birthDate={input.date}
+              latitude={input.latitude}
+              longitude={input.longitude}
+              settings={effectiveSettings}
+              onApplyBirthDate={(date) => {
+                setInput({ ...input, date });
+                setRpMoment(new Date());
+              }}
+            />
+          )}
+          <KpMatchPanel personA={input} settings={effectiveSettings} />
         </>
       )}
 
@@ -243,9 +371,11 @@ export default function KpAstrologyPage() {
                       <button
                         type="button"
                         style={{ padding: "2px 8px", fontSize: 12 }}
+                        disabled={horaryLocked}
                         onClick={() => {
                           setMode("horary249");
                           setHoraryNumber(row.number);
+                          setHoraryPickNote(null);
                         }}
                       >
                         Use #{row.number}

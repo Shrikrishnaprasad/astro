@@ -191,25 +191,29 @@ export default function KpPredictionsPanel({
   mode,
   question,
   settings,
+  topicOverride,
 }: {
   kp: KpSystemResult;
   birthDate: Date;
   mode: KpMode;
   question: string;
   settings?: EphemerisSettings;
+  /** Manual topic id from the horary picker (overrides keyword match). */
+  topicOverride?: string;
 }) {
   const report = useMemo(
     () => buildKpPredictionReport(kp, birthDate, new Date(), mode, question, settings),
     [kp, birthDate, mode, question, settings],
   );
 
+  const focusTopicId = topicOverride || report.questionTopicId;
+
   const ordered = useMemo(() => {
-    if (!report.questionTopicId) return report.topics;
+    if (!focusTopicId) return report.topics;
     return [...report.topics].sort(
-      (a, b) =>
-        Number(b.id === report.questionTopicId) - Number(a.id === report.questionTopicId),
+      (a, b) => Number(b.id === focusTopicId) - Number(a.id === focusTopicId),
     );
-  }, [report]);
+  }, [report, focusTopicId]);
 
   return (
     <section className="card">
@@ -228,14 +232,14 @@ export default function KpPredictionsPanel({
         <RemedyList items={report.currentRemedies} />
       </div>
 
-      {mode === "horary249" && question.trim() && !report.questionTopicId && (
+      {mode === "horary249" && question.trim() && !focusTopicId && (
         <p style={{ fontSize: 12, color: "#f0b429" }}>
-          Could not map the question to a topic; review all topics below.
+          Could not map the question to a topic; pick one in Horary aids or review all topics below.
         </p>
       )}
 
       {ordered.map((t) => (
-        <TopicCard key={t.id} t={t} highlight={t.id === report.questionTopicId} />
+        <TopicCard key={t.id} t={t} highlight={t.id === focusTopicId} />
       ))}
     </section>
   );

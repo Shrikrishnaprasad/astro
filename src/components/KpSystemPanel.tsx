@@ -4,6 +4,7 @@ import { RASIS } from "../data/rasis";
 import type { KpSystemResult } from "../engine/kp";
 import { PLANETS } from "../engine/types";
 import { formatDegreeInRasi, formatSiderealLongitude } from "../utils/format";
+import KpInterlinksPanel from "./KpInterlinksPanel";
 import SouthIndianChart, { type ChartMarker } from "./SouthIndianChart";
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
@@ -321,6 +322,8 @@ export default function KpSystemPanel({
           </table>
         </div>
       </section>
+
+      <KpInterlinksPanel kp={kp} />
 
       {/* 4. KP Cuspal Sub-Lord Event Promise Analyzer */}
       <section className="card">
